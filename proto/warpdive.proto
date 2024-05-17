@@ -8,26 +8,37 @@ import "google/protobuf/timestamp.proto";
 option go_package = "github.com/wagoodman/dive/generated;warpdive";
 package warpdive;
 
-// google.protobuf.Any typeUrl 'type.googleapis.com/warpdive.WarpDiveImage'
 message WarpDiveImage {
   map<uint64, Node> nodes = 1;
   TreeNode tree           = 2;
   Metadata metadata       = 3;
 
   message Metadata {
-    string container_tag                = 1;   // The tag of the container, e.g., "latest" or "v1.0.0"
-    string built_with                   = 2;   // Information about the build tool or system used, e.g., Docker version
-    string commit_sha                   = 3;   // The git commit SHA corresponding to the source used for building the image
-    string image_sha                    = 4;   // The SHA identifier of the Docker image
-    google.protobuf.Timestamp timestamp = 5;   // Timestamp when the image was built
-    string platform                     = 6;   // Platform or architecture for which the image was built, e.g., amd64, arm64
-    string ci_pipeline_id               = 7;   // Identifier for the CI pipeline run that produced this image
-    string project_name                 = 8;   // Name of the project or repository
-    string ci_build_url                 = 9;   // URL to the CI build page for more details
-    string release_version              = 10;  // Version of the release, if applicable
-    string build_number                 = 11;  // Build number as assigned by the CI system
-    string builder_image                = 12;  // The base image or builder image used, if applicable
-    google.protobuf.Any pack            = 13;  // unused - to force compiler to generate Any
+    string container_tag         = 1;   // The tag of the container, e.g., "latest" or "v1.0.0"
+    string built_with            = 2;   // Information about the build tool or system used, e.g., Docker version
+    string commit_sha            = 3;   // The git commit SHA corresponding to the source used for building the image
+    string image_sha             = 4;   // The SHA identifier of the Docker image
+    google.protobuf.Timestamp ts = 5;   // Timestamp when the image was built
+    string platform              = 6;   // Platform or architecture for which the image was built, e.g., amd64, arm64
+    string ci_pipeline_id        = 7;   // Identifier for the CI pipeline run that produced this image
+    string project_name          = 8;   // Name of the project or repository
+    string ci_build_url          = 9;   // URL to the CI build page for more details
+    string release_version       = 10;  // Version of the release, if applicable
+    string build_number          = 11;  // Build number as assigned by the CI system
+    string builder_image         = 12;  // The base image or builder image used, if applicable
+  }
+
+  message DotWarpDive {
+    // Binary Format Specification: `.warpdive`
+    // `.wiredive` is a binary encoded google.protobuf.Any message
+    //  - typeUrl: 'type.googleapis.com/warpdive.WarpDiveImage'
+    //  - value: `WarpDiveImage` message encoded in bytes
+    //
+    // note: google.protobuf.Any is imported to force compiler
+    // to generate generated/google/protobuf/any_pb
+    // message `DotWarpDive` is not actually used but written for
+    // reference purposes
+    google.protobuf.Any pack = 1;
   }
 
   message TreeNode {
