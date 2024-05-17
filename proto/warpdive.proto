@@ -45,8 +45,9 @@ message WarpDiveImage {
     optional SortOrder sort_order = 5; // Not serialized but may be used in UI
 
     enum SortOrder {
-      BY_NAME = 0;
-      BY_SIZE_DESC = 1;
+      SORT_ORDER_DEFAULT = 0; // Default value for enum field presence
+      SORT_ORDER_BY_NAME = 1;
+      SORT_ORDER_BY_SIZE_DESC = 2;
     }
   }
 
