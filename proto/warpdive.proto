@@ -11,7 +11,7 @@ package warpdive;
 // google.protobuf.Any typeUrl 'type.googleapis.com/warpdive.WarpDiveImage'
 message WarpDiveImage {
   map<uint64, Node> nodes = 1;
-  NodeTree tree           = 2;
+  TreeNode tree           = 2;
   Metadata metadata       = 3;
 
   message Metadata {
@@ -30,9 +30,9 @@ message WarpDiveImage {
     google.protobuf.Any pack            = 13;  // unused - to force compiler to generate Any
   }
 
-  message NodeTree {
+  message TreeNode {
     Ref ref                    = 1;
-    repeated NodeTree children = 2;
+    repeated TreeNode children = 2;
 
     message Ref {
       uint64 gid = 1;
