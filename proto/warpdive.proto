@@ -1,0 +1,109 @@
+// Copyright 2024 Gaurav Khanna.
+// https://github.com/gvkhna/www-warpdive
+syntax = "proto3";
+
+option go_package = "github.com/wagoodman/dive/generated;warpdive";
+package warpdive;
+
+message WarpDiveImage {
+  map<uint64, Node> nodes = 1;
+  NodeTree tree = 2;
+}
+
+message NodeTree {
+  Ref ref = 1;
+  repeated NodeTree children = 2;
+
+  message Ref {
+    uint64 gid = 1;
+  }
+}
+
+message Node {
+  uint64 gid = 1;
+  oneof data {
+    Layer layer = 2;
+    FileTree file_tree = 3;
+    FileNode file_node = 4;
+  }
+}
+
+message Layer {
+  string id = 1;
+  int32 index = 2;
+  string command = 3;
+  uint64 size = 4;
+  NodeTree.Ref tree_ref = 5; // Reference to the FileTree root
+  repeated string names = 6;
+  string digest = 7;
+}
+
+message FileTree {
+  NodeTree.Ref root_ref = 1; // Reference to the root FileNode
+  uint64 size = 2;
+  uint64 file_size = 3;
+  string name = 4;
+  // SortOrder sort_order = 5;
+
+  // enum SortOrder {
+  //   BY_NAME = 0;
+  //   BY_SIZE_DESC = 1;
+  // }
+}
+
+message FileNode {
+  NodeTree.Ref tree_ref = 1; // Reference to the FileTree it belongs to
+  NodeTree.Ref parent_ref = 2; // Reference to the parent FileNode
+  uint64 size = 3;
+  string name = 4;
+  NodeData node_data = 5;
+
+  // sorted ascending by name
+  repeated NodeTree.Ref children_refs = 7; // References to the child FileNodes
+
+  message NodeData {
+    DiffType diff_type = 1;
+    FileInfo file_info = 2;
+    // ViewInfo view_info = 3; purposely ignored this is used for the UI
+  }
+
+  // message ViewInfo {
+  //   bool collapsed = 1;
+  //   bool hidden = 2;
+  // }
+
+  message FileInfo {
+    string path = 1;
+    FileType type_flag = 2;
+    uint32 mode = 3;
+    int32 uid = 4;
+    int32 gid = 5;
+    uint64 hash = 6;
+    string linkname = 7;
+  }
+
+  enum FileType {
+    FILE_TYPE_UNKNOWN = 0;  // Default value for unknown or unsupported types
+    FILE_TYPE_REGULAR = 1;  // Regular file ('0' or '\0')
+    FILE_TYPE_HARD_LINK = 2;  // Hard link ('1')
+    FILE_TYPE_SYMLINK = 3;  // Symbolic link ('2')
+    FILE_TYPE_CHARACTER_DEVICE = 4;  // Character device node ('3')
+    FILE_TYPE_BLOCK_DEVICE = 5;  // Block device node ('4')
+    FILE_TYPE_DIRECTORY = 6;  // Directory ('5')
+    FILE_TYPE_FIFO = 7;  // FIFO node ('6')
+    FILE_TYPE_CONTIGUOUS_FILE = 8;  // Reserved for contiguous files ('7')
+    FILE_TYPE_EXTENDED_HEADER = 9;  // Extended header with PAX records ('x')
+    FILE_TYPE_GLOBAL_EXTENDED_HEADER = 10;  // Global extended header with PAX records ('g')
+    FILE_TYPE_GNU_SPARSE_FILE = 11;  // GNU sparse file ('S')
+    FILE_TYPE_GNU_LONG_FILENAME = 12;  // GNU long filename entry ('L')
+    FILE_TYPE_GNU_LONG_LINKNAME = 13;  // GNU long linkname entry ('K')
+  }
+
+
+  enum DiffType {
+    DIFF_TYPE_UNMODIFIED = 0;
+    DIFF_TYPE_MODIFIED = 1;
+    DIFF_TYPE_ADDED = 2;
+    DIFF_TYPE_REMOVED = 3;
+  }
+}
