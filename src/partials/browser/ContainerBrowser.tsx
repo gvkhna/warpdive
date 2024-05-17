@@ -1,6 +1,7 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card'
 import {Input} from '@/components/ui/input'
 import {Label} from '@/components/ui/label'
+import FileSystemViewer from './FileSystemViewer'
 import Link from '@/components/Link'
 import {Button} from '@/components/ui/button'
 import {PlusIcon, ChevronRightIcon, DownloadIcon} from '@radix-ui/react-icons'
@@ -14,16 +15,11 @@ import {useState, useEffect, type FC} from 'react'
 import LayerRow from './LayerRow'
 import LayersList from './LayersList'
 import {ScrollArea} from '@/components/ui/scroll-area'
-
-// import {type SettingsPageProps, SettingsLayout} from '../layout'
+import {WARP_DIVE_IMAGE_TYPE_URL} from '@/strings'
 
 export interface LayerBrowserProps {
   binaryPath?: string
 }
-
-// export interface SettingsUserAccountProps extends SettingsPageProps {
-// user: AppUser
-// }
 
 const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
   const {wpImage, setWpImage} = useWarpImage()
@@ -40,7 +36,7 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
         const binary = new Uint8Array(arrayBuffer)
         const anyPb = Any.fromBinary(binary)
 
-        if (anyPb.typeUrl === 'type.googleapis.com/warpdive.WarpDiveImage') {
+        if (anyPb.typeUrl === WARP_DIVE_IMAGE_TYPE_URL) {
           const wpImageRead = WarpDiveImage.fromBinary(anyPb.value)
           console.log(wpImageRead.tree)
           setWpImage(wpImageRead)
@@ -74,12 +70,6 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
     if (!wpImage || !wpImage.tree || !wpImage.tree.children || wpImage.tree.children.length === 0) {
       return []
     }
-
-    // Accessing the first root node's children safely
-    // const rootChildren = wpImage.tree.children[0]?.children // Optional chaining in case children[0] is undefined
-    // if (!rootChildren) {
-    //   return []
-    // }
 
     // Map each child to a node using the ref's gid, and filter nodes that are defined and are layers
     return wpImage.tree.children
@@ -186,53 +176,7 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel>
-            <div className='flex-1 bg-white p-4 dark:bg-gray-950 md:p-6'>
-              <div className='mb-4 flex items-center justify-between'>
-                <h2 className='text-lg font-semibold'>Entry Details</h2>
-                <div className='flex items-center gap-4'>
-                  <Button
-                    size='sm'
-                    variant='outline'
-                  >
-                    <DownloadIcon className='mr-2 h-4 w-4' />
-                    Export
-                  </Button>
-                  <Button
-                    size='sm'
-                    variant='outline'
-                  >
-                    {/* <DeleteIcon className='mr-2 h-4 w-4' /> */}
-                    Edit
-                  </Button>
-                </div>
-              </div>
-              <div className='grid gap-6'>
-                <div className='grid gap-2'>
-                  <div className='text-sm font-medium text-gray-500 dark:text-gray-400'>Invoice</div>
-                  <div className='text-lg font-semibold'>INV001</div>
-                </div>
-                <div className='grid gap-2'>
-                  <div className='text-sm font-medium text-gray-500 dark:text-gray-400'>Customer</div>
-                  <div className='text-lg font-semibold'>Jared Palmer</div>
-                </div>
-                <div className='grid gap-2'>
-                  <div className='text-sm font-medium text-gray-500 dark:text-gray-400'>Status</div>
-                  <div className='rounded-full bg-green-500 px-3 py-1 text-xs font-medium text-white'>Paid</div>
-                </div>
-                <div className='grid gap-2'>
-                  <div className='text-sm font-medium text-gray-500 dark:text-gray-400'>Amount</div>
-                  <div className='text-lg font-semibold'>$250.00</div>
-                </div>
-                <div className='grid gap-2'>
-                  <div className='text-sm font-medium text-gray-500 dark:text-gray-400'>Payment Method</div>
-                  <div className='text-lg font-semibold'>Credit Card</div>
-                </div>
-                <div className='grid gap-2'>
-                  <div className='text-sm font-medium text-gray-500 dark:text-gray-400'>Date</div>
-                  <div className='text-lg font-semibold'>2023-05-01</div>
-                </div>
-              </div>
-            </div>
+            <FileSystemViewer />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>

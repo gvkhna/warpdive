@@ -1,5 +1,5 @@
 import {WarpImageProvider} from './WarpImageProvider'
-import LayerBrowser from './LayerBrowser'
+import LayerBrowser from './ContainerBrowser'
 
 export interface PageProps {
   binaryPath?: string

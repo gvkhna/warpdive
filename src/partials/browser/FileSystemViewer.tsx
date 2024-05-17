@@ -1,81 +1,74 @@
-import {Tree, type TreeViewElement, File, Folder, CollapseButton} from '@/components/extension/tree-view-api'
+import {Tree, type TreeViewElement, File, Folder, CollapseButton} from './FileSystemTreeView'
+import type {WarpDiveImage, NodeTree, Node, NodeTree_Ref} from '@/generated/warpdive_pb'
+import {useLayer} from './useLayer'
+import {useWarpImage} from './WarpImageProvider'
 
-type TOCProps = {
-  toc: TreeViewElement[]
-}
+type FileSystemViewerProps = {}
 
-// var diffTypeColor = map[DiffType]*color.Color{
-// 	Added:      color.New(color.FgGreen),
-// 	Removed:    color.New(color.FgRed),
-// 	Modified:   color.New(color.FgYellow),
-// 	Unmodified: color.New(color.Reset),
-// }
+const FileSystemViewer = (props: FileSystemViewerProps) => {
+  const {wpImage, setWpImage} = useWarpImage()
+  const [layerState, setLayerState] = useLayer()
 
-const newLine = '\n'
-const noBranchSpace = '    '
-const branchSpace = '│   '
-const middleItem = '├─'
-const lastItem = '└─'
-const uncollapsedItem = '─ '
-const collapsedItem = '⊕ '
-
-// const (
-// 	newLine              = "\n"
-// 	noBranchSpace        = "    "
-// 	branchSpace          = "│   "
-// 	middleItem           = "├─"
-// 	lastItem             = "└─"
-// 	whiteoutPrefix       = ".wh."
-// 	doubleWhiteoutPrefix = ".wh..wh.."
-// 	uncollapsedItem      = "─ "
-// 	collapsedItem        = "⊕ "
-// )
-
-const TOC = ({toc}: TOCProps) => {
+  if (!wpImage?.tree?.children) {
+    return <span>No Data Found</span>
+  }
   return (
     <Tree
-      className='h-60 w-full rounded-md bg-background p-2'
+      className='p- h-60 w-full overflow-clip rounded-md bg-background'
       indicator={true}
     >
-      {toc.map((element, _) => (
-        <TreeItem
-          key={element.id}
-          elements={[element]}
-        />
-      ))}
-      <CollapseButton
+      {wpImage.tree.children.map(
+        (element, _) =>
+          element.ref && (
+            <TreeItem
+              key={element.ref?.gid}
+              elements={element.children}
+              node={element.ref}
+              indentLevel={0}
+            />
+          )
+      )}
+      {/* <CollapseButton
         elements={toc}
         expandAll={true}
-      />
+      /> */}
     </Tree>
   )
 }
 
-export default TOC
+export default FileSystemViewer
 
 type TreeItemProps = {
-  elements: TreeViewElement[]
+  elements: NodeTree[]
+  node: NodeTree_Ref | undefined
+  indentLevel: number
 }
 
-export const TreeItem = ({elements}: TreeItemProps) => {
+export const TreeItem = ({elements, indentLevel, node}: TreeItemProps) => {
+  if (!node || !elements) {
+    return <>There was an error</>
+  }
   return (
-    <ul className='w-full space-y-1'>
+    <ul className={` w-full ${false && 'space-y-1'}`}>
       {elements.map((element) => (
         <li
-          key={element.id}
-          className='w-full space-y-2'
+          key={element.ref?.gid}
+          className=' w-full' // space-y-2
+          style={{lineHeight: 0}}
         >
-          {element.children && element.children?.length > 0 ? (
+          {element.ref && element.children && element.children?.length > 0 ? (
             <Folder
-              element={element.name}
-              value={element.id}
-              isSelectable={element.isSelectable}
-              className='px-px pr-1'
+              element={element.ref.gid}
+              value={node?.gid}
+              isSelectable={false}
+              className='' //px-px pr-1
+              indentLevel={indentLevel}
             >
               <TreeItem
-                key={element.id}
-                aria-label={`folder ${element.name}`}
+                key={element.ref.gid}
                 elements={element.children}
+                indentLevel={indentLevel + 1}
+                node={}
               />
             </Folder>
           ) : (
@@ -83,9 +76,9 @@ export const TreeItem = ({elements}: TreeItemProps) => {
               key={element.id}
               value={element.id}
               isSelectable={element.isSelectable}
-            >
-              <span>{element?.name}</span>
-            </File>
+              elementName={element?.name}
+              indentLevel={indentLevel}
+            ></File>
           )}
         </li>
       ))}

@@ -5,7 +5,7 @@ import {Layer} from '@/generated/warpdive_pb'
 import LayersList from './LayersList'
 
 const meta: Meta<typeof LayerRow> = {
-  title: 'LayersList',
+  title: 'ContainerBrowser/LayersList',
   component: LayersList,
   parameters: {
     layout: 'fullscreen'

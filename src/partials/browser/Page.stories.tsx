@@ -25,7 +25,7 @@ import path from 'path'
 // console.log('arr', arrayBuffer)
 
 const meta = {
-  title: 'LayerBrowser',
+  title: 'ContainerBrowser/Page',
   component: Page,
   parameters: {
     layout: 'fullscreen'
