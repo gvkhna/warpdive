@@ -4,6 +4,7 @@
   "standardRuby.mode": "onlyRunGlobally",
   "standardRuby.commandPath": "${userHome}/.asdf/shims/bundle exec standardrb",
   "css.customData": [".vscode/tailwind.json"],
+  "clang-format.style": "{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true, ColumnLimit: 160 }",
   "custom-language-properties": {
     "astro.comments.blockComment": ["{/*", "*/}"]
   },

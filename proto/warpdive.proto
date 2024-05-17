@@ -2,15 +2,36 @@
 // https://github.com/gvkhna/www-warpdive
 syntax = "proto3";
 
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
 option go_package = "github.com/wagoodman/dive/generated;warpdive";
 package warpdive;
 
+// google.protobuf.Any typeUrl 'type.googleapis.com/warpdive.WarpDiveImage'
 message WarpDiveImage {
   map<uint64, Node> nodes = 1;
-  NodeTree tree = 2;
+  NodeTree tree           = 2;
+  Metadata metadata       = 3;
+
+  message Metadata {
+    string container_tag                = 1;   // The tag of the container, e.g., "latest" or "v1.0.0"
+    string built_with                   = 2;   // Information about the build tool or system used, e.g., Docker version
+    string commit_sha                   = 3;   // The git commit SHA corresponding to the source used for building the image
+    string image_sha                    = 4;   // The SHA identifier of the Docker image
+    google.protobuf.Timestamp timestamp = 5;   // Timestamp when the image was built
+    string platform                     = 6;   // Platform or architecture for which the image was built, e.g., amd64, arm64
+    string ci_pipeline_id               = 7;   // Identifier for the CI pipeline run that produced this image
+    string project_name                 = 8;   // Name of the project or repository
+    string ci_build_url                 = 9;   // URL to the CI build page for more details
+    string release_version              = 10;  // Version of the release, if applicable
+    string build_number                 = 11;  // Build number as assigned by the CI system
+    string builder_image                = 12;  // The base image or builder image used, if applicable
+    google.protobuf.Any pack            = 13;  // unused - to force compiler to generate Any
+  }
 
   message NodeTree {
-    Ref ref = 1;
+    Ref ref                    = 1;
     repeated NodeTree children = 2;
 
     message Ref {
@@ -21,93 +42,91 @@ message WarpDiveImage {
   message Node {
     uint64 gid = 1;
     oneof data {
-      Layer layer = 2;
+      Layer layer        = 2;
       FileTree file_tree = 3;
       FileNode file_node = 4;
     }
   }
 
   message Layer {
-    string id = 1;
-    int32 index = 2;
-    string command = 3;
-    uint64 size = 4;
-    NodeTree.Ref tree_ref = 5; // Reference to the FileTree root
+    string id             = 1;
+    int32 index           = 2;
+    string command        = 3;
+    uint64 size           = 4;
+    NodeTree.Ref tree_ref = 5;  // Reference to the FileTree root
     repeated string names = 6;
-    string digest = 7;
+    string digest         = 7;
   }
 
   message FileTree {
-    NodeTree.Ref root_ref = 1; // Reference to the root FileNode
-    uint64 size = 2;
-    uint64 file_size = 3;
-    string name = 4;
-    optional SortOrder sort_order = 5; // Not serialized but may be used in UI
+    NodeTree.Ref root_ref         = 1;  // Reference to the root FileNode
+    uint64 size                   = 2;
+    uint64 file_size              = 3;
+    string name                   = 4;
+    optional SortOrder sort_order = 5;  // Not serialized but may be used in UI state
 
     enum SortOrder {
-      SORT_ORDER_DEFAULT = 0; // Default value for enum field presence
-      SORT_ORDER_BY_NAME = 1;
+      SORT_ORDER_DEFAULT      = 0;  // Default value for enum field presence
+      SORT_ORDER_BY_NAME      = 1;
       SORT_ORDER_BY_SIZE_DESC = 2;
     }
   }
 
   message FileNode {
-    NodeTree.Ref tree_ref = 1; // Reference to the FileTree it belongs to
-    NodeTree.Ref parent_ref = 2; // Reference to the parent FileNode
-    uint64 size = 3;
-    string name = 4;
-    NodeData node_data = 5;
+    NodeTree.Ref tree_ref   = 1;  // Reference to the FileTree it belongs to
+    NodeTree.Ref parent_ref = 2;  // Reference to the parent FileNode
+    uint64 size             = 3;
+    string name             = 4;
+    NodeData node_data      = 5;
 
     // sorted ascending by name
-    repeated NodeTree.Ref children_refs = 7; // References to the child FileNodes
+    repeated NodeTree.Ref children_refs = 7;  // References to the child FileNodes
 
     message NodeData {
-      DiffType diff_type = 1;
-      FileInfo file_info = 2;
-      optional ViewInfo view_info = 3; // not serialized but may be used in UI
+      DiffType diff_type          = 1;
+      FileInfo file_info          = 2;
+      optional ViewInfo view_info = 3;  // not serialized but may be used in UI state
     }
 
     message ViewInfo {
       bool collapsed = 1;
-      bool hidden = 2;
+      bool hidden    = 2;
     }
 
     message FileInfo {
-      string path = 1;
+      string path        = 1;
       FileType type_flag = 2;
-      uint32 mode = 3;
-      int32 uid = 4;
-      int32 gid = 5;
-      uint64 hash = 6;
-      string linkname = 7;
+      uint32 mode        = 3;
+      int32 uid          = 4;
+      int32 gid          = 5;
+      uint64 hash        = 6;
+      string linkname    = 7;
     }
 
     enum FileType {
-      FILE_TYPE_DEFAULT = 0; // Default value for enum field presence
-      FILE_TYPE_REGULAR = 1;  // Regular file ('0' or '\0')
-      FILE_TYPE_HARD_LINK = 2;  // Hard link ('1')
-      FILE_TYPE_SYMLINK = 3;  // Symbolic link ('2')
-      FILE_TYPE_CHARACTER_DEVICE = 4;  // Character device node ('3')
-      FILE_TYPE_BLOCK_DEVICE = 5;  // Block device node ('4')
-      FILE_TYPE_DIRECTORY = 6;  // Directory ('5')
-      FILE_TYPE_FIFO = 7;  // FIFO node ('6')
-      FILE_TYPE_CONTIGUOUS_FILE = 8;  // Reserved for contiguous files ('7')
-      FILE_TYPE_EXTENDED_HEADER = 9;  // Extended header with PAX records ('x')
+      FILE_TYPE_DEFAULT                = 0;   // Default value for enum field presence
+      FILE_TYPE_REGULAR                = 1;   // Regular file ('0' or '\0')
+      FILE_TYPE_HARD_LINK              = 2;   // Hard link ('1')
+      FILE_TYPE_SYMLINK                = 3;   // Symbolic link ('2')
+      FILE_TYPE_CHARACTER_DEVICE       = 4;   // Character device node ('3')
+      FILE_TYPE_BLOCK_DEVICE           = 5;   // Block device node ('4')
+      FILE_TYPE_DIRECTORY              = 6;   // Directory ('5')
+      FILE_TYPE_FIFO                   = 7;   // FIFO node ('6')
+      FILE_TYPE_CONTIGUOUS_FILE        = 8;   // Reserved for contiguous files ('7')
+      FILE_TYPE_EXTENDED_HEADER        = 9;   // Extended header with PAX records ('x')
       FILE_TYPE_GLOBAL_EXTENDED_HEADER = 10;  // Global extended header with PAX records ('g')
-      FILE_TYPE_GNU_SPARSE_FILE = 11;  // GNU sparse file ('S')
-      FILE_TYPE_GNU_LONG_FILENAME = 12;  // GNU long filename entry ('L')
-      FILE_TYPE_GNU_LONG_LINKNAME = 13;  // GNU long linkname entry ('K')
-      FILE_TYPE_UNKNOWN = 14;  // Unknown or unsupported types
+      FILE_TYPE_GNU_SPARSE_FILE        = 11;  // GNU sparse file ('S')
+      FILE_TYPE_GNU_LONG_FILENAME      = 12;  // GNU long filename entry ('L')
+      FILE_TYPE_GNU_LONG_LINKNAME      = 13;  // GNU long linkname entry ('K')
+      FILE_TYPE_UNKNOWN                = 14;  // Unknown or unsupported types
     }
-
 
     enum DiffType {
-      DIFF_TYPE_DEFAULT = 0; // Default value for enum field presence
+      DIFF_TYPE_DEFAULT    = 0;  // Default value for enum field presence
       DIFF_TYPE_UNMODIFIED = 1;
-      DIFF_TYPE_MODIFIED = 2;
-      DIFF_TYPE_ADDED = 3;
-      DIFF_TYPE_REMOVED = 4;
+      DIFF_TYPE_MODIFIED   = 2;
+      DIFF_TYPE_ADDED      = 3;
+      DIFF_TYPE_REMOVED    = 4;
     }
   }
-
 }

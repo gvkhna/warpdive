@@ -15,6 +15,7 @@ const command = [
   '--ts_opt generate_dependencies',
   '--ts_opt long_type_string',
   '--ts_opt add_pb_suffix',
+  '--ts_opt force_disable_services',
   protoFiles
 ].join(' ')
 
