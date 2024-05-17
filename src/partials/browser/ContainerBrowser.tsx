@@ -7,7 +7,7 @@ import {Button} from '@/components/ui/button'
 import {PlusIcon, ChevronRightIcon, DownloadIcon} from '@radix-ui/react-icons'
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select'
 import {Any} from '@/generated/google/protobuf/any_pb'
-import {WarpDiveImage, Node as WarpDiveNode} from '@/generated/warpdive_pb'
+import {WarpDiveImage, WarpDiveImage_Node} from '@/generated/warpdive_pb'
 import {useWarpImage} from './WarpImageProvider'
 
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable'
@@ -65,7 +65,7 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
   }
 
   // Function to get layers from the first root node
-  const getLayersFromRoot = (): WarpDiveNode[] => {
+  const getLayersFromRoot = (): WarpDiveImage_Node[] => {
     // Ensure wpImage and wpImage.tree exist and have the needed properties
     if (!wpImage || !wpImage.tree || !wpImage.tree.children || wpImage.tree.children.length === 0) {
       return []
@@ -74,7 +74,7 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
     // Map each child to a node using the ref's gid, and filter nodes that are defined and are layers
     return wpImage.tree.children
       .map((child) => (child.ref ? wpImage.nodes[child.ref.gid] : undefined)) // Using ternary operator for clearer intent
-      .filter((node): node is WarpDiveNode => node !== undefined && node.data.oneofKind === 'layer') // Using type guard in filter
+      .filter((node): node is WarpDiveImage_Node => node !== undefined && node.data.oneofKind === 'layer') // Using type guard in filter
   }
 
   const layers = getLayersFromRoot()

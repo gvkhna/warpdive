@@ -71,7 +71,7 @@ const mockWarpDiveImage: WarpDiveImage = {
 export const Default: StoryObj<typeof FileSystemViewer> = {
   render: () => (
     <div className=' w-[420px]'>
-      <FileSystemViewer image={mockWarpDiveImage} />
+      <FileSystemViewer />
     </div>
   )
 }

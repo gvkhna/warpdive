@@ -1,7 +1,7 @@
 // Importing necessary packages and components
 import type {Meta, StoryObj} from '@storybook/react'
 import LayerRow from './LayerRow'
-import {Layer} from '@/generated/warpdive_pb'
+import {WarpDiveImage_Layer} from '@/generated/warpdive_pb'
 import LayersList from './LayersList'
 
 const meta: Meta<typeof LayerRow> = {
@@ -19,7 +19,7 @@ type Story = StoryObj<typeof meta>
 // Generating fake layer data
 const layers = Array.from({length: 10}).map((_, index) => ({
   gid: index.toString(),
-  layer: Layer.create({
+  layer: WarpDiveImage_Layer.create({
     id: `layer-${index}`,
     index: index,
     command: `command-really-long-digest-1l2kj3l1k2j3lk1j3l1kj3l12j3lk12j3kl12${index}`,

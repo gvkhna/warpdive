@@ -1,9 +1,14 @@
 import {Tree, type TreeViewElement, File, Folder, CollapseButton} from './FileSystemTreeView'
-import type {WarpDiveImage, NodeTree, Node, NodeTree_Ref} from '@/generated/warpdive_pb'
+import type {
+  WarpDiveImage,
+  WarpDiveImage_NodeTree,
+  WarpDiveImage_NodeTree_Ref,
+  WarpDiveImage_Node
+} from '@/generated/warpdive_pb'
 import {useLayer} from './useLayer'
 import {useWarpImage} from './WarpImageProvider'
 
-type FileSystemViewerProps = {}
+export interface FileSystemViewerProps {}
 
 const FileSystemViewer = (props: FileSystemViewerProps) => {
   const {wpImage, setWpImage} = useWarpImage()
@@ -39,8 +44,8 @@ const FileSystemViewer = (props: FileSystemViewerProps) => {
 export default FileSystemViewer
 
 type TreeItemProps = {
-  elements: NodeTree[]
-  node: NodeTree_Ref | undefined
+  elements: WarpDiveImage_NodeTree[]
+  node: WarpDiveImage_NodeTree_Ref | undefined
   indentLevel: number
 }
 
