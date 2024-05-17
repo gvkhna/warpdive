@@ -82,7 +82,7 @@ message WarpDiveImage {
     }
 
     enum FileType {
-      FILE_TYPE_UNKNOWN = 0;  // Default value for unknown or unsupported types
+      FILE_TYPE_DEFAULT = 0; // Default value for enum field presence
       FILE_TYPE_REGULAR = 1;  // Regular file ('0' or '\0')
       FILE_TYPE_HARD_LINK = 2;  // Hard link ('1')
       FILE_TYPE_SYMLINK = 3;  // Symbolic link ('2')
@@ -96,14 +96,16 @@ message WarpDiveImage {
       FILE_TYPE_GNU_SPARSE_FILE = 11;  // GNU sparse file ('S')
       FILE_TYPE_GNU_LONG_FILENAME = 12;  // GNU long filename entry ('L')
       FILE_TYPE_GNU_LONG_LINKNAME = 13;  // GNU long linkname entry ('K')
+      FILE_TYPE_UNKNOWN = 14;  // Unknown or unsupported types
     }
 
 
     enum DiffType {
-      DIFF_TYPE_UNMODIFIED = 0;
-      DIFF_TYPE_MODIFIED = 1;
-      DIFF_TYPE_ADDED = 2;
-      DIFF_TYPE_REMOVED = 3;
+      DIFF_TYPE_DEFAULT = 0; // Default value for enum field presence
+      DIFF_TYPE_UNMODIFIED = 1;
+      DIFF_TYPE_MODIFIED = 2;
+      DIFF_TYPE_ADDED = 3;
+      DIFF_TYPE_REMOVED = 4;
     }
   }
 
