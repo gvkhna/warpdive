@@ -53,13 +53,13 @@ message WarpDiveImage {
     int32 index           = 2;
     string command        = 3;
     uint64 size           = 4;
-    NodeTree.Ref tree_ref = 5;  // Reference to the FileTree root
+    TreeNode.Ref tree_ref = 5;  // Reference to the FileTree root
     repeated string names = 6;
     string digest         = 7;
   }
 
   message FileTree {
-    NodeTree.Ref root_ref         = 1;  // Reference to the root FileNode
+    TreeNode.Ref root_ref         = 1;  // Reference to the root FileNode
     uint64 size                   = 2;
     uint64 file_size              = 3;
     string name                   = 4;
@@ -73,14 +73,14 @@ message WarpDiveImage {
   }
 
   message FileNode {
-    NodeTree.Ref tree_ref   = 1;  // Reference to the FileTree it belongs to
-    NodeTree.Ref parent_ref = 2;  // Reference to the parent FileNode
+    TreeNode.Ref tree_ref   = 1;  // Reference to the FileTree it belongs to
+    TreeNode.Ref parent_ref = 2;  // Reference to the parent FileNode
     uint64 size             = 3;
     string name             = 4;
     NodeData node_data      = 5;
 
     // sorted ascending by name
-    repeated NodeTree.Ref children_refs = 7;  // References to the child FileNodes
+    repeated TreeNode.Ref children_refs = 7;  // References to the child FileNodes
 
     message NodeData {
       DiffType diff_type          = 1;
