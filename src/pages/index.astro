@@ -1,0 +1,17 @@
+---
+import HomeLayout from '@/layouts/HomeLayout.astro'
+import client from '@client'
+export const prerender = false
+
+// 'http://localhost:4321/api/users'
+const test = await client.$get()
+const data = await test.json()
+console.log(data)
+---
+
+<HomeLayout
+  title='Signin'
+  desc='Sign in to your account'
+>
+  WIP {JSON.stringify(data)}
+</HomeLayout>

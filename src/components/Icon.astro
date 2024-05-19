@@ -1,0 +1,215 @@
+---
+import fs from 'node:fs/promises'
+import {fileURLToPath} from 'node:url'
+import {XMLParser} from 'fast-xml-parser'
+import * as cheerio from 'cheerio'
+import debugLog from 'debug'
+import type {HTMLAttributes} from 'astro/types'
+import os from 'node:os'
+import path from 'node:path'
+import {cache} from './icon-cache'
+import {createHash} from 'node:crypto'
+
+const debug = debugLog('svg-inline-icon')
+const debugCache = debugLog('svg-inline-icon:cache')
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
+export interface Props extends Omit<HTMLAttributes<'svg'>, 'src' | 'alt' | 'class'> {
+  src: Promise<any>
+  alt?: string
+  class?: string
+}
+
+function replaceFileSystemReferences(src: string) {
+  if (os.platform().includes('win32')) {
+    return src.replace(/^\/@fs\//, '')
+  } else if (src.startsWith('/_astro')) {
+    const resolvePath = path.join(__dirname, '../', src)
+    debug('fsref: ', src, resolvePath)
+    return resolvePath
+  } else {
+    return src.replace(/^\/@fs/, '')
+  }
+}
+
+interface ResolvedSrc {
+  src: string
+  width: number
+  height: number
+  format: string
+}
+
+async function resolveSrcAttr(propSrc: Promise<any> | string): Promise<ResolvedSrc | undefined> {
+  let src: ResolvedSrc | undefined = undefined
+
+  if (typeof propSrc === 'string') {
+    debug('src is string: ', propSrc)
+    throw new Error('received string for src')
+  }
+  if (propSrc && propSrc instanceof Promise) {
+    let p = await propSrc
+    debug('src promise: ', p, p.default)
+    if (p && p.default) {
+      src = p.default
+    }
+  }
+  return src
+}
+
+async function getSVGFile(moduleImportURL: ResolvedSrc) {
+  let filePath: string | undefined = undefined
+  debug(`get-svg-file: ${JSON.stringify(moduleImportURL)} ${typeof moduleImportURL} ${moduleImportURL}`)
+
+  const url = new URL(`file://${replaceFileSystemReferences(moduleImportURL.src)}`)
+  debug(`loading url ${url}`)
+  return await fs.readFile(url)
+}
+
+async function getSVGAttributes(fileData: Buffer, props: Props, hash: string): Promise<astroHTML.JSX.SVGAttributes> {
+  let metaWidth: string | null | number | undefined = undefined
+  let metaHeight: string | null | number | undefined = undefined
+  metaWidth = props?.width
+  metaHeight = props?.height
+
+  let transformMap = new Map()
+
+  if (fileData) {
+    const options = {
+      ignoreAttributes: false,
+      allowBooleanAttributes: true,
+      processEntities: true,
+      ignoreDeclaration: true,
+      ignorePiTags: true,
+      attributeNamePrefix: '@_'
+    }
+
+    const parser = new XMLParser(options)
+    let jsonObj = parser.parse(fileData)
+    debug(`svg: ${JSON.stringify(jsonObj)}`)
+
+    // inline svg elements do not require these attributes
+    const svgFilterAttributes = ['xmlns', 'version', 'xmlns:xlink']
+
+    let svgNode = jsonObj['svg']
+    if (svgNode && svgNode instanceof Object) {
+      debug(`keys: ${Object.keys(svgNode)}`)
+      for (let svgPropKey in svgNode) {
+        let svgProp = svgNode[svgPropKey]
+        if (svgPropKey.startsWith('@_')) {
+          let svgAttributeKey = svgPropKey.replace('@_', '')
+          if (svgFilterAttributes.indexOf(svgAttributeKey) < 0) {
+            transformMap.set(svgAttributeKey, svgProp)
+          }
+        }
+      }
+    }
+
+    debug(`transform: ${JSON.stringify(transformMap)}`)
+  }
+
+  // not valid attributes for svg elements
+  const svgFilterProps = ['src', 'alt']
+  for (let propKey in props) {
+    if (svgFilterProps.indexOf(propKey) < 0) {
+      transformMap.set(propKey, props[propKey])
+    }
+  }
+
+  transformMap.set('role', 'img')
+  // transformMap.set('data-id', hash)
+  // transformMap.set('data-debug', resolvedSrc?.src)
+  if (props?.alt) {
+    transformMap.set('aria-labelledby', props.alt)
+  }
+
+  let transform: astroHTML.JSX.SVGAttributes = Object.fromEntries(transformMap)
+
+  return transform
+}
+
+async function getSVGInnerHtml(fileData: Buffer) {
+  if (fileData) {
+    const $ = cheerio.load(fileData)
+    return $('svg').html()
+  }
+}
+
+const {src} = Astro.props
+
+const resolvedSrc = await resolveSrcAttr(src)
+
+const req = Astro.request
+const url = Astro.url.pathname
+const map = cache.get(req) ?? new Map()
+const hashFunc = createHash('shake256', {outputLength: 8})
+
+debug('loading src: ', resolvedSrc)
+let attrs: any = {}
+let innerHTML: string | undefined | null = undefined
+let alreadyInlineInPage = false
+let hashId: string
+
+if (resolvedSrc) {
+  const fileBuffer = await getSVGFile(resolvedSrc)
+  if (fileBuffer) {
+    const fileString = fileBuffer.toString()
+    // create hash of the filename/import src
+    const hashText = hashFunc.update(fileString).digest('hex')
+    hashId = `icon:${hashText}`
+
+    // get if it's already been referenced before
+    const cachedInlinePosition = map.get(hashText) ?? 0
+
+    // update the reference for current use
+    map.set(hashText, cachedInlinePosition + 1)
+    cache.set(req, map)
+
+    if (cachedInlinePosition > 0) {
+      alreadyInlineInPage = true
+    }
+    debugCache('cache: ', resolvedSrc.src, url, cachedInlinePosition, alreadyInlineInPage)
+    attrs = await getSVGAttributes(fileBuffer, Astro.props, hashText)
+    innerHTML = await getSVGInnerHtml(fileBuffer)
+  } else {
+    throw new Error(`svg-inline-file: '${resolvedSrc.src}' not found`)
+  }
+} else {
+  throw new Error(`Icon: Unable to resolve src: ${src}`)
+}
+---
+
+{
+  /*
+  // Credit to https://github.com/natemoo-re/astro-icon
+<Icon src={import('@images/logo.svg')} />
+
+<!-- First usage generates the following HTML -->
+<svg>
+  <symbol id="ai:uniqueid"><!-- contents of /src/icons/logo.svg --></symbol>
+  <use xlink:href="#ai:uniqueid"></use>
+</svg>
+
+<!-- Additional usage generates the following HTML -->
+<svg>
+  <use xlink:href="#ai:uniqueid"></use>
+</svg>
+*/
+}
+
+<svg {...attrs}>
+  {
+    alreadyInlineInPage ? (
+      <Fragment>
+        <use xlink:href={`#${hashId}`} />
+      </Fragment>
+    ) : (
+      <Fragment>
+        <symbol
+          id={hashId}
+          set:html={innerHTML ? innerHTML : ''}
+        />
+        <use xlink:href={`#${hashId}`} />
+      </Fragment>
+    )
+  }
+</svg>

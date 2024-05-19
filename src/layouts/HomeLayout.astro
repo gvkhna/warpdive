@@ -1,0 +1,34 @@
+---
+import {SEO, type Props as SEOProps} from 'astro-seo'
+export interface Props {
+  title: string
+  desc?: string
+  seo?: SEOProps
+}
+
+const {title, desc, seo} = Astro.props
+
+import '@styles/globals.css'
+---
+
+<!doctype html>
+<html lang='en'>
+  <head>
+    <SEO
+      charset='utf-8'
+      twitter={{
+        card: 'summary_large_image'
+      }}
+      extend={{
+        link: [{rel: 'icon', href: '/favicon.ico'}],
+        meta: [{name: 'viewport', content: 'width=device-width,initial-scale=1'}]
+      }}
+      {...{
+        title: title || undefined
+      }}
+    />
+  </head>
+  <body class={`font-sans antialiased bg-white text-zinc-900 tracking-tight`}>
+    <slot />
+  </body>
+</html>

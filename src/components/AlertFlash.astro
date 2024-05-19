@@ -1,18 +1,20 @@
 ---
-import {Status} from 'src/generated/google/rpc/status_pb'
-import {Code} from 'src/generated/google/rpc/code_pb'
-import {FormSubmit} from 'src/generated/auth_pb'
+// import {Status} from 'src/generated/google/rpc/status_pb'
+// import {Code} from 'src/generated/google/rpc/code_pb'
+// import {FormSubmit} from 'src/generated/auth_pb'
 import AlertError from '@components/AlertError.astro'
 import AlertSuccess from '@components/AlertSuccess.astro'
 
-export interface Props {
-  flash: Status | FormSubmit | undefined
-}
+// export interface Props {
+//   flash: Status | FormSubmit | undefined
+// }
 
-const {flash} = Astro.props
+// const {flash} = Astro.props
 ---
 
-<>
+{
+  /* <>
   {flash?.code === Code.OK && flash.message && <AlertSuccess message={flash.message} />}
   {typeof flash?.code === 'number' && flash?.code !== Code.OK && <AlertError error={flash?.message} />}
-</>
+</> */
+}

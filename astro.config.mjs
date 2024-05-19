@@ -8,14 +8,15 @@ import react from '@astrojs/react'
 import tailwind from '@astrojs/tailwind'
 import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
-import compress from 'astro-compress'
-import partytown from '@astrojs/partytown'
-import compressor from 'astro-compressor'
+// import compress from 'astro-compress'
+// import partytown from '@astrojs/partytown'
+// import compressor from 'astro-compressor'
 import node from '@astrojs/node'
 import robotsTxt from 'astro-robots-txt'
 import Critters from 'astro-critters'
 
 // eslint-disable-next-line no-undef
+import cloudflare from '@astrojs/cloudflare'
 const PUBLIC_WEB_HOSTNAME = process.env.PUBLIC_WEB_HOSTNAME
 // eslint-disable-next-line no-undef
 const ASTRO_PORT = process.env.ASTRO_PORT
@@ -23,7 +24,6 @@ const ASTRO_PORT = process.env.ASTRO_PORT
 const ASTRO_HOST = process.env.ASTRO_HOST
 // eslint-disable-next-line no-undef
 const RAILS_ENV = process.env.RAILS_ENV
-
 let port
 let host
 if (ASTRO_PORT) {
@@ -50,8 +50,9 @@ export default defineConfig({
   devToolbar: {
     enabled: false
   },
-  adapter: node({
-    mode: 'standalone'
+  adapter: cloudflare({
+    imageService: 'compile',
+    mode: 'advanced'
   }),
   srcDir: './src/',
   publicDir: './public/',
@@ -93,11 +94,9 @@ export default defineConfig({
         if (filterBases.some((base) => url.pathname.startsWith(`/${base}/`))) {
           sitemapAllow = false // Reject the page
         }
-
         if (url.pathname === '/docs/') {
           sitemapAllow = false
         }
-
         console.log(`SITEMAP: ${url.pathname} -> ${sitemapAllow}`)
         return sitemapAllow // Include the page
       }
@@ -107,6 +106,12 @@ export default defineConfig({
   vite: {
     css: {
       devSourcemap: true
+    },
+    build: {
+      minify: false
+    },
+    ssr: {
+      external: ['node:fs/promises', 'node:url', 'node:os', 'node:path', 'node:crypto']
     }
   }
 })

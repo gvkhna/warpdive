@@ -1,0 +1,118 @@
+---
+import Auth from '../layouts/Auth.astro'
+// import client from '@client'
+import AlertError from '@components/AlertError.astro'
+// import {Struct} from 'src/generated/google/protobuf/struct_pb'
+// import {cookieOpts} from '@cookies'
+// import {Code} from 'src/generated/google/rpc/code_pb'
+import Icon from '@/components/Icon.astro'
+export const prerender = false
+let displayError: any
+let form: any
+
+const sessionKey = Astro.cookies.get('_session')
+const tokenKey = sessionKey?.value
+
+// if (Astro.request.method === 'POST') {
+//   const data = await Astro.request.formData()
+//   const email = data.get('email')
+//   const password = data.get('password')
+//   const rememberMe = true
+//   const headers = Struct.fromJson(Object.fromEntries(Astro.request.headers))
+
+//   // const rememberMe = data.get('rememberMe') === 'on'
+//   if (typeof email === 'string' && typeof password === 'string') {
+//     try {
+//       const resp = await client.signin({email, password, rememberMe, headers}, Astro)
+
+//       if (resp.code === Code.OK) {
+//         Astro.cookies.set('_session', resp.tokenKey, cookieOpts('user'))
+//         // const userData = JSON.stringify(resp.user)
+//         // const userData = AppUser.fromJsonString(resp.user)
+//         // if (resp.user) {
+//         //   const userData = AppUser.toJsonString(resp.user)
+//         //   Astro.cookies.set('user_data', userData, cookieOpts('user'))
+//         // }
+
+//         return Astro.redirect('/app/')
+//       } else {
+//         displayError = resp.error
+//         if (resp.form) {
+//           form = Struct.toJson(resp.form)
+//         }
+//       }
+//     } catch (e) {
+//       displayError = e
+//     }
+//   }
+// }
+
+// if (tokenKey && typeof tokenKey === 'string') {
+//   return Astro.redirect('/app/')
+// }
+---
+
+<Auth
+  title='Signin'
+  desc='Sign in to your account'
+>
+  <AlertError error={displayError} />
+
+  <div class='flex flex-col space-y-2 text-center'>
+    <h1 class='text-2xl font-semibold tracking-tight'>Create an account</h1>
+    <p class='text-sm text-muted-foreground'>Authenticate with Github</p>
+  </div>
+  <div class='grid gap-2'>
+    {
+      /* <form>
+      <div class='grid gap-2'>
+        <div class='grid gap-1'>
+          <label
+            class='sr-only text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'
+            for='email'
+            >Email</label
+          ><input
+            class='focus-visible:ring-1 focus-visible:ring-ring flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50'
+            id='email'
+            placeholder='name@example.com'
+            autocapitalize='none'
+            autocomplete='email'
+            autocorrect='off'
+            type='email'
+          />
+        </div><button
+          class='focus-visible:ring-1 focus-visible:ring-ring inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
+          >Sign In with Email</button
+        >
+      </div>
+    </form> */
+    }
+    <div class='relative'>
+      {
+        /* <div class='absolute inset-0 flex items-center'><span class='w-full border-t'></span></div><div
+        class='relative flex justify-center text-xs uppercase'
+      >
+        <span class='bg-background px-2 text-muted-foreground'>Or continue with</span>
+      </div> */
+      }
+    </div>
+    <button
+      type='button'
+      class='focus-visible:ring-1 focus-visible:ring-ring inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
+    >
+      <Icon src={import('@icons/github-logo.svg')} />
+      GitHub
+    </button>
+  </div>
+  <p class='px-8 text-center text-sm text-muted-foreground'>
+    By clicking continue, you agree to our <a
+      class='underline underline-offset-4 hover:text-primary'
+      href='/terms'
+      >Terms of Service</a
+    > and <a
+      class='underline underline-offset-4 hover:text-primary'
+      href='/privacy'
+      >Privacy Policy</a
+    >.
+  </p>
+</Auth>

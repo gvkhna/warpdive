@@ -7,6 +7,9 @@ tmp/*
 !.env.example
 *tmp*
 
+wrangler.toml
+*.vars
+
 .astro
 
 .cache/
