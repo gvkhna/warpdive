@@ -1,5 +1,5 @@
 // Copyright 2024 Gaurav Khanna.
-// https://github.com/gvkhna/www-warpdive
+// https://github.com/gvkhna/warpdive
 syntax = "proto3";
 
 import "google/protobuf/any.proto";

@@ -1,23 +1,14 @@
 {
   "prettier.documentSelectors": ["**/*.astro", "**/*.ts", "**/*.tsx", "**/*.mdx"],
   "editor.formatOnSave": true,
-  "standardRuby.mode": "onlyRunGlobally",
-  "standardRuby.commandPath": "${userHome}/.asdf/shims/bundle exec standardrb",
   "css.customData": [".vscode/tailwind.json"],
   "clang-format.style": "{ IndentWidth: 2, BasedOnStyle: google, AlignConsecutiveAssignments: true, ColumnLimit: 160 }",
   "custom-language-properties": {
     "astro.comments.blockComment": ["{/*", "*/}"]
   },
-  "[ruby]": {
-    "editor.defaultFormatter": "testdouble.vscode-standard-ruby"
-  },
   "[mdx]": {
     "editor.wordWrap": "bounded",
     "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-  },
-  "[liquid]": {
-    "editor.defaultFormatter": "sissel.shopify-liquid",
     "editor.formatOnSave": true
   },
   "[html]": {
@@ -40,10 +31,6 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
   },
-  "[erb]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.formatOnSave": true
-  },
   "[javascriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.formatOnSave": true
@@ -62,9 +49,6 @@
   },
   "protoc": {
     "options": ["--proto_path=proto"]
-  },
-  "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter"
   },
   "search.exclude": {
     "**/.git": true,

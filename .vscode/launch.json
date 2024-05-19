@@ -2,15 +2,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "type": "rdbg",
-      "name": "Run rake test",
-      "request": "launch",
-      "command": "rake",
-      "script": "crawler_tests:test_urls", // launch rake test with debugger
-      "args": [],
-      "askParameters": false // Do not ask startup parameter any more
-    },
-    {
       "command": "./node_modules/.bin/astro dev",
       "name": "Development server",
       "request": "launch",
