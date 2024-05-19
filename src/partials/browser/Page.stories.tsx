@@ -1,7 +1,7 @@
 import type {Meta, StoryObj} from '@storybook/react'
 // import {Status} from '@/generated/google/rpc/status_pb'
 // import {Code} from '@/generated/google/rpc/code_pb'
-import {Any} from '@/generated/google/protobuf/any_pb'
+// import {Any} from '@/generated/google/protobuf/any_pb'
 import {WarpDiveImage} from '@/generated/warpdive_pb'
 import Page from './page'
 import fs from 'fs'

@@ -1,14 +1,13 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card'
 import {Input} from '@/components/ui/input'
 import {Label} from '@/components/ui/label'
-import FileSystemViewer from './FileSystemViewer'
 import Link from '@/components/Link'
 import {Button} from '@/components/ui/button'
 import {PlusIcon, ChevronRightIcon, DownloadIcon} from '@radix-ui/react-icons'
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select'
 import {Any} from '@/generated/google/protobuf/any_pb'
-import {WarpDiveImage, WarpDiveImage_Node} from '@/generated/warpdive_pb'
-import {useWarpImage} from './WarpImageProvider'
+import {WarpDiveImage, WarpDiveImage_Node, WarpDiveImage_TreeNode} from '@/generated/warpdive_pb'
+import {useWarpImage} from './WarpDiveImageProvider'
 
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable'
 import {useState, useEffect, type FC} from 'react'
@@ -16,6 +15,8 @@ import LayerRow from './LayerRow'
 import LayersList from './LayersList'
 import {ScrollArea} from '@/components/ui/scroll-area'
 import {WARP_DIVE_IMAGE_TYPE_URL} from '@/strings'
+import {Timestamp} from '@/generated/google/protobuf/timestamp_pb'
+import FileSystemViewer from './FileSystemViewer'
 
 export interface LayerBrowserProps {
   binaryPath?: string
@@ -34,11 +35,16 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
         const response = await fetch(binaryPath)
         const arrayBuffer = await response.arrayBuffer()
         const binary = new Uint8Array(arrayBuffer)
-        const anyPb = Any.fromBinary(binary)
-
-        if (anyPb.typeUrl === WARP_DIVE_IMAGE_TYPE_URL) {
-          const wpImageRead = WarpDiveImage.fromBinary(anyPb.value)
+        const anyPb = Any.fromBinary(binary, {})
+        if (Any.contains(anyPb, WarpDiveImage)) {
+          const wpImageRead = Any.unpack(anyPb, WarpDiveImage)
           console.log(wpImageRead.tree)
+          console.log(wpImageRead.nodes)
+          console.log(wpImageRead.metadata)
+          if (wpImageRead.metadata?.ts) {
+            const d = Timestamp.toDate(wpImageRead.metadata?.ts)
+            console.log(d.toString())
+          }
           setWpImage(wpImageRead)
         }
       } catch (err) {
@@ -65,16 +71,20 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
   }
 
   // Function to get layers from the first root node
-  const getLayersFromRoot = (): WarpDiveImage_Node[] => {
+  const getLayersFromRoot = (): WarpDiveImage_TreeNode[] => {
     // Ensure wpImage and wpImage.tree exist and have the needed properties
     if (!wpImage || !wpImage.tree || !wpImage.tree.children || wpImage.tree.children.length === 0) {
       return []
     }
+    return wpImage.tree.children
 
     // Map each child to a node using the ref's gid, and filter nodes that are defined and are layers
-    return wpImage.tree.children
-      .map((child) => (child.ref ? wpImage.nodes[child.ref.gid] : undefined)) // Using ternary operator for clearer intent
-      .filter((node): node is WarpDiveImage_Node => node !== undefined && node.data.oneofKind === 'layer') // Using type guard in filter
+    // return wpImage.tree.children.filter(
+    //   (node): node is WarpDiveImage_NodeTree => node !== undefined
+    // )
+    // return wpImage.tree.children
+    //   .map((child) => (child.ref ? wpImage.nodes[child.ref.gid] : undefined)) // Using ternary operator for clearer intent
+    //   .filter((node): node is WarpDiveImage_Node => node !== undefined && node.data.oneofKind === 'layer') // Using type guard in filter
   }
 
   const layers = getLayersFromRoot()
@@ -162,11 +172,10 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
                 <LayersList>
                   {layers.map(
                     (layer) =>
-                      layer.data.oneofKind === 'layer' && (
+                      layer.ref?.gid && (
                         <LayerRow
-                          key={layer.gid}
-                          gid={layer.gid}
-                          layer={layer.data.layer}
+                          key={layer.ref.gid}
+                          treeNode={layer}
                         />
                       )
                   )}

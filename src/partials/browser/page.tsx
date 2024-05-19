@@ -1,4 +1,4 @@
-import {WarpImageProvider} from './WarpImageProvider'
+import {WarpDiveImageProvider} from './WarpDiveImageProvider'
 import LayerBrowser from './ContainerBrowser'
 
 export interface PageProps {
@@ -7,8 +7,8 @@ export interface PageProps {
 
 export default function Page(props: PageProps) {
   return (
-    <WarpImageProvider>
+    <WarpDiveImageProvider>
       <LayerBrowser binaryPath={props.binaryPath} />
-    </WarpImageProvider>
+    </WarpDiveImageProvider>
   )
 }

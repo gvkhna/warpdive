@@ -5,6 +5,7 @@
     "esModuleInterop": true,
     "jsx": "react-jsx",
     "module": "ESNext",
+    "verbatimModuleSyntax": false,
     "allowSyntheticDefaultImports": true,
     "strictNullChecks": true,
     "isolatedModules": true,
@@ -29,12 +30,6 @@
       "@webclient": ["src/webclient.ts"]
     }
   },
-  "include": [
-    "types.d.ts",
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.astro",
-    "scripts/**/*.ts"
-  ],
+  "include": ["types.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.astro", "scripts/**/*.ts"],
   "exclude": ["node_modules"]
 }

@@ -1,45 +1,61 @@
 import {PlusIcon, ChevronRightIcon, DownloadIcon} from '@radix-ui/react-icons'
 import {type ComponentProps} from 'react'
 import {cn} from '@/lib/utils'
-import {Layer, NodeTree_Ref} from '@/generated/warpdive_pb'
+import {WarpDiveImage_Layer, WarpDiveImage_TreeNode, WarpDiveImage_TreeNode_Ref} from '@/generated/warpdive_pb'
 import {useLayer} from './useLayer'
 import {Badge} from '@/components/ui/badge'
-import {formatBytesString} from './format'
+import {formatBytesString} from './format-numbers'
+import {useWarpImage} from './WarpDiveImageProvider'
 
 export interface LayerRowProps {
-  gid: string
-  layer: Layer
+  treeNode: WarpDiveImage_TreeNode
 }
 
 export default function LayerRow(props: LayerRowProps) {
+  const {wpImage, setWpImage} = useWarpImage()
   const [layerState, setLayerState] = useLayer()
+
+  const gid = props.treeNode.ref?.gid
+  if (!wpImage) {
+    return <>No Image Found</>
+  }
+
+  if (!gid) {
+    return <>No Gid Found</>
+  }
+
+  const currentNode = wpImage.nodes[gid]
+
+  if (currentNode.data.oneofKind !== 'layer') {
+    return <></>
+  }
+
   return (
     <button
-      key={props.gid}
       className={cn(
         'flex flex-col items-start gap-1 text-wrap break-all rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent',
-        layerState.selectedGid?.gid === props.gid && 'bg-muted'
+        layerState.selectedLayer?.ref?.gid === gid && 'bg-muted'
       )}
       onClick={() =>
         setLayerState({
-          selectedGid: NodeTree_Ref.create({gid: props.gid})
+          selectedLayer: props.treeNode
         })
       }
     >
       <div className='flex gap-1'>
-        <Badge>{`#${props.layer.index}`}</Badge>
-        <Badge variant={'outline'}>{`Size: ${formatBytesString(props.layer.size)}`}</Badge>
+        <Badge>{`#${currentNode.data.layer.index}`}</Badge>
+        <Badge variant={'outline'}>{`Size: ${formatBytesString(currentNode.data.layer.size)}`}</Badge>
       </div>
       <div className='flex w-full flex-col gap-1'>
         <div className='flex items-center'>
           <div className='flex items-center gap-2'>
-            <div className=' font-mono font-medium'>{props.layer.command || ''}</div>
+            <div className=' font-mono font-medium'>{currentNode.data.layer.command || ''}</div>
             {/* {!item.read && <span className='flex h-2 w-2 rounded-full bg-blue-600' />} */}
           </div>
           <div
             className={cn(
               'ml-auto text-xs',
-              layerState.selectedGid?.gid === props.gid ? 'text-foreground' : 'text-muted-foreground'
+              layerState.selectedLayer?.ref?.gid === gid ? 'text-foreground' : 'text-muted-foreground'
             )}
           >
             {/* {formatDistanceToNow(new Date(item.date), {
@@ -47,9 +63,11 @@ export default function LayerRow(props: LayerRowProps) {
             })} */}
           </div>
         </div>
-        {props.layer.names && <div className='font-mono text-xs font-medium'>{props.layer.names}</div>}
+        {currentNode.data.layer.names && (
+          <div className='font-mono text-xs font-medium'>{currentNode.data.layer.names}</div>
+        )}
       </div>
-      <div className='line-clamp-2 font-mono text-xs text-muted-foreground'>{props.layer.digest}</div>
+      <div className='line-clamp-2 font-mono text-xs text-muted-foreground'>{currentNode.data.layer.digest}</div>
       {/* {item.labels.length ? (
         <div className='flex items-center gap-2'>
           {item.labels.map((label) => (

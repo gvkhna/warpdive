@@ -3,27 +3,27 @@ import React, {createContext, useContext, useState, useMemo, type ReactNode} fro
 // Assuming WarpDiveImage type is imported or defined somewhere
 import {WarpDiveImage} from '@/generated/warpdive_pb'
 
-interface WarpImageContextType {
+interface WarpDiveImageContextType {
   wpImage: WarpDiveImage | null
   setWpImage: (image: WarpDiveImage) => void
 }
 
-const WarpImageContext = createContext<WarpImageContextType | undefined>(undefined)
+const WarpDiveImageContext = createContext<WarpDiveImageContextType | undefined>(undefined)
 
 interface WarpImageProviderProps {
   children: ReactNode
 }
 
-export const WarpImageProvider: React.FC<WarpImageProviderProps> = ({children}) => {
+export const WarpDiveImageProvider: React.FC<WarpImageProviderProps> = ({children}) => {
   const [wpImage, setWpImage] = useState<WarpDiveImage | null>(null)
 
   const value = useMemo(() => ({wpImage, setWpImage}), [wpImage])
 
-  return <WarpImageContext.Provider value={value}>{children}</WarpImageContext.Provider>
+  return <WarpDiveImageContext.Provider value={value}>{children}</WarpDiveImageContext.Provider>
 }
 
-export const useWarpImage = (): WarpImageContextType => {
-  const context = useContext(WarpImageContext)
+export const useWarpImage = (): WarpDiveImageContextType => {
+  const context = useContext(WarpDiveImageContext)
   if (context === undefined) {
     throw new Error('useWarpImage must be used within a WarpImageProvider')
   }
