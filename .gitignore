@@ -1,13 +1,17 @@
 
 src/generated/*
 !src/generated/.keep
+
+
+*tmp*
 tmp/*
 !tmp/.keep
+
 *.env*
 !.env.example
-*tmp*
 
 wrangler.toml
+.wrangler
 *.vars
 
 .astro

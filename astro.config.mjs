@@ -1,67 +1,40 @@
 import 'dotenv/config'
 import {URL} from 'node:url'
-import path from 'path'
-// import untildify from 'untildify'
-import fs from 'fs'
 import {defineConfig} from 'astro/config'
 import react from '@astrojs/react'
 import tailwind from '@astrojs/tailwind'
 import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
-// import compress from 'astro-compress'
-// import partytown from '@astrojs/partytown'
-// import compressor from 'astro-compressor'
-import node from '@astrojs/node'
 import robotsTxt from 'astro-robots-txt'
 import Critters from 'astro-critters'
-
-// eslint-disable-next-line no-undef
 import cloudflare from '@astrojs/cloudflare'
-const PUBLIC_WEB_HOSTNAME = process.env.PUBLIC_WEB_HOSTNAME
-// eslint-disable-next-line no-undef
-const ASTRO_PORT = process.env.ASTRO_PORT
-// eslint-disable-next-line no-undef
-const ASTRO_HOST = process.env.ASTRO_HOST
-// eslint-disable-next-line no-undef
-const RAILS_ENV = process.env.RAILS_ENV
-let port
-let host
-if (ASTRO_PORT) {
-  port = parseInt(ASTRO_PORT)
-} else {
-  port = parseInt(new URL(PUBLIC_WEB_HOSTNAME).port)
-}
-if (ASTRO_HOST) {
-  host = ASTRO_HOST
-} else {
-  host = new URL(PUBLIC_WEB_HOSTNAME).hostname
-}
-// eslint-disable-next-line no-console,no-undef
-console.log(`ASTRO SITE: ${PUBLIC_WEB_HOSTNAME}, host: ${host} port:${port}`)
 
-// https://astro.build/config
+// eslint-disable-next-line no-undef
+const PUBLIC_WEB_HOSTNAME = process.env.PUBLIC_WEB_HOSTNAME
+
+// eslint-disable-next-line no-console,no-undef
+console.log(`ASTRO SITE: ${PUBLIC_WEB_HOSTNAME}`)
+
 export default defineConfig({
   site: PUBLIC_WEB_HOSTNAME,
   output: 'server',
-  server: {
-    port: port,
-    host: host
-  },
   devToolbar: {
     enabled: false
   },
   adapter: cloudflare({
     imageService: 'compile',
-    mode: 'advanced'
+    mode: 'directory',
+    platformProxy: {
+      enabled: true,
+      configPath: 'wrangler.toml',
+      persist: true
+    }
   }),
   srcDir: './src/',
   publicDir: './public/',
-  // trailingSlash: 'always',
-  compressHTML: true,
+  compressHTML: false,
   integrations: [
     react(),
-    // media(),
-
     tailwind({
       applyBaseStyles: false
     }),
@@ -69,12 +42,6 @@ export default defineConfig({
     Critters({
       logger: 0
     }),
-    // compress({
-    //   logger: 0,
-    //   Exclude: ['.png$']
-    // }),
-    // compressor(),
-    // must be last in order
     sitemap({
       filter: (page) => {
         let sitemapAllow = true
@@ -108,10 +75,15 @@ export default defineConfig({
       devSourcemap: true
     },
     build: {
-      minify: false
+      minify: false,
+      sourcemap: true
     },
+    // https://github.com/sveltejs/kit/issues/8140
+    optimizeDeps: {exclude: ['fsevents']},
     ssr: {
-      external: ['node:fs/promises', 'node:url', 'node:os', 'node:path', 'node:crypto']
+      external: [
+        // 'node:fs/promises', 'node:url', 'node:os', 'node:path', 'node:crypto'
+      ]
     }
   }
 })

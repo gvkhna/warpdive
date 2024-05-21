@@ -5,7 +5,7 @@ import AlertError from '@components/AlertError.astro'
 // import {Struct} from 'src/generated/google/protobuf/struct_pb'
 // import {cookieOpts} from '@cookies'
 // import {Code} from 'src/generated/google/rpc/code_pb'
-import Icon from '@/components/Icon.astro'
+// import Icon from '@/components/Icon.astro'
 export const prerender = false
 let displayError: any
 let form: any
@@ -100,7 +100,7 @@ const tokenKey = sessionKey?.value
       type='button'
       class='focus-visible:ring-1 focus-visible:ring-ring inline-flex h-9 items-center justify-center whitespace-nowrap rounded-md border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
     >
-      <Icon src={import('@icons/github-logo.svg')} />
+      {/* <Icon src={import('@icons/github-logo.svg')} /> */}
       GitHub
     </button>
   </div>

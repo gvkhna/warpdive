@@ -5,11 +5,12 @@
     "bradlc.vscode-tailwindcss",
     "dbaeumer.vscode-eslint",
     "editorconfig.editorconfig",
+    "esbenp.prettier-vscode",
     "medo64.render-crlf",
     "redhat.vscode-yaml",
+    "tamasfe.even-better-toml",
     "unifiedjs.vscode-mdx",
-    "zxh404.vscode-proto3",
-    "esbenp.prettier-vscode"
+    "zxh404.vscode-proto3"
   ],
   "unwantedRecommendations": []
 }

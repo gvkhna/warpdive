@@ -1,0 +1,44 @@
+name: Deploy Astro site to Cloudflare Pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+    branches: ['main']
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  deployments: write
+
+env:
+  BUILD_PATH: '.' # default value when not using subfolders
+
+jobs:
+  build:
+    name: Build & Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install asdf & tools
+        uses: asdf-vm/actions/install@v3
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        working-directory: ${{ env.BUILD_PATH }}
+      - name: Build with Astro
+        env:
+          PUBLIC_WEB_HOSTNAME: ${{ vars.PUBLIC_WEB_HOSTNAME }}
+        run: |
+          pnpm run astro build
+        working-directory: ${{ env.BUILD_PATH }}
+      - name: Publish
+        uses: cloudflare/pages-action@1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: ${{ vars.CLOUDFLARE_PROJECT_ID }}
+          directory: ${{ env.BUILD_PATH }}/dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

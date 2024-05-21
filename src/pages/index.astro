@@ -1,17 +1,37 @@
 ---
 import HomeLayout from '@/layouts/HomeLayout.astro'
 import client from '@client'
+import {drizzle} from 'drizzle-orm/d1'
+import {desc} from 'drizzle-orm'
+import {users} from '@/db/schema'
 export const prerender = false
 
-// 'http://localhost:4321/api/users'
 const test = await client.$get()
 const data = await test.json()
 console.log(data)
+const x = JSON.stringify(data)
+
+const db = drizzle(Astro.locals.runtime.env.DB)
+
+// const newUser = await db.insert(users).values({id: '0', fullName: 'test'})
+
+const usersData = await db.select().from(users).orderBy(desc(users.id))
 ---
 
 <HomeLayout
   title='Signin'
   desc='Sign in to your account'
 >
-  WIP {JSON.stringify(data)}
+  <div>
+    WIP {x}
+  </div>
+  <div>
+    {
+      usersData.map((user) => (
+        <li>
+          {user.id} {user.fullName}
+        </li>
+      ))
+    }
+  </div>
 </HomeLayout>
