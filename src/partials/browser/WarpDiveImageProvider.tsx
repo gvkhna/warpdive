@@ -1,6 +1,4 @@
 import React, {createContext, useContext, useState, useMemo, type ReactNode} from 'react'
-
-// Assuming WarpDiveImage type is imported or defined somewhere
 import {WarpDiveImage} from '@/generated/warpdive_pb'
 
 interface WarpDiveImageContextType {

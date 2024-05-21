@@ -1,0 +1,9 @@
+---
+import HomeLayout from '@/layouts/HomeLayout.astro'
+export const prerender = true
+import LocalViewerPage from '@/partials/browser/LocalViewerPage'
+---
+
+<HomeLayout title='Local Viewer'>
+  <LocalViewerPage client:only />
+</HomeLayout>

@@ -14,27 +14,23 @@ import {useState, useEffect, type FC} from 'react'
 import LayerRow from './LayerRow'
 import LayersList from './LayersList'
 import {ScrollArea} from '@/components/ui/scroll-area'
-import {WARP_DIVE_IMAGE_TYPE_URL} from '@/strings'
 import {Timestamp} from '@/generated/google/protobuf/timestamp_pb'
 import FileSystemViewer from './FileSystemViewer'
 
 export interface LayerBrowserProps {
-  binaryPath?: string
+  binary: Uint8Array
+  onError: (e: Error) => void
 }
 
-const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
+const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
   const {wpImage, setWpImage} = useWarpImage()
   const [isLoading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    async function fetchAndProcessBinary() {
-      if (!binaryPath) return
+    function processBinary() {
+      if (!binary) return
       setLoading(true)
       try {
-        const response = await fetch(binaryPath)
-        const arrayBuffer = await response.arrayBuffer()
-        const binary = new Uint8Array(arrayBuffer)
         const anyPb = Any.fromBinary(binary, {})
         if (Any.contains(anyPb, WarpDiveImage)) {
           const wpImageRead = Any.unpack(anyPb, WarpDiveImage)
@@ -48,22 +44,18 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
           setWpImage(wpImageRead)
         }
       } catch (err) {
-        console.error('Error:', err)
-        setError('Failed to load binary data.')
+        console.error('Error parsing file:', err)
+        onError(new Error('Failed to load binary. The file is not a valid `.warpdive` binary.'))
       } finally {
         setLoading(false)
       }
     }
 
-    fetchAndProcessBinary()
-  }, [binaryPath, setWpImage])
+    processBinary()
+  }, [binary, setWpImage, onError])
 
   if (isLoading) {
     return <div>Loading...</div>
-  }
-
-  if (error) {
-    return <div>Error: {error}</div>
   }
 
   if (!wpImage) {
@@ -77,14 +69,6 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
       return []
     }
     return wpImage.tree.children
-
-    // Map each child to a node using the ref's gid, and filter nodes that are defined and are layers
-    // return wpImage.tree.children.filter(
-    //   (node): node is WarpDiveImage_NodeTree => node !== undefined
-    // )
-    // return wpImage.tree.children
-    //   .map((child) => (child.ref ? wpImage.nodes[child.ref.gid] : undefined)) // Using ternary operator for clearer intent
-    //   .filter((node): node is WarpDiveImage_Node => node !== undefined && node.data.oneofKind === 'layer') // Using type guard in filter
   }
 
   const layers = getLayersFromRoot()
@@ -98,69 +82,6 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binaryPath}) => {
 
   return (
     <>
-      <header className='flex h-16 items-center justify-between border-b bg-white px-4 shadow-sm dark:border-gray-800 dark:bg-gray-950 md:px-6'>
-        <div className='flex items-center gap-4'>
-          <Link
-            className='text-lg font-semibold'
-            href='#'
-          >
-            Acme Inc
-          </Link>
-          <div className='hidden items-center gap-4 md:flex'>
-            <Button
-              size='sm'
-              variant='ghost'
-            >
-              All
-            </Button>
-            <Button
-              size='sm'
-              variant='ghost'
-            >
-              Pending
-            </Button>
-            <Button
-              size='sm'
-              variant='ghost'
-            >
-              Completed
-            </Button>
-            <Button
-              size='sm'
-              variant='ghost'
-            >
-              Archived
-            </Button>
-          </div>
-        </div>
-        <div className='flex items-center gap-4'>
-          <div className='hidden md:block'>
-            <Input
-              className='max-w-xs'
-              placeholder='Search entries...'
-              type='search'
-            />
-          </div>
-          <Button
-            className='rounded-full'
-            size='icon'
-            variant='ghost'
-          >
-            <img
-              alt='Avatar'
-              className='rounded-full'
-              height='32'
-              src='/placeholder.svg'
-              style={{
-                aspectRatio: '32/32',
-                objectFit: 'cover'
-              }}
-              width='32'
-            />
-            <span className='sr-only'>Toggle user menu</span>
-          </Button>
-        </div>
-      </header>
       <div className='flex h-[calc(100vh_-_theme(spacing.16))] w-full'>
         <ResizablePanelGroup direction='horizontal'>
           <ResizablePanel defaultSize={40}>
