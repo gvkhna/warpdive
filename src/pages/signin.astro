@@ -1,36 +1,16 @@
 ---
-import {setOauthStateCookie} from '@/lib/cookies'
 import AuthLayout from '../layouts/AuthLayout.astro'
 import AlertFlash from '@components/AlertFlash.astro'
-const {crypto} = globalThis
-import {GITHUB_OAUTH_REDIRECT_URL} from '@/strings'
+import {verifyValidSession, githubNewOauthSigninUrl} from '@/lib/githubclient'
 
 export const prerender = false
-let displayError: any
 
-const {PUBLIC_WEB_HOSTNAME, PUBLIC_GITHUB_CLIENT_ID} = import.meta.env
-
-const arrayBuffer = crypto.getRandomValues(new Uint8Array(16))
-const randomState = Array.from(arrayBuffer)
-  .map((b) => b.toString(16).padStart(2, '0'))
-  .join('')
-
-setOauthStateCookie(randomState, Astro)
-
-const scopes = ['read:user']
-
-const authUrl = new URL('https://github.com/login/oauth/authorize')
-
-const params = new URLSearchParams()
-params.set('client_id', PUBLIC_GITHUB_CLIENT_ID)
-console.log('redirecting to: ', PUBLIC_WEB_HOSTNAME)
-params.set('redirect_uri', GITHUB_OAUTH_REDIRECT_URL)
-params.set('scope', scopes.join(' '))
-params.set('state', randomState)
-
-authUrl.search = params.toString()
-
-const authLink = authUrl.href
+const existingSession = await verifyValidSession(Astro)
+if (existingSession.valid && existingSession.redirect) {
+  return existingSession.redirect
+}
+const displayError = existingSession.displayError
+const authLink = githubNewOauthSigninUrl(Astro)
 ---
 
 <AuthLayout

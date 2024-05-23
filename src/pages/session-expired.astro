@@ -1,12 +1,10 @@
 ---
-import AuthLayout from '@/layouts/AuthLayout.astro'
-import CircleLoader from '@components/CircleLoader.astro'
-import {deleteFlashCookie, deleteOauthStateCookie, deleteUserAuthCookie} from '@/lib/cookies'
+import AuthLayout from '@layouts/AuthLayout.astro'
+import CircleLoader from '@/components/CircleLoader.astro'
+import {signoutSession} from '@/lib/githubclient'
 export const prerender = false
 
-deleteOauthStateCookie(Astro)
-deleteUserAuthCookie(Astro)
-deleteFlashCookie(Astro)
+await signoutSession(Astro)
 ---
 
 <AuthLayout title='Expired'>

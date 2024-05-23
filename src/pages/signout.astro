@@ -1,29 +1,10 @@
 ---
 import AuthLayout from '@layouts/AuthLayout.astro'
 import CircleLoader from '@/components/CircleLoader.astro'
-import {deleteFlashCookie, deleteOauthStateCookie, deleteUserAuthCookie, setFlashCookie} from '@/lib/cookies'
-
-import HomeLayout from '@/layouts/HomeLayout.astro'
-import {drizzle} from 'drizzle-orm/d1'
-import {eq} from 'drizzle-orm'
-import * as schema from '@/db/schema'
-import {decode, sign, verify} from 'hono/jwt'
-import {getUserAuthCookie} from '@/lib/cookies'
-
-const userAuthCookie = getUserAuthCookie(Astro)
+import {signoutSession} from '@/lib/githubclient'
 export const prerender = false
 
-let displayError: Error | undefined = undefined
-
-if (userAuthCookie) {
-  const db = drizzle(Astro.locals.runtime.env.DB, {schema})
-  const result = await db.delete(schema.userSessions).where(eq(schema.userSessions.sessionToken, userAuthCookie))
-
-  console.log('signout res: ', result)
-}
-deleteOauthStateCookie(Astro)
-deleteUserAuthCookie(Astro)
-deleteFlashCookie(Astro)
+await signoutSession(Astro)
 ---
 
 <AuthLayout title='Signout'>

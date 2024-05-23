@@ -1,12 +1,10 @@
 ---
 import AuthLayout from '@layouts/AuthLayout.astro'
 import AlertFlash from '@components/AlertFlash.astro'
-import {getFlashCookie, deleteOauthStateCookie, deleteUserAuthCookie, deleteFlashCookie} from '@/lib/cookies'
+import {getFlashCookie, deleteAllCookies} from '@/lib/cookies'
 export const prerender = false
 let flash = getFlashCookie(Astro)
-deleteOauthStateCookie(Astro)
-deleteUserAuthCookie(Astro)
-deleteFlashCookie(Astro)
+deleteAllCookies(Astro)
 ---
 
 <AuthLayout title='Session Error'>
