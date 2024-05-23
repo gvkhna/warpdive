@@ -1,9 +1,9 @@
 ---
-import HomeLayout from '@/layouts/home-layout.astro'
+import MainLayout from '@/layouts/main-layout.astro'
 export const prerender = true
 import LocalViewerPage from '@/partials/viewer/local-viewer-page'
 ---
 
-<HomeLayout title='Local Viewer'>
+<MainLayout title='Local Viewer'>
   <LocalViewerPage client:only='react' />
-</HomeLayout>
+</MainLayout>

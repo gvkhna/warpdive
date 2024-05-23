@@ -8,6 +8,14 @@ export interface Props {
 
 const {title, desc, seo} = Astro.props
 
+const newUrl = new URL(Astro.url.toString())
+
+// Check if there's a trailing slash and it's not just the root path
+if (newUrl.pathname.endsWith('/') && newUrl.pathname !== '/') {
+  // Remove the trailing slash if it exists
+  newUrl.pathname = newUrl.pathname.slice(0, -1)
+}
+
 import '@styles/globals.css'
 ---
 
@@ -16,6 +24,7 @@ import '@styles/globals.css'
   <head>
     <SEO
       charset='utf-8'
+      canonical={newUrl}
       extend={{
         link: [
           {rel: 'icon', href: '/favicon.ico'},

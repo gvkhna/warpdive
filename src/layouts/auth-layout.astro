@@ -1,12 +1,12 @@
 ---
-import HomeLayout, {type Props as HomeProps} from './home-layout.astro'
+import MainLayout, {type Props as MainLayoutProps} from './main-layout.astro'
 
-export interface Props extends HomeProps {}
+export interface Props extends MainLayoutProps {}
 
 const props = Astro.props
 ---
 
-<HomeLayout {...props}>
+<MainLayout {...props}>
   <div
     class='container relative grid h-[100vh] flex-col items-center justify-center lg:max-w-none lg:grid-cols-2 lg:px-0'
   >
@@ -41,4 +41,4 @@ const props = Astro.props
       </div>
     </div>
   </div>
-</HomeLayout>
+</MainLayout>

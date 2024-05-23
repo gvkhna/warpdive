@@ -61,7 +61,17 @@ export default defineConfig({
         }
         // eslint-disable-next-line no-console,no-undef
         console.log(`sitemap include?: ${url.pathname} -> ${sitemapAllow}`)
-        return sitemapAllow // Include the page
+        return sitemapAllow // Include? the page
+      },
+      serialize: (page) => {
+        const newUrl = new URL(page.url)
+        // Check if there's a trailing slash and it's not just the root path
+        if (newUrl.pathname.endsWith('/') && newUrl.pathname !== '/') {
+          // Remove the trailing slash if it exists
+          newUrl.pathname = newUrl.pathname.slice(0, -1)
+        }
+        page.url = newUrl.toString()
+        return page
       }
     }),
     robotsTxt()

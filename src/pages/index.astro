@@ -1,5 +1,5 @@
 ---
-import HomeLayout from '@/layouts/home-layout.astro'
+import MainLayout from '@/layouts/main-layout.astro'
 import client from '@/lib/api-client'
 import {drizzle} from 'drizzle-orm/d1'
 import {desc} from 'drizzle-orm'
@@ -18,7 +18,7 @@ const db = drizzle(Astro.locals.runtime.env.DB)
 const usersData = await db.select().from(users).orderBy(desc(users.id))
 ---
 
-<HomeLayout
+<MainLayout
   title='Signin'
   desc='Sign in to your account'
 >
@@ -33,4 +33,4 @@ const usersData = await db.select().from(users).orderBy(desc(users.id))
     }
   </div>
   <div>testing</div>
-</HomeLayout>
+</MainLayout>
