@@ -1,7 +1,7 @@
-import {WarpDiveImageProvider} from './WarpDiveImageProvider'
-import LocalLoader from './LocalLoader'
+import {WarpDiveImageProvider} from './warp-dive-image-provider'
+import LocalLoader from './local-loader'
 import {ReactNode, useState} from 'react'
-import LayerBrowser from './LayerBrowser'
+import LayerBrowser from './layer-browser'
 import {
   AlertDialog,
   AlertDialogAction,

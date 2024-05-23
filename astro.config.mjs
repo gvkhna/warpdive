@@ -39,6 +39,7 @@ export default defineConfig({
   srcDir: './src/',
   publicDir: './public/',
   compressHTML: PROD,
+  trailingSlash: 'ignore',
   integrations: [
     react(),
     tailwind({
@@ -51,26 +52,15 @@ export default defineConfig({
     sitemap({
       filter: (page) => {
         let sitemapAllow = true
-        const filterBases = [
-          'app',
-          'confirmation',
-          'connect',
-          'reset-password',
-          'xtm.js',
-          'expired-token',
-          'expired',
-          '_image'
-        ]
+        const filterBases = ['_image', 'app', 'github-callback', 'session-error', 'session-expired', 'signout']
         const url = new URL(page) // Convert the page URL to a URL object
 
         // Check if the URL pathname starts with any of the filter bases
         if (filterBases.some((base) => url.pathname.startsWith(`/${base}/`))) {
           sitemapAllow = false // Reject the page
         }
-        if (url.pathname === '/docs/') {
-          sitemapAllow = false
-        }
-        console.log(`SITEMAP: ${url.pathname} -> ${sitemapAllow}`)
+        // eslint-disable-next-line no-console,no-undef
+        console.log(`sitemap include?: ${url.pathname} -> ${sitemapAllow}`)
         return sitemapAllow // Include the page
       }
     }),

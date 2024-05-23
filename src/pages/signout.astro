@@ -1,7 +1,7 @@
 ---
-import AuthLayout from '@layouts/AuthLayout.astro'
-import CircleLoader from '@/components/CircleLoader.astro'
-import {signoutSession} from '@/lib/githubclient'
+import AuthLayout from '@/layouts/auth-layout.astro'
+import CircleLoader from '@/components/circle-loader.astro'
+import {signoutSession} from '@/lib/github-client'
 export const prerender = false
 
 await signoutSession(Astro)
@@ -26,7 +26,7 @@ await signoutSession(Astro)
         &#8203;
       </span>
       <div
-        class='inline-block flex-1 transform overflow-hidden rounded-sm bg-white px-4 pb-4 pt-5 text-left align-bottom shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6 sm:align-middle'
+        class='inline-block flex-1 transform overflow-hidden rounded-sm bg-muted px-4 pb-4 pt-5 text-left align-bottom transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6 sm:align-middle'
         role='dialog'
         aria-modal='true'
         aria-labelledby='modal-headline'
@@ -36,7 +36,7 @@ await signoutSession(Astro)
             <div class='mx-auto flex h-12 w-12 items-center justify-center rounded-full'>
               <CircleLoader class='h-15 w-15 text-black' />
             </div>
-            <div class='mt-3 text-center sm:mt-5'>
+            <div class='mt-5 text-center md:mt-1'>
               <h3
                 class='text-lg font-medium leading-6 text-gray-900'
                 id='modal-headline'
@@ -59,11 +59,13 @@ await signoutSession(Astro)
       </div>
     </div>
   </div>
-  <script>
+  {
+    /* <script>
     document.addEventListener('DOMContentLoaded', () => {
       setTimeout(() => {
         window.location.replace('/signin/')
       }, 3500)
     })
-  </script>
+  </script> */
+  }
 </AuthLayout>

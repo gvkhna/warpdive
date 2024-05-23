@@ -2,10 +2,10 @@ import {PlusIcon, ChevronRightIcon, DownloadIcon} from '@radix-ui/react-icons'
 import {type ComponentProps} from 'react'
 import {cn} from '@/lib/utils'
 import {WarpDiveImage_Layer, WarpDiveImage_TreeNode, WarpDiveImage_TreeNode_Ref} from '@/generated/warpdive_pb'
-import {useLayer} from './useLayer'
+import {useLayer} from './use-layer'
 import {Badge} from '@/components/ui/badge'
 import {formatBytesString} from './format-numbers'
-import {useWarpImage} from './WarpDiveImageProvider'
+import {useWarpImage} from './warp-dive-image-provider'
 
 export interface LayerRowProps {
   treeNode: WarpDiveImage_TreeNode

@@ -16,7 +16,7 @@
       "@ui/*": ["src/components/ui/*"],
       "@hooks/*": ["src/components/hooks/*"],
       "@assets/*": ["src/assets/*"],
-      "@client": ["src/lib/apiclient.ts"],
+      "@client": ["src/lib/api-client.ts"],
       "@components/*": ["src/components/*"],
       "@icons/*": ["src/icons/*"],
       "@images/*": ["src/images/*"],

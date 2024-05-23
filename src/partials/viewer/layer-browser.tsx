@@ -1,21 +1,21 @@
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card'
 import {Input} from '@/components/ui/input'
 import {Label} from '@/components/ui/label'
-import Link from '@/components/Link'
+import Link from '@/components/link'
 import {Button} from '@/components/ui/button'
 import {PlusIcon, ChevronRightIcon, DownloadIcon} from '@radix-ui/react-icons'
 import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select'
 import {Any} from '@/generated/google/protobuf/any_pb'
 import {WarpDiveImage, WarpDiveImage_Node, WarpDiveImage_TreeNode} from '@/generated/warpdive_pb'
-import {useWarpImage} from './WarpDiveImageProvider'
+import {useWarpImage} from './warp-dive-image-provider'
 
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable'
 import {useState, useEffect, type FC} from 'react'
-import LayerRow from './LayerRow'
-import LayersList from './LayersList'
+import LayerRow from './layer-row'
+import LayersList from './layers-list'
 import {ScrollArea} from '@/components/ui/scroll-area'
 import {Timestamp} from '@/generated/google/protobuf/timestamp_pb'
-import FileSystemViewer from './FileSystemViewer'
+import FileSystemViewer from './file-system-viewer'
 
 export interface LayerBrowserProps {
   binary: Uint8Array

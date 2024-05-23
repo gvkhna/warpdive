@@ -1,6 +1,6 @@
 import {Input} from '@/components/ui/input'
 import {Label} from '@/components/ui/label'
-import Link from '@/components/Link'
+import Link from '@/components/link'
 import {Button} from '@/components/ui/button'
 
 export default function ViewerHeader() {

@@ -1,8 +1,8 @@
 ---
 // main dashboard single page app
 
-import HomeLayout from '@/layouts/HomeLayout.astro'
-import {verifyValidSession} from '@/lib/githubclient'
+import HomeLayout from '@/layouts/home-layout.astro'
+import {verifyValidSession} from '@/lib/github-client'
 
 export const prerender = false
 
@@ -15,3 +15,4 @@ if (!existingSession.valid && existingSession.redirect) {
 <HomeLayout title='App Dashboard'>
   <h1>Successful auth</h1>
 </HomeLayout>
+z

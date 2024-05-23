@@ -93,7 +93,7 @@ export async function verifyValidSession(astro: AstroGlobal): Promise<UserSessio
       return {
         valid: false,
         displayError: displayError,
-        redirect: astro.redirect('/signin')
+        redirect: astro.redirect('/session-error')
       }
     }
   } else {

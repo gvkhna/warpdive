@@ -1,7 +1,7 @@
 ---
-import AuthLayout from '@layouts/AuthLayout.astro'
-import CircleLoader from '@/components/CircleLoader.astro'
-import {signoutSession} from '@/lib/githubclient'
+import AuthLayout from '@/layouts/auth-layout.astro'
+import CircleLoader from '@/components/circle-loader.astro'
+import {signoutSession} from '@/lib/github-client'
 export const prerender = false
 
 await signoutSession(Astro)

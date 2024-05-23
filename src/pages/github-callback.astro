@@ -1,7 +1,7 @@
 ---
-import HomeLayout from '@/layouts/HomeLayout.astro'
+import HomeLayout from '@/layouts/home-layout.astro'
 import {deleteOauthStateCookie, getOauthStateCookie} from '@/lib/cookies'
-import {fetchGithubUserProfile, fetchGithubUserAccessToken, githubAuthUser} from '@/lib/githubclient'
+import {fetchGithubUserProfile, fetchGithubUserAccessToken, githubAuthUser} from '@/lib/github-client'
 
 export const prerender = false
 const oauthState = getOauthStateCookie(Astro)

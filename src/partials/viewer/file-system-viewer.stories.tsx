@@ -1,7 +1,7 @@
 // Import React and the necessary Storybook components
 import React from 'react'
 import {type Meta, type StoryObj} from '@storybook/react'
-import FileSystemViewer from './FileSystemViewer'
+import FileSystemViewer from './file-system-viewer'
 import {WarpDiveImage, WarpDiveImage_TreeNode, WarpDiveImage_TreeNode_Ref} from '@/generated/warpdive_pb'
 // Define the metadata for the Storybook
 const meta: Meta<typeof FileSystemViewer> = {
@@ -332,9 +332,7 @@ export const Default: StoryObj<typeof FileSystemViewer> = {
   cursor: pointer;
 } `}
         </style>
-        <div className='min-h-[400px] min-w-[400px]'>
-          <FileSystemViewer data={data_} />
-        </div>
+        <div className='min-h-[400px] min-w-[400px]'>{/* <FileSystemViewer data={data_} /> */}</div>
       </>
     )
   }

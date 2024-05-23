@@ -1,7 +1,7 @@
 ---
-import AuthLayout from '../layouts/AuthLayout.astro'
-import AlertFlash from '@components/AlertFlash.astro'
-import {verifyValidSession, githubNewOauthSigninUrl} from '@/lib/githubclient'
+import AuthLayout from '../layouts/auth-layout.astro'
+import AlertFlash from '@/components/alert-flash.astro'
+import {verifyValidSession, githubNewOauthSigninUrl} from '@/lib/github-client'
 
 export const prerender = false
 
@@ -17,7 +17,7 @@ const authLink = githubNewOauthSigninUrl(Astro)
   title='Signin'
   desc='Sign in to your account'
 >
-  {displayError && <AlertFlash flash={displayError.message} />}
+  {/* {displayError && <AlertFlash flash={displayError.message} />} */}
 
   <div class='flex flex-col space-y-2 text-center'>
     <h1 class='text-2xl font-semibold tracking-tight'>Signin to your account</h1>

@@ -1,6 +1,6 @@
 ---
-import AuthLayout from '@layouts/AuthLayout.astro'
-import AlertFlash from '@components/AlertFlash.astro'
+import AuthLayout from '@/layouts/auth-layout.astro'
+import AlertFlash from '@/components/alert-flash.astro'
 import {getFlashCookie, deleteAllCookies} from '@/lib/cookies'
 export const prerender = false
 let flash = getFlashCookie(Astro)

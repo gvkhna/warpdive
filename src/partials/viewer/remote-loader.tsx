@@ -1,5 +1,5 @@
 import {Suspense, useMemo} from 'react'
-import LayerBrowser from './LayerBrowser'
+import LayerBrowser from './layer-browser'
 
 const useBinaryData = (binaryPath: string) => {
   const promise = useMemo(async () => {

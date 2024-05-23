@@ -1,6 +1,6 @@
-import {WarpDiveImageProvider} from './WarpDiveImageProvider'
-import RemoteLoader from './RemoteLoader'
-import AppHeader from '@partials/header/AppHeader'
+import {WarpDiveImageProvider} from './warp-dive-image-provider'
+import RemoteLoader from './remote-loader'
+import AppHeader from '@/partials/header/viewer-header'
 export interface PageProps {
   binaryPath?: string
 }

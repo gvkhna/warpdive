@@ -1,8 +1,8 @@
 // Importing necessary packages and components
 import type {Meta, StoryObj} from '@storybook/react'
-import LayerRow from './LayerRow'
+import LayerRow from './layer-row'
 import {WarpDiveImage_Layer} from '@/generated/warpdive_pb'
-import LayersList from './LayersList'
+import LayersList from './layers-list'
 
 const meta: Meta<typeof LayerRow> = {
   title: 'ContainerBrowser/LayersList',

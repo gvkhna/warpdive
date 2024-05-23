@@ -16,11 +16,11 @@ import '@styles/globals.css'
   <head>
     <SEO
       charset='utf-8'
-      twitter={{
-        card: 'summary_large_image'
-      }}
       extend={{
-        link: [{rel: 'icon', href: '/favicon.ico'}],
+        link: [
+          {rel: 'icon', href: '/favicon.ico'},
+          {rel: 'sitemap', href: '/sitemap-index.xml'}
+        ],
         meta: [{name: 'viewport', content: 'width=device-width,initial-scale=1'}]
       }}
       {...{
