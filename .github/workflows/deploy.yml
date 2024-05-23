@@ -36,12 +36,8 @@ jobs:
         run: |
           pnpm run proto
           pnpm astro build
+          pnpm wrangler d1 migrations apply warpdive-db --remote
         working-directory: ${{ env.BUILD_PATH }}
-      - name: Migrate
-        uses: cloudflare/wrangler-action@v3
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          command: wrangler d1 migrations apply warpdive-db --remote
       - name: Publish
         uses: cloudflare/pages-action@1
         with:
