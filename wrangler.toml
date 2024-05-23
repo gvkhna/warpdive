@@ -5,10 +5,9 @@ compatibility_date = "2024-05-19"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "warpdive-dev-db"
 database_id = "3057d479-df8e-4c8e-ab90-36e9f06212da"
+database_name = "warpdive-dev-db"
 migrations_dir = "./src/db/migrations"
-preview_database_id = "DB"
 
 [[r2_buckets]]
 binding = "STORAGE"
@@ -25,9 +24,10 @@ local_protocol = "http"
 compatibility_date = "2024-05-19"
 
 [[env.production.d1_databases]]
-database_id = "12089d9c-57f0-40ff-816c-49e0d84149cd"
 binding = "DB"
+database_id = "12089d9c-57f0-40ff-816c-49e0d84149cd"
 database_name = "warpdive-db"
+migrations_dir = "./src/db/migrations"
 
 [[env.production.r2_buckets]]
 binding = "STORAGE"
