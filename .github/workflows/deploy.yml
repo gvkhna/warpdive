@@ -20,6 +20,7 @@ jobs:
   build:
     name: Build & Deploy
     runs-on: ubuntu-latest
+    environment: production
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -33,7 +34,7 @@ jobs:
           PUBLIC_WEB_HOSTNAME: ${{ vars.PUBLIC_WEB_HOSTNAME }}
           PUBLIC_GITHUB_CLIENT_ID: ${{ vars.PUBLIC_GITHUB_CLIENT_ID }}
         run: |
-          pnpm run astro build
+          pnpm astro build
         working-directory: ${{ env.BUILD_PATH }}
       - name: Migrate
         uses: cloudflare/wrangler-action@v3
