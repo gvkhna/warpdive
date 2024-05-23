@@ -1,6 +1,6 @@
 import {WarpDiveImageProvider} from './WarpDiveImageProvider'
 import RemoteLoader from './RemoteLoader'
-import ViewerHeader from './ViewerHeader'
+import AppHeader from '@partials/header/AppHeader'
 export interface PageProps {
   binaryPath?: string
 }
@@ -8,7 +8,7 @@ export interface PageProps {
 export default function RemoteViewerPage(props: PageProps) {
   return (
     <WarpDiveImageProvider>
-      <ViewerHeader />
+      <AppHeader />
       <RemoteLoader binaryPath={props.binaryPath} />
     </WarpDiveImageProvider>
   )

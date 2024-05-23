@@ -11,9 +11,15 @@ import cloudflare from '@astrojs/cloudflare'
 
 // eslint-disable-next-line no-undef
 const PUBLIC_WEB_HOSTNAME = process.env.PUBLIC_WEB_HOSTNAME
+// eslint-disable-next-line no-undef
+const MODE = process.env.NODE_ENV
+// eslint-disable-next-line no-undef
+const DEV = process.env.NODE_ENV === 'development'
+// eslint-disable-next-line no-undef
+const PROD = process.env.NODE_ENV === 'production'
 
 // eslint-disable-next-line no-console,no-undef
-console.log(`ASTRO SITE: ${PUBLIC_WEB_HOSTNAME}`)
+console.log(`ASTRO SITE: ${PUBLIC_WEB_HOSTNAME} ${MODE}`)
 
 export default defineConfig({
   site: PUBLIC_WEB_HOSTNAME,
@@ -32,7 +38,7 @@ export default defineConfig({
   }),
   srcDir: './src/',
   publicDir: './public/',
-  compressHTML: false,
+  compressHTML: PROD,
   integrations: [
     react(),
     tailwind({
@@ -72,18 +78,16 @@ export default defineConfig({
   ],
   vite: {
     css: {
-      devSourcemap: true
+      devSourcemap: DEV
     },
     build: {
-      minify: false,
-      sourcemap: true
+      minify: PROD,
+      sourcemap: DEV
     },
     // https://github.com/sveltejs/kit/issues/8140
     optimizeDeps: {exclude: ['fsevents']},
     ssr: {
-      external: [
-        // 'node:fs/promises', 'node:url', 'node:os', 'node:path', 'node:crypto'
-      ]
+      //external: ['node:crypto']
     }
   }
 })

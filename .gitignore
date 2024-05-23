@@ -10,7 +10,7 @@ tmp/*
 *.env*
 !.env.example
 
-wrangler.toml
+wrangler*.toml
 .wrangler
 *.vars
 

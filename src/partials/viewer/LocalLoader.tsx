@@ -46,19 +46,19 @@ export default function LocalLoader({onFileLoad, onError}: LocalLoaderProps) {
       <div className='mx-4 flex w-full max-w-md flex-col items-center space-y-4 rounded-sm border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900'>
         <div className='flex h-64 w-full flex-col items-center justify-center rounded-sm border-2 border-dashed border-gray-300 p-4 dark:border-gray-700'>
           <UploadIcon className='h-12 w-12 text-gray-400 dark:text-gray-500' />
-          <p className='mt-4 text-center text-gray-500 dark:text-gray-400 md:text-left'>
-            Drag and drop a file here, or click to select a file
+          <p className='mt-4 px-4 text-center text-gray-500 dark:text-gray-400'>
+            Drag and drop a `.warpdive` file here, or select a file below
           </p>
         </div>
         <div className='flex w-full flex-col items-center space-y-2'>
-          <p className='text-gray-500 dark:text-gray-400'>
-            This file will only be opened in your local browser and is not uploaded or sent anywhere.
-          </p>
           <Input
             className='w-full'
             type='file'
             onChange={handleFileChange}
           />
+          <p className='text-gray-500 dark:text-gray-400'>
+            This file will only be opened in your local browser and is not uploaded or sent anywhere.
+          </p>
         </div>
       </div>
     </div>

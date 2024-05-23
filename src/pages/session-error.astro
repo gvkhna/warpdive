@@ -1,0 +1,35 @@
+---
+import AuthLayout from '@layouts/AuthLayout.astro'
+import AlertFlash from '@components/AlertFlash.astro'
+import {getFlashCookie, deleteOauthStateCookie, deleteUserAuthCookie, deleteFlashCookie} from '@/lib/cookies'
+export const prerender = false
+let flash = getFlashCookie(Astro)
+deleteOauthStateCookie(Astro)
+deleteUserAuthCookie(Astro)
+deleteFlashCookie(Astro)
+---
+
+<AuthLayout title='Session Error'>
+  <div class='mx-auto max-w-sm px-4 py-8'>
+    <h3
+      class='text-lg font-medium leading-6 text-gray-900'
+      id='modal-headline'
+    >
+      Session Error
+    </h3>
+    <div class='mt-2'>
+      <AlertFlash {flash} />
+    </div>
+
+    <div class='mt-6 border-t border-slate-200 pt-5'>
+      <div class='text-sm'>
+        If you encounter repeated issues contact us. <a
+          class='font-medium text-indigo-500 hover:text-indigo-600'
+          href='/signin'
+        >
+          Signin
+        </a>
+      </div>
+    </div>
+  </div>
+</AuthLayout>

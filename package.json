@@ -15,7 +15,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "CI=true wrangler d1 migrations apply warpdive-dev-db --local",
     "db:seed": "tsx src/db/seed.ts",
-    "db:browser": "open $(find .wrangler/state/v3/d1/ -type f -name '*.sqlite' -print -quit)",
+    "db:open": "open $(find .wrangler/state/v3/d1/ -type f -name '*.sqlite' -print -quit)",
     "dev": "wrangler types .astro/worker-configuration.d.ts && astro dev --host",
     "maildev": "maildev -v --hide-extensions STARTTLS --mail-directory tmp/maildev/",
     "preview": "astro preview",

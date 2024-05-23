@@ -15,8 +15,7 @@ declare namespace App {
 
 interface ImportMetaEnv {
   readonly PUBLIC_WEB_HOSTNAME: string
-  readonly PUBLIC_BRAND_NAME: string
-  readonly PUBLIC_DEBUG: string
+  readonly PUBLIC_GITHUB_CLIENT_ID: string
 }
 
 interface ImportMeta {

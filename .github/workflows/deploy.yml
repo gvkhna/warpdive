@@ -31,14 +31,20 @@ jobs:
       - name: Build with Astro
         env:
           PUBLIC_WEB_HOSTNAME: ${{ vars.PUBLIC_WEB_HOSTNAME }}
+          PUBLIC_GITHUB_CLIENT_ID: ${{ vars.PUBLIC_GITHUB_CLIENT_ID }}
         run: |
           pnpm run astro build
         working-directory: ${{ env.BUILD_PATH }}
+      - name: Migrate
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          command: wrangler d1 migrations apply warpdive-db --remote
       - name: Publish
         uses: cloudflare/pages-action@1
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: ${{ vars.CLOUDFLARE_PROJECT_ID }}
+          projectName: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
           directory: ${{ env.BUILD_PATH }}/dist
           gitHubToken: ${{ secrets.GITHUB_TOKEN }}

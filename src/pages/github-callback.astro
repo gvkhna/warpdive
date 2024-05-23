@@ -1,0 +1,63 @@
+---
+import HomeLayout from '@/layouts/HomeLayout.astro'
+import {deleteOauthStateCookie, getOauthStateCookie} from '@/lib/cookies'
+import {fetchGithubUserProfile, fetchGithubUserAccessToken, githubAuthUser} from '@/lib/githubclient'
+
+export const prerender = false
+const oauthState = getOauthStateCookie(Astro)
+
+const githubCode = Astro.url.searchParams.get('code')
+const githubState = Astro.url.searchParams.get('state')
+
+let displayError: Error | undefined = undefined
+
+if (oauthState && githubState && oauthState === githubState && githubCode) {
+  try {
+    const accessTokenResp = await fetchGithubUserAccessToken(githubCode, Astro)
+    console.log(accessTokenResp)
+    const accessToken = accessTokenResp && accessTokenResp['access_token']
+    if (accessToken) {
+      try {
+        const userProfile = await fetchGithubUserProfile(accessToken)
+        if (userProfile) {
+          try {
+            const res = await githubAuthUser(userProfile, Astro)
+            console.log('res: ', res)
+            return res
+          } catch (authError) {
+            if (authError instanceof Error) {
+              displayError = new Error(`Error authenticating user: ${authError.message}`)
+            } else {
+              displayError = new Error(`Encountered Unknown Error: ${authError}`)
+            }
+          }
+        } else {
+          displayError = new Error(`Fetching github user profile failed.`)
+        }
+      } catch (userProfileError) {
+        if (userProfileError instanceof Error) {
+          displayError = new Error(`Error in fetching github user profile: ${userProfileError.message}`)
+        } else {
+          displayError = new Error(`Encountered Unknown Error: ${userProfileError}`)
+        }
+      }
+    } else {
+      displayError = new Error('Unable to authenticate successfully, no access token found.')
+    }
+  } catch (accessTokenError) {
+    if (accessTokenError instanceof Error) {
+      displayError = new Error(`Failed to exchange code for access token: ${accessTokenError.message}`)
+    } else {
+      displayError = new Error(`Encountered Unknown Error: ${accessTokenError}`)
+    }
+  }
+} else {
+  displayError = new Error('Invalid response from Github, please try again.')
+}
+
+deleteOauthStateCookie(Astro)
+---
+
+<HomeLayout title='Oauth Login'>
+  {displayError ? <h1>{displayError.message}</h1> : <h1>Successful auth</h1>}
+</HomeLayout>

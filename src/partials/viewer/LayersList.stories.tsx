@@ -36,7 +36,6 @@ export const Default: Story = {
         {layers.map((item) => (
           <LayerRow
             key={item.gid}
-            gid={item.gid}
             layer={item.layer}
           />
         ))}

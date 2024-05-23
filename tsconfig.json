@@ -16,19 +16,15 @@
       "@ui/*": ["src/components/ui/*"],
       "@hooks/*": ["src/components/hooks/*"],
       "@assets/*": ["src/assets/*"],
-      "@auth": ["src/auth.ts"],
-      "@client": ["src/client.ts"],
+      "@client": ["src/lib/apiclient.ts"],
       "@components/*": ["src/components/*"],
-      "@cookies": ["src/cookies.ts"],
-      "@error": ["src/error.ts"],
       "@icons/*": ["src/icons/*"],
       "@images/*": ["src/images/*"],
       "@layouts/*": ["src/layouts/*"],
-      "@log": ["src/log.ts"],
       "@partials/*": ["src/partials/*"],
       "@styles/*": ["src/styles/*"]
     }
   },
-  "include": ["types.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.astro", "scripts/**/*.ts"],
+  "include": ["types.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.astro", "scripts/**/*.ts", "test/**/*.ts"],
   "exclude": ["node_modules"]
 }

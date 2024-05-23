@@ -12,13 +12,16 @@ export const users = sqliteTable(
     }),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`),
-    email: text('email').notNull(),
-    fullName: text('full_name')
+    // email: text('email').notNull(),
+    fullName: text('full_name'),
+    githubId: integer('github_id', {mode: 'number'}),
+    githubLogin: text('github_login'),
+    githubAvatarUrl: text('github_avatar_url')
   },
   (table) => {
     return {
-      userIdx: uniqueIndex('uid_idx').on(table.uid),
-      emailIdx: uniqueIndex('email_idx').on(table.email)
+      userIdx: uniqueIndex('uid_idx').on(table.uid)
+      // emailIdx: uniqueIndex('email_idx').on(table.email)
     }
   }
 )
@@ -30,7 +33,7 @@ export const userSessions = sqliteTable(
     userId: integer('user_id')
       .references(() => users.id)
       .notNull(),
-    type: text('type', {enum: ['oauth']}).notNull(),
+    type: text('type', {enum: ['jwt']}).notNull(),
     sessionToken: text('session_token').notNull().unique(),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`)
@@ -76,6 +79,7 @@ export const projects = sqliteTable(
     org: text('org'),
     repoUrl: text('repo_url'),
     registryUrl: text('registry_url'),
+    public: integer('public', {mode: 'boolean'}),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`)
   },

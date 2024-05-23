@@ -1,0 +1,43 @@
+---
+import AuthLayout from '@/layouts/AuthLayout.astro'
+import CircleLoader from '@components/CircleLoader.astro'
+import {deleteFlashCookie, deleteOauthStateCookie, deleteUserAuthCookie} from '@/lib/cookies'
+export const prerender = false
+
+deleteOauthStateCookie(Astro)
+deleteUserAuthCookie(Astro)
+deleteFlashCookie(Astro)
+---
+
+<AuthLayout title='Expired'>
+  <div
+    class='inline-block flex-1 transform overflow-hidden rounded-sm bg-white px-4 pb-4 pt-5 text-left align-bottom transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6 sm:align-middle'
+    role='dialog'
+    aria-modal='true'
+    aria-labelledby='modal-headline'
+  >
+    <div>
+      <div class='mx-auto flex h-12 w-12 items-center justify-center rounded-full'>
+        <CircleLoader class='h-15 w-15 text-black' />
+      </div>
+      <div class='mt-3 text-center sm:mt-5'>
+        <h3
+          class='text-lg font-medium leading-6 text-gray-900'
+          id='modal-headline'
+        >
+          Session Expired
+        </h3>
+        <div class='mt-2'>
+          <p class='text-sm text-gray-600'>You are unauthenticated or your session expired. Redirecting to Signin...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      setTimeout(() => {
+        window.location.replace('/signin/')
+      }, 3500)
+    })
+  </script>
+</AuthLayout>
