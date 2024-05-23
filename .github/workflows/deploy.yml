@@ -42,4 +42,4 @@ jobs:
           pnpm run proto
           pnpm astro build
           pnpm wrangler d1 migrations apply warpdive-db --remote --env production
-          pnpm wrangler pages deploy ${{ env.BUILD_PATH }}/dist
+          pnpm wrangler pages deploy ${{ env.BUILD_PATH }}/dist --project-name ${{ env.CLOUDFLARE_PROJECT_NAME}}
