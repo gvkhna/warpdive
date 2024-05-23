@@ -1,4 +1,4 @@
-name: Deploy Astro site to Cloudflare Pages
+name: build
 
 on:
   # Runs on pushes targeting the default branch
@@ -34,6 +34,7 @@ jobs:
           PUBLIC_WEB_HOSTNAME: ${{ vars.PUBLIC_WEB_HOSTNAME }}
           PUBLIC_GITHUB_CLIENT_ID: ${{ vars.PUBLIC_GITHUB_CLIENT_ID }}
         run: |
+          pnpm run proto
           pnpm astro build
         working-directory: ${{ env.BUILD_PATH }}
       - name: Migrate
