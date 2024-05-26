@@ -34,6 +34,11 @@ export default defineConfig({
       enabled: true,
       configPath: 'wrangler.toml',
       persist: true
+    },
+    routes: {
+      extend: {
+        exclude: [{pattern: '/dev/*'}]
+      }
     }
   }),
   srcDir: './src/',
@@ -52,14 +57,14 @@ export default defineConfig({
     sitemap({
       filter: (page) => {
         let sitemapAllow = true
-        const filterBases = ['_image', 'app', 'github-callback', 'session-error', 'session-expired', 'signout']
+        const filterBases = ['_image', 'app', 'dev', 'github-callback', 'session-error', 'session-expired', 'signout']
         const url = new URL(page) // Convert the page URL to a URL object
 
         // Check if the URL pathname starts with any of the filter bases
         if (filterBases.some((base) => url.pathname.startsWith(`/${base}/`))) {
           sitemapAllow = false // Reject the page
         }
-        // eslint-disable-next-line no-console,no-undef
+        // eslint-disable-next-line no-undef
         console.log(`sitemap include?: ${url.pathname} -> ${sitemapAllow}`)
         return sitemapAllow // Include? the page
       },

@@ -6,9 +6,9 @@ export const users = sqliteTable(
   'users',
   {
     id: integer('id', {mode: 'number'}).primaryKey({autoIncrement: true}),
-    uid: text('uid').$defaultFn(() => {
+    pid: text('pid').$defaultFn(() => {
       const ulid = ulidFactory()
-      return ulid()
+      return ulid().toLowerCase()
     }),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`),
@@ -20,7 +20,7 @@ export const users = sqliteTable(
   },
   (table) => {
     return {
-      userIdx: uniqueIndex('uid_idx').on(table.uid)
+      userPublicIdx: uniqueIndex('user_pid_idx').on(table.pid)
       // emailIdx: uniqueIndex('email_idx').on(table.email)
     }
   }
@@ -49,17 +49,20 @@ export const apiKeys = sqliteTable(
   'api_keys',
   {
     id: integer('id', {mode: 'number'}).primaryKey({autoIncrement: true}),
+    pid: text('pid').$defaultFn(() => {
+      const ulid = ulidFactory()
+      return ulid().toLowerCase()
+    }),
     userId: integer('user_id')
       .references(() => users.id)
       .notNull(),
-    jwtToken: text('jwt_token').notNull().unique(),
-    active: integer('active', {mode: 'boolean'}).notNull().default(true),
+    description: text('description'),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`)
   },
   (table) => {
     return {
-      jwtTokenIdx: uniqueIndex('jwt_token_idx').on(table.jwtToken)
+      apiKeyPublicIdx: uniqueIndex('api_key_pid_idx').on(table.pid)
     }
   }
 )
@@ -70,11 +73,12 @@ export const projects = sqliteTable(
     id: integer('id', {mode: 'number'}).primaryKey({autoIncrement: true}),
     pid: text('pid').$defaultFn(() => {
       const ulid = ulidFactory()
-      return ulid()
+      return ulid().toLowerCase()
     }),
     userId: integer('user_id')
       .references(() => users.id)
       .notNull(),
+    userPid: text('user_pid').notNull(),
     name: text('name').notNull(),
     org: text('org'),
     repoUrl: text('repo_url'),
@@ -96,17 +100,22 @@ export const builds = sqliteTable(
     id: integer('id', {mode: 'number'}).primaryKey({autoIncrement: true}),
     pid: text('pid').$defaultFn(() => {
       const ulid = ulidFactory()
-      return ulid()
+      return ulid().toLowerCase()
     }),
-    repoId: integer('repo_id')
+    userId: integer('user_id')
+      .references(() => users.id)
+      .notNull(),
+    userPid: text('user_pid').notNull(),
+    projectId: integer('project_id')
       .references(() => projects.id)
       .notNull(),
+    projectPid: text('project_pid').notNull(),
     commitSha: text('commit_sha'),
     imageSha: text('image_sha'),
     tag: text('tag'),
     releaseUrl: text('release_url'),
     registryUrl: text('registry_url'),
-    builtWith: text('built_with'), // podman,docker
+    builtWith: text('built_with'), // podman, docker
     builtBy: text('built_by'), // user, ci, etc
     objectPath: text('object_path'), // r2 object_path
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)

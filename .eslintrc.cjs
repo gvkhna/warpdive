@@ -23,7 +23,7 @@ module.exports = {
     '@typescript-eslint/no-this-alias': 'off',
     '@typescript-eslint/no-unused-vars': 'off',
     '@typescript-eslint/triple-slash-reference': 'off',
-    'no-console': 'warn',
+    'no-console': ['error', {allow: ['log']}],
     'prefer-const': 'off',
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': ['error'],

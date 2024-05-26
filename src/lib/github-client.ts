@@ -4,7 +4,7 @@ import {eq} from 'drizzle-orm'
 import * as schema from '@/db/schema'
 import {sign, verify} from 'hono/jwt'
 const {crypto} = globalThis
-import {addDays} from 'date-fns'
+import {addDays} from 'date-fns/esm'
 import {
   deleteAllCookies,
   getUserAuthCookie,
@@ -153,7 +153,7 @@ export async function githubAuthNewSession(user: UserType, astro: AstroGlobal) {
   const exp = addDays(new Date(), 30).valueOf() // 30 days
   // const exp = Math.floor(Date.now() / 1000) + 60 * 1 // 1 minute for testing
   const payload = {
-    sub: user.uid,
+    sub: user.pid,
     role: 'user',
     exp: exp
   }
@@ -180,7 +180,8 @@ export async function githubAuthNewSession(user: UserType, astro: AstroGlobal) {
       {
         githubAvatarUrl: user.githubAvatarUrl,
         githubLogin: user.githubLogin,
-        fullName: user.fullName
+        fullName: user.fullName,
+        pid: user.pid
       },
       astro
     )
@@ -285,7 +286,7 @@ export async function fetchGithubUserAccessToken(githubCode: string, astro: Astr
     // This will contain the access_token, scope, and token_type
     return accessTokenResp
   } catch (error) {
-    console.error('Failed to fetch user access token:', error)
+    console.log('Failed to fetch user access token:', error)
     throw error
   }
 }
@@ -309,7 +310,7 @@ export async function fetchGithubUserProfile(accessToken: string) {
     const userProfile = await response.json() // Parse the JSON response
     return userProfile // This will contain the user profile information
   } catch (error) {
-    console.error('Failed to fetch user profile:', error)
+    console.log('Failed to fetch user profile:', error)
     throw error
   }
 }

@@ -1,7 +1,7 @@
 import type {APIRoute} from 'astro'
 import app from '@/server/'
 
-const handler: APIRoute = ({request}) => app.fetch(request)
+const handler: APIRoute = (ctx) => app.fetch(ctx.request, ctx.locals.runtime.env)
 
 export {
   handler as GET,

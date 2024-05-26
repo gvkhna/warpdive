@@ -12,17 +12,7 @@
     "target": "ESNext",
     "noUnusedLocals": false,
     "paths": {
-      "@/*": ["src/*"],
-      "@ui/*": ["src/components/ui/*"],
-      "@hooks/*": ["src/components/hooks/*"],
-      "@assets/*": ["src/assets/*"],
-      "@client": ["src/lib/api-client.ts"],
-      "@components/*": ["src/components/*"],
-      "@icons/*": ["src/icons/*"],
-      "@images/*": ["src/images/*"],
-      "@layouts/*": ["src/layouts/*"],
-      "@partials/*": ["src/partials/*"],
-      "@styles/*": ["src/styles/*"]
+      "@/*": ["src/*"]
     }
   },
   "include": ["types.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.astro", "scripts/**/*.ts", "test/**/*.ts"],

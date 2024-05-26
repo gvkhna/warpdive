@@ -16,7 +16,7 @@ if (newUrl.pathname.endsWith('/') && newUrl.pathname !== '/') {
   newUrl.pathname = newUrl.pathname.slice(0, -1)
 }
 
-import '@styles/globals.css'
+import '@/styles/globals.css'
 ---
 
 <!doctype html>
@@ -37,7 +37,7 @@ import '@styles/globals.css'
       }}
     />
   </head>
-  <body class={`font-sans antialiased bg-white text-zinc-900 tracking-tight`}>
+  <body class={`font-sans min-h-screen antialiased bg-white text-zinc-900 tracking-tight`}>
     <slot />
   </body>
 </html>

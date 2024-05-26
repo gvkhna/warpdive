@@ -1,4 +1,4 @@
-import {addDays, addHours, addMinutes} from 'date-fns'
+import {addDays, addHours, addMinutes} from 'date-fns/esm'
 import type {AstroGlobal} from 'astro'
 
 const {PUBLIC_WEB_HOSTNAME} = import.meta.env
@@ -7,8 +7,8 @@ const secure = PUBLIC_WEB_HOSTNAME ? new URL(PUBLIC_WEB_HOSTNAME).protocol === '
 
 const FLASH_COOKIE_NAME = '_flash'
 const OAUTH_STATE_COOKIE_NAME = '_oauth_state'
-const USER_AUTH_COOKIE_NAME = '_user_auth'
-const USER_PROFILE_COOKIE_NAME = '_user_profile'
+export const USER_PROFILE_COOKIE_NAME = '_user_profile'
+export const USER_AUTH_COOKIE_NAME = '_user_auth'
 
 export function deleteAllCookies(astro: AstroGlobal) {
   deleteFlashCookie(astro)
@@ -18,9 +18,10 @@ export function deleteAllCookies(astro: AstroGlobal) {
 }
 
 export interface UserProfile {
-  githubAvatarUrl?: string | null
-  githubLogin?: string | null
-  fullName?: string | null
+  githubAvatarUrl: string | null
+  githubLogin: string | null
+  fullName: string | null
+  pid: string | null
 }
 
 export function setUserProfileCookie(state: UserProfile, astro: AstroGlobal) {
@@ -29,7 +30,7 @@ export function setUserProfileCookie(state: UserProfile, astro: AstroGlobal) {
   astro.cookies.set(USER_PROFILE_COOKIE_NAME, JSON.stringify(state), {
     httpOnly: false,
     secure: secure,
-    sameSite: true,
+    sameSite: secure,
     maxAge,
     expires,
     path: '/'
@@ -58,9 +59,9 @@ export function setFlashCookie(state: string, astro: AstroGlobal) {
   let maxAge = 60 * 5 // 5 minutes in seconds
   let expires = addMinutes(new Date(), 5)
   astro.cookies.set(FLASH_COOKIE_NAME, state, {
-    httpOnly: false,
+    httpOnly: true,
     secure: secure,
-    sameSite: true,
+    sameSite: secure,
     maxAge,
     expires,
     path: '/'
@@ -85,9 +86,9 @@ export function setUserAuthCookie(state: string, astro: AstroGlobal) {
   let maxAge = 60 * 60 * 24 * 30 // 30 days in seconds
   let expires = addDays(new Date(), 30)
   astro.cookies.set(USER_AUTH_COOKIE_NAME, state, {
-    httpOnly: false,
+    httpOnly: true,
     secure: secure,
-    sameSite: true,
+    sameSite: secure,
     maxAge,
     expires,
     path: '/'
@@ -112,9 +113,9 @@ export function setOauthStateCookie(state: string, astro: AstroGlobal) {
   let maxAge = 60 * 60 * 1 // 1 hour in seconds
   let expires = addHours(new Date(), 1)
   astro.cookies.set(OAUTH_STATE_COOKIE_NAME, state, {
-    httpOnly: false,
+    httpOnly: true,
     secure: secure,
-    sameSite: true,
+    sameSite: secure,
     maxAge,
     expires,
     path: '/'

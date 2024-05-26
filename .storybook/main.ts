@@ -5,7 +5,13 @@ const {mergeConfig} = require('vite')
 
 const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
-  addons: ['@storybook/addon-links', '@storybook/addon-essentials', '@storybook/addon-interactions'],
+  addons: [
+    '@storybook/addon-essentials',
+    '@storybook/addon-interactions',
+    '@storybook/addon-links',
+    'storybook-addon-fetch-mock',
+    'storybook-addon-remix-react-router'
+  ],
   framework: {
     name: '@storybook/react-vite',
     options: {}

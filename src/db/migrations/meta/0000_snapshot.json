@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "26be94d1-ffbf-4f6c-b87d-241808144b95",
+  "id": "206a3c30-67f7-4624-868f-1ca6467d0f86",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "api_keys": {
@@ -14,6 +14,13 @@
           "notNull": true,
           "autoincrement": true
         },
+        "pid": {
+          "name": "pid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
         "user_id": {
           "name": "user_id",
           "type": "integer",
@@ -21,20 +28,12 @@
           "notNull": true,
           "autoincrement": false
         },
-        "jwt_token": {
-          "name": "jwt_token",
+        "description": {
+          "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "autoincrement": false
-        },
-        "active": {
-          "name": "active",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true,
-          "autoincrement": false,
-          "default": true
         },
         "created_at": {
           "name": "created_at",
@@ -54,17 +53,10 @@
         }
       },
       "indexes": {
-        "api_keys_jwt_token_unique": {
-          "name": "api_keys_jwt_token_unique",
+        "api_key_pid_idx": {
+          "name": "api_key_pid_idx",
           "columns": [
-            "jwt_token"
-          ],
-          "isUnique": true
-        },
-        "jwt_token_idx": {
-          "name": "jwt_token_idx",
-          "columns": [
-            "jwt_token"
+            "pid"
           ],
           "isUnique": true
         }
@@ -104,9 +96,30 @@
           "notNull": false,
           "autoincrement": false
         },
-        "repo_id": {
-          "name": "repo_id",
+        "user_id": {
+          "name": "user_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_pid": {
+          "name": "user_pid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "project_id": {
+          "name": "project_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "project_pid": {
+          "name": "project_pid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -186,12 +199,25 @@
         }
       },
       "foreignKeys": {
-        "builds_repo_id_projects_id_fk": {
-          "name": "builds_repo_id_projects_id_fk",
+        "builds_user_id_users_id_fk": {
+          "name": "builds_user_id_users_id_fk",
+          "tableFrom": "builds",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "builds_project_id_projects_id_fk": {
+          "name": "builds_project_id_projects_id_fk",
           "tableFrom": "builds",
           "tableTo": "projects",
           "columnsFrom": [
-            "repo_id"
+            "project_id"
           ],
           "columnsTo": [
             "id"
@@ -223,6 +249,13 @@
         "user_id": {
           "name": "user_id",
           "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false
+        },
+        "user_pid": {
+          "name": "user_pid",
+          "type": "text",
           "primaryKey": false,
           "notNull": true,
           "autoincrement": false
@@ -398,8 +431,8 @@
           "notNull": true,
           "autoincrement": true
         },
-        "uid": {
-          "name": "uid",
+        "pid": {
+          "name": "pid",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -451,10 +484,10 @@
         }
       },
       "indexes": {
-        "uid_idx": {
-          "name": "uid_idx",
+        "user_pid_idx": {
+          "name": "user_pid_idx",
           "columns": [
-            "uid"
+            "pid"
           ],
           "isUnique": true
         }

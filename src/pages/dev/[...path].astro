@@ -1,0 +1,32 @@
+---
+// Sets a session token for the first user in the database
+// For local testing you will be signed into the first user
+
+import {drizzle} from 'drizzle-orm/d1'
+import * as schema from '@/db/schema'
+import {githubAuthNewSession} from '@/lib/github-client'
+export const prerender = false
+
+export function getStaticPaths() {
+  if (import.meta.env.PROD) {
+    return []
+  } else {
+    return [{params: {path: 'signin'}}]
+  }
+}
+
+const {path} = Astro.params
+
+console.log('file: ', path, import.meta.env.DEV)
+// export const prerender = import.meta.env.PROD
+if (import.meta.env.DEV && path === 'signin') {
+  const db = drizzle(Astro.locals.runtime.env.DB, {schema})
+
+  const res = await db.query.users.findFirst()
+  if (res) {
+    return await githubAuthNewSession(res, Astro)
+  } else {
+    throw new Error('Run pnpm db:seed to generate a test user')
+  }
+}
+---

@@ -19,5 +19,14 @@ export const collections = {
           message: 'At least 2 tags are required.'
         })
       })
+  }),
+  emptyStates: defineCollection({
+    type: 'content',
+    schema: () => {
+      z.object({
+        title: z.string(),
+        description: z.string()
+      })
+    }
   })
 }

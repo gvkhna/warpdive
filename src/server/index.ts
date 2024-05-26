@@ -1,13 +1,23 @@
 import {Hono} from 'hono'
-import {hc} from 'hono/client'
 import users from './users'
+import projects from './projects'
+import dashboard from './dashboard'
 
-const app = new Hono().basePath('/api')
+type HonoBindings = {
+  DB: D1Database
+  STORAGE: R2Bucket
+  APP_SECRET_KEY: string | null
+}
 
-const routes = app.route('/users', users).get('/', (c) => c.json({message: 'Server is healthy'}))
+export type HonoServer = {Bindings: HonoBindings}
+
+const app = new Hono<HonoServer>().basePath('/api')
+
+const routes = app
+  .route('/dashboard', dashboard)
+  .route('/users', users)
+  .route('/projects', projects)
+  .get('/', (c) => c.json({message: 'Server is healthy'}, 200))
 
 export default app
 export type AppType = typeof routes
-
-export const client = hc<AppType>('/')
-export type ClientType = typeof client
