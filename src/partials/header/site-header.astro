@@ -1,0 +1,68 @@
+---
+import GithubLogo from '@/icons/github-logo.astro'
+import TwitterLogo from '@/icons/twitter-logo.astro'
+import {siteConfig} from '@/strings'
+export interface Props {
+  class?: string
+}
+const {class: cls} = Astro.props
+---
+
+<header
+  class={`${cls} sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60`}
+>
+  <div class='container flex h-14 max-w-screen-2xl items-center'>
+    <div class='mr-4 flex'>
+      <a
+        class='mr-6 flex items-center space-x-2'
+        href='/'
+        ><span class='inline-block font-bold'>warpdive</span></a
+      ><nav class='flex items-center gap-4 text-sm lg:gap-6'>
+        {
+          /* <a
+          class='text-foreground/60 transition-colors hover:text-foreground/80'
+          href='/docs'
+          >Docs</a
+        > */
+        }
+        {
+          /* <a
+          class='hidden text-foreground/60 transition-colors hover:text-foreground/80 lg:block'
+          href='https://github.com/shadcn-ui/ui'
+          >GitHub</a
+        > */
+        }
+      </nav>
+    </div>
+    <div class='flex flex-1 items-center justify-end space-x-2'>
+      <nav class='flex items-center'>
+        <a
+          target='_blank'
+          rel='noreferrer'
+          href={siteConfig.links.github}
+          ><div
+            class='focus-visible:ring-1 focus-visible:ring-ring inline-flex h-9 w-9 items-center justify-center whitespace-nowrap rounded-md px-0 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
+          >
+            <GithubLogo />
+            <span class='sr-only'>GitHub</span>
+          </div></a
+        ><a
+          target='_blank'
+          rel='noreferrer'
+          href={siteConfig.links.twitter}
+          ><div
+            class='focus-visible:ring-1 focus-visible:ring-ring inline-flex h-9 w-9 items-center justify-center whitespace-nowrap rounded-md px-0 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
+          >
+            <TwitterLogo />
+            <span class='sr-only'>Twitter</span>
+          </div></a
+        >
+        <a
+          class='focus-visible:ring-1 focus-visible:ring-ring mx-2 inline-flex h-9 items-center justify-center whitespace-nowrap rounded-[6px] border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
+          href='/signin'
+          >Signin</a
+        >
+      </nav>
+    </div>
+  </div>
+</header>

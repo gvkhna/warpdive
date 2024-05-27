@@ -55,7 +55,7 @@ export default function SettingsPage(props: SettingsPageProps) {
             <div className='space-y-6'>
               <ProfileCard />
               <ApiKeysCard apiKeys={data?.apiKeys} />
-              <DeleteUserForm showInitialError={props.showInitialError} />
+              {/* <DeleteUserForm showInitialError={props.showInitialError} /> */}
             </div>
           </div>
         </div>

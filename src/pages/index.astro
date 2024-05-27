@@ -1,36 +1,78 @@
 ---
+import GithubLogo from '@/icons/github-logo.astro'
 import MainLayout from '@/layouts/main-layout.astro'
-import client from '@/lib/api-client'
-import {drizzle} from 'drizzle-orm/d1'
-import {desc} from 'drizzle-orm'
-import {users} from '@/db/schema'
-export const prerender = false
-
-// const test = await client.$get()
-// const data = await test.json()
-// console.log(data)
-// const x = JSON.stringify(data)
-
-const db = drizzle(Astro.locals.runtime.env.DB)
-
-// const newUser = await db.insert(users).values({id: '0', fullName: 'test'})
-
-const usersData = await db.select().from(users).orderBy(desc(users.id))
+import SiteFooter from '@/partials/footer/site-footer.astro'
+import SiteHeader from '@/partials/header/site-header.astro'
+import ExamplesSection from '@/partials/site/examples-section.astro'
+export const prerender = true
 ---
 
 <MainLayout
-  title='Signin'
-  desc='Sign in to your account'
+  title='Warpdive'
+  desc='A docker/oci container layer browser'
 >
-  <div>WIP</div>
-  <div>
-    {
-      usersData.map((user) => (
-        <li>
-          {user.id} {user.fullName}
-        </li>
-      ))
-    }
+  <div vaul-drawer-wrapper=''>
+    <div class='relative flex min-h-screen flex-col bg-background'>
+      <SiteHeader />
+      <main class='flex-1'>
+        <div class='container relative'>
+          <section
+            class='mx-auto flex max-w-[980px] flex-col items-center gap-2 py-8 md:py-12 md:pb-8 lg:py-24 lg:pb-20'
+          >
+            {
+              /* <a
+              class='inline-flex items-center rounded-lg bg-zinc-900 px-3 py-1 text-sm font-medium text-white'
+              href='/docs/'
+            >
+              <span>&beta;</span>
+              <div
+                data-orientation='vertical'
+                role='none'
+                class='mx-2 h-4 w-[1px] shrink-0 bg-border'
+              >
+              </div>
+              <span>Now in beta</span></a
+            > */
+            }
+            <a
+              class='inline-flex items-center rounded-lg bg-zinc-900 px-3 py-1 text-sm font-medium text-white'
+              href='#'
+            >
+              <span>&alpha;</span>
+              <div
+                data-orientation='vertical'
+                role='none'
+                class='mx-2 h-4 w-[1px] shrink-0 bg-border'
+              >
+              </div>
+              <span>Coming soon</span></a
+            >
+            <h1
+              class='block text-center text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]'
+            >
+              Docker Container Layer Browser
+            </h1><span class='inline-block max-w-[750px] text-center align-top text-lg font-light text-foreground'
+              >Easy to use container layer browser. Use with docker/OCI images. Track size over time by connecting to
+              CI. Catch layer caching issues or debug errors. Free and open source.</span
+            >
+            <div
+              class='flex w-full flex-col items-center justify-center space-x-4 space-y-2 py-4 md:flex-row md:space-y-0 md:pb-10'
+            >
+              <a
+                class='focus-visible:ring-1 focus-visible:ring-ring inline-flex h-9 items-center justify-center whitespace-nowrap rounded-[6px] bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
+                href='/signin'
+                ><GithubLogo /><span class='ml-2'>Signin with Github</span></a
+              ><a
+                class='focus-visible:ring-1 focus-visible:ring-ring inline-flex h-9 items-center justify-center whitespace-nowrap rounded-[6px] border border-input bg-background px-4 py-2 text-sm font-medium shadow-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
+                href='/viewer'
+                >Offline Viewer</a
+              >
+            </div>
+          </section>
+          {/* <ExamplesSection /> */}
+        </div>
+      </main>
+      <SiteFooter />
+    </div>
   </div>
-  <div>testing</div>
 </MainLayout>

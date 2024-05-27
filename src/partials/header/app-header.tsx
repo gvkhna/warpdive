@@ -6,7 +6,7 @@ import {siteConfig} from '@/strings'
 import {UserNav} from './user-nav'
 import {useLocation} from 'react-router-dom'
 
-export function SiteHeader() {
+export function AppHeader() {
   const location = useLocation()
   const pathname = location.pathname
   return (

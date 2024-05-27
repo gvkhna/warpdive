@@ -1,6 +1,6 @@
 import {Children, PropsWithChildren} from 'react'
-import {SiteHeader} from '../header/app-header'
-import {SiteFooter} from '../footer/site-footer'
+import {AppHeader} from '../header/app-header'
+import {AppFooter} from '../footer/app-footer'
 import {useLocation} from 'react-router-dom'
 export interface AppLayoutProps {}
 
@@ -10,9 +10,9 @@ export default function AppLayout({children}: PropsWithChildren<AppLayoutProps>)
   const hideFooter = location.pathname.startsWith('/app/deployment')
   return (
     <div className='relative flex min-h-screen flex-col bg-background'>
-      <SiteHeader />
+      <AppHeader />
       <main className='flex-1'>{children}</main>
-      {!hideFooter && <SiteFooter />}
+      {!hideFooter && <AppFooter />}
     </div>
   )
 }

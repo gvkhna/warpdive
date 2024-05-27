@@ -71,7 +71,9 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
-            navigate('/signout')
+            if (window && window.location) {
+              window.location.href = '/signout'
+            }
           }}
         >
           Signout
