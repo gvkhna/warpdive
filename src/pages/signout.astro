@@ -31,31 +31,29 @@ await signoutSession(Astro)
         aria-modal='true'
         aria-labelledby='modal-headline'
       >
-        <>
-          <div>
-            <div class='mx-auto flex h-12 w-12 items-center justify-center rounded-full'>
-              <CircleLoader class='h-15 w-15 text-black' />
-            </div>
-            <div class='mt-5 text-center md:mt-1'>
-              <h3
-                class='text-lg font-medium leading-6 text-gray-900'
-                id='modal-headline'
-              >
-                Signing out
-              </h3>
-              <div class='mt-2'>
-                <p class='text-sm text-gray-600'>
-                  Redirecting to <a
-                    class='font-medium text-indigo-500 hover:text-indigo-600'
-                    href='/signin'
-                  >
-                    Signin
-                  </a>...
-                </p>
-              </div>
+        <div>
+          <div class='mx-auto flex h-12 w-12 items-center justify-center rounded-full'>
+            <CircleLoader class='h-15 w-15 text-black' />
+          </div>
+          <div class='mt-5 text-center md:mt-1'>
+            <h3
+              class='text-lg font-medium leading-6 text-gray-900'
+              id='modal-headline'
+            >
+              Signing out
+            </h3>
+            <div class='mt-2'>
+              <p class='text-sm text-gray-600'>
+                Redirecting to <a
+                  class='font-medium text-indigo-500 hover:text-indigo-600'
+                  href='/signin'
+                >
+                  Signin
+                </a>...
+              </p>
             </div>
           </div>
-        </>
+        </div>
       </div>
     </div>
   </div>

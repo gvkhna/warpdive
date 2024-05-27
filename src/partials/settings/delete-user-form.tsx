@@ -26,6 +26,19 @@ export default function DeleteUserForm({showInitialError = false}: DeleteUserFor
   const [showError, setShowError] = useState(showInitialError)
   const [errorText, setErrorText] = useState('')
 
+  const formSubmit = async () => {
+    setErrorText('')
+    const res = await api.users.delete.$get()
+
+    if (res.ok) {
+      // navigate('/signout')
+    } else {
+      const json = await res.json()
+      setErrorText(json.message)
+      setShowError(true)
+    }
+  }
+
   return (
     <>
       <ErrorAlert
@@ -46,31 +59,7 @@ export default function DeleteUserForm({showInitialError = false}: DeleteUserFor
           <form
             onSubmit={(event) => {
               event.preventDefault()
-              setErrorText('')
-              api.users.delete
-                .$get()
-                .then((res) => {
-                  if (res.ok) {
-                    // navigate('/signout')
-                  } else {
-                    res
-                      .json()
-                      .then((json) => {
-                        setErrorText(json.message)
-                        setShowError(true)
-                      })
-                      .catch((e) => {
-                        console.log('api returned err: ', e)
-                        setErrorText('Server returned incorrect data, please try again.')
-                        setShowError(true)
-                      })
-                  }
-                })
-                .catch((e) => {
-                  console.log('api error: ', e)
-                  setErrorText('Unable to communicate with server, please try again.')
-                  setShowError(true)
-                })
+              formSubmit()
             }}
           >
             <AlertDialogHeader>

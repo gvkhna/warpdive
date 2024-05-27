@@ -6,6 +6,8 @@ import DashboardPage from '../dashboard/dashboard-page'
 import ProjectsPage from '../projects/projects-page'
 import NewProjectPage from '../projects/new-project-page'
 import AppLayout from './app-layout'
+import SettingsPage from '../settings/settings-page'
+import AppViewerPage from '../viewer/app-viewer-page'
 
 export default function App() {
   return (
@@ -33,6 +35,14 @@ export default function App() {
               <Route
                 path='/app/project/:pid'
                 element={<ProjectsPage />}
+              />
+              <Route
+                path='/app/deployment/:pid'
+                element={<AppViewerPage />}
+              />
+              <Route
+                path='/app/settings'
+                element={<SettingsPage />}
               />
             </Routes>
           </AppLayout>

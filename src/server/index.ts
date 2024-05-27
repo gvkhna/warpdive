@@ -2,6 +2,7 @@ import {Hono} from 'hono'
 import users from './users'
 import projects from './projects'
 import dashboard from './dashboard'
+import builds from './builds'
 
 type HonoBindings = {
   DB: D1Database
@@ -17,6 +18,7 @@ const routes = app
   .route('/dashboard', dashboard)
   .route('/users', users)
   .route('/projects', projects)
+  .route('/builds', builds)
   .get('/', (c) => c.json({message: 'Server is healthy'}, 200))
 
 export default app

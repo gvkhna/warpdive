@@ -1,8 +1,5 @@
 import {MoreHorizontal} from 'lucide-react'
-
-import {Badge} from '@/components/ui/badge'
-import {PlusIcon} from '@radix-ui/react-icons'
-import {Button} from '@/components/ui/button'
+import {Button, buttonVariants} from '@/components/ui/button'
 import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card'
 import {
   DropdownMenu,
@@ -12,188 +9,164 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu'
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from '@/components/ui/table'
-import {ErrorAlert} from './error-alert'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from '@/components/ui/dialog'
-import {Input} from '@/components/ui/input'
-import {Label} from '@/components/ui/label'
+import * as schema from '@/db/schema'
+import {NewApiKeyForm} from './new-api-key-form'
+import {formatRelativeTimeFromUTC, formatTimeFromUTC} from '@/lib/format-dates'
 import {useState} from 'react'
+import {ErrorAlert} from './error-alert'
 import api from '@/lib/api-client'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from '@/components/ui/alert-dialog'
 import {useNavigate} from 'react-router-dom'
-import {ShowApiKeyDialog} from './show-api-key-dialog'
+import {mutate} from 'swr'
 
-export function NewApiKeyForm() {
+export interface ApiKeysCardProps {
+  apiKeys?: Omit<typeof schema.apiKeys.$inferSelect, 'id' | 'userId'>[]
+}
+
+export function ApiKeysCard(props: ApiKeysCardProps) {
   const navigate = useNavigate()
 
-  const [showApiKey, setShowApiKey] = useState(false)
-  const [apiKey, setApiKey] = useState('')
+  const [showConfirmRevoke, setShowConfirmRevoke] = useState(false)
 
   const [showError, setShowError] = useState(false)
   const [errorText, setErrorText] = useState('')
+  const [revokePid, setRevokePid] = useState('')
 
-  const [description, setDescription] = useState('')
-  const [showDescriptionRequired, setShowDescriptionRequired] = useState(false)
+  console.log('loading api keys: ', props.apiKeys)
 
-  const formSubmit = async () => {
+  const revokeFormApiKey = async () => {
     setErrorText('')
-    setApiKey('')
-    if (!description) {
-      setShowDescriptionRequired(true)
-      return
-    }
-    try {
-      const res = await api.users['api-key'].new.$post({
-        json: {
-          description
-        }
-      })
-      if (res.ok) {
-        const json = await res.json()
-        setApiKey(json.apiKey.token)
-        setShowApiKey(true)
-      } else {
-        const json = await res.json()
-        if (json.message) {
-          setErrorText(json.message)
-          setShowError(true)
-        }
+    const res = await api.users['api-key'].revoke.$post({
+      json: {
+        pid: revokePid
       }
-    } catch (e) {
-      console.log('api error: ', e)
-      setErrorText('Unable to communicate with server, please try again.')
+    })
+
+    if (res.ok) {
+      mutate(api.users.settings.$url().pathname)
+      navigate('/app/settings')
+    } else {
+      const json = await res.json()
+      setErrorText(json.message)
       setShowError(true)
     }
   }
 
   return (
     <>
-      <ShowApiKeyDialog
-        open={showApiKey}
-        onOpenChange={setShowApiKey}
-        apiKey={apiKey}
-      />
       <ErrorAlert
         open={showError}
         onOpenChange={setShowError}
         error={errorText}
       />
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button
-            className='h-8 gap-1'
-            size='sm'
-          >
-            <PlusIcon className='h-3.5 w-3.5' />
-            <span className='sr-only sm:not-sr-only sm:whitespace-nowrap'>New API Key</span>
-          </Button>
-        </DialogTrigger>
-        <DialogContent className='sm:max-w-[425px]'>
+      <AlertDialog
+        open={showConfirmRevoke}
+        onOpenChange={setShowConfirmRevoke}
+      >
+        <AlertDialogContent>
           <form
             onSubmit={(event) => {
               event.preventDefault()
-              formSubmit()
+              setShowConfirmRevoke(false)
+              revokeFormApiKey()
             }}
           >
-            <DialogHeader>
-              <DialogTitle>New API Key</DialogTitle>
-              <DialogDescription>API Keys can only be named upon creation</DialogDescription>
-            </DialogHeader>
-            <div className='grid gap-4 py-4'>
-              <div className='grid grid-cols-4 items-center gap-4'>
-                <Label
-                  htmlFor='description'
-                  className='text-right'
-                >
-                  Description
-                </Label>
-                <Input
-                  id='description'
-                  placeholder='production ci'
-                  className='col-span-3'
-                  value={description}
-                  onChange={(e) => {
-                    setDescription(e.currentTarget.value)
-                  }}
-                  onPaste={(e) => {
-                    setDescription(e.currentTarget.value)
-                  }}
-                />
-              </div>
-              {showDescriptionRequired && (
-                <p className='text-sm font-medium text-destructive'>A description is required</p>
-              )}
-            </div>
-            <DialogFooter>
-              <Button type='submit'>Create</Button>
-            </DialogFooter>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+              <AlertDialogDescription className='pb-2'>
+                This will permanently delete the api key.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction
+                asChild
+                className={buttonVariants({variant: 'destructive'})}
+              >
+                <button type='submit'>Continue</button>
+              </AlertDialogAction>
+            </AlertDialogFooter>
           </form>
-        </DialogContent>
-      </Dialog>
+        </AlertDialogContent>
+      </AlertDialog>
+      <Card>
+        <CardHeader>
+          <CardTitle>API Keys</CardTitle>
+          <CardDescription>Manage your API Keys for `warpdive-cli`</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Description</TableHead>
+                <TableHead className='hidden md:table-cell'>Last used</TableHead>
+                <TableHead className='hidden md:table-cell'>Created</TableHead>
+                <TableHead>
+                  <span className='sr-only'>Actions</span>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {props.apiKeys &&
+                props.apiKeys.map((apiKey) => (
+                  <TableRow key={apiKey.pid}>
+                    <TableCell className='font-medium'>{apiKey.description}</TableCell>
+                    <TableCell className='hidden md:table-cell'>
+                      {apiKey.updatedAt &&
+                        apiKey.createdAt &&
+                        (apiKey.createdAt === apiKey.updatedAt ? '-' : formatRelativeTimeFromUTC(apiKey.updatedAt))}
+                    </TableCell>
+                    <TableCell className='hidden md:table-cell'>
+                      {apiKey.createdAt && formatTimeFromUTC(apiKey.createdAt)}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button
+                            aria-haspopup='true'
+                            size='icon'
+                            variant='ghost'
+                            className=''
+                          >
+                            <MoreHorizontal className='h-4 w-4' />
+                            <span className='sr-only'>Toggle menu</span>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align='end'>
+                          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                          <DropdownMenuItem
+                            onClick={() => {
+                              console.log('api key: ', apiKey.pid)
+                              if (apiKey.pid) {
+                                setRevokePid(apiKey.pid)
+                                setShowConfirmRevoke(true)
+                              }
+                            }}
+                          >
+                            Revoke
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+        <CardFooter>
+          <NewApiKeyForm />
+        </CardFooter>
+      </Card>
     </>
-  )
-}
-
-export default function ApiKeysCard() {
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>API Keys</CardTitle>
-        <CardDescription>Manage your api keys for the command line client</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              {/* <TableHead className='hidden w-[100px] sm:table-cell'>
-                <span className='sr-only'>Image</span>
-              </TableHead> */}
-              <TableHead>Description</TableHead>
-              {/* <TableHead>Status</TableHead> */}
-              {/* <TableHead className='hidden md:table-cell'>Price</TableHead> */}
-              {/* <TableHead className='hidden md:table-cell'>Total Sales</TableHead> */}
-              <TableHead className='hidden md:table-cell'>Last used</TableHead>
-              <TableHead>
-                <span className='sr-only'>Actions</span>
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            <TableRow>
-              <TableCell className='font-medium'>Laser Lemonade Machin </TableCell>
-              <TableCell className='hidden md:table-cell'>2023-07-12 10:42 AM</TableCell>
-              <TableCell>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      aria-haspopup='true'
-                      size='icon'
-                      variant='ghost'
-                      className=''
-                    >
-                      <MoreHorizontal className='h-4 w-4' />
-                      <span className='sr-only'>Toggle menu</span>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align='end'>
-                    <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                    <DropdownMenuItem>Revoke</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </TableCell>
-            </TableRow>
-          </TableBody>
-        </Table>
-      </CardContent>
-      <CardFooter>
-        <NewApiKeyForm />
-      </CardFooter>
-    </Card>
   )
 }

@@ -30,6 +30,10 @@ const projects = new Hono<HonoServer>()
         return c.json({message: 'Project must have a valid name, no spaces'}, 400)
       }
 
+      if (name === '<untagged>') {
+        return c.json({message: 'Cannot create a project with name `<untagged>`'}, 400)
+      }
+
       const helper = await getAuthenticatedUserDB(c)
       console.log('helper: ', helper.currentUser)
       if (helper.currentUser && helper.currentUser.pid && helper.db) {

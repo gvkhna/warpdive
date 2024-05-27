@@ -7,7 +7,7 @@ import {useLayer} from './use-layer'
 import {WarpDiveImage_FileNode_FileType} from '@/generated/warpdive_pb'
 import type {WarpDiveImage_TreeNode} from '@/generated/warpdive_pb'
 import {FileIcon, FolderIcon, FolderOpenIcon} from 'lucide-react'
-import {formatBytesString} from './format-numbers'
+import {formatBytesString} from './format-byte-size'
 import {formatFilePermissionsMode} from './format-permissions'
 
 interface TreeNodeItem {
@@ -123,7 +123,7 @@ const Row = memo(({data, index, style}: RowProps) => {
         onClick={(e) => onSelect(e, node)}
       >
         <div
-          className='grid text-nowrap font-mono'
+          className='grid text-nowrap pl-1 font-mono'
           style={{
             gridTemplateColumns: 'minmax(6rem, 6rem) minmax(4rem, auto) minmax(4rem, auto) 1fr'
           }}

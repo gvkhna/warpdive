@@ -1,4 +1,4 @@
-import {eq, desc, getTableColumns} from 'drizzle-orm'
+import {eq, desc, getTableColumns, sql} from 'drizzle-orm'
 import {getAuthenticatedUserDB} from './users'
 import {Hono} from 'hono'
 import {HonoServer} from '.'
@@ -16,16 +16,38 @@ const dashboard = new Hono<HonoServer>().get('/', async (c) => {
       .select(projectCols)
       .from(schema.projects)
       .where(eq(schema.projects.userId, userId))
-      .limit(15)
+      .limit(50)
       .orderBy(desc(schema.projects.updatedAt))
 
-    const {id: buildId, userId: buildUserId, projectId: buildRepoId, ...buildCols} = getTableColumns(schema.builds)
+    // alias all columns on join due to issue for joins with drizzle/d1
+    // tracking bug: https://github.com/drizzle-team/drizzle-orm/issues/555
+    // const {id: buildId, userId: buildUserId, projectId: buildRepoId, ...buildCols} = getTableColumns(schema.builds)
     const recentBuilds = await db
-      .select(buildCols)
-      .from(schema.builds)
-      .where(eq(schema.builds.userId, userId))
-      .limit(15)
-      .orderBy(desc(schema.builds.createdAt))
+      .select({
+        builtBy: sql<string | null>`${schema.builds.builtBy}`.as('build_built_by'),
+        builtWith: sql<string | null>`${schema.builds.builtWith}`.as('build_built_with'),
+        commitSha: sql<string | null>`${schema.builds.commitSha}`.as('build_commit_sha'),
+        createdAt: sql<string | null>`${schema.builds.createdAt}`.as('build_created_at'),
+        imageSha: sql<string | null>`${schema.builds.imageSha}`.as('build_image_sha'),
+        objectPath: sql<string>`${schema.builds.objectPath}`.as('build_object_path'),
+        pid: sql<string | null>`${schema.builds.pid}`.as('build_pid'),
+        projectCreatedAt: sql<string | null>`${schema.projects.createdAt}`.as('project_created_at'),
+        projectName: sql<string>`${schema.projects.name}`.as('project_name'),
+        projectOrg: sql<string | null>`${schema.projects.org}`.as('project_org'),
+        projectPid: sql<string | null>`${schema.projects.pid}`.as('project_pid'),
+        projectPublic: sql<boolean | null>`${schema.projects.public}`.as('project_public'),
+        projectRegistryUrl: sql<string | null>`${schema.projects.registryUrl}`.as('project_registry_url'),
+        projectRepoUrl: sql<string | null>`${schema.projects.repoUrl}`.as('project_repo_url'),
+        projectUpdatedAt: sql<string | null>`${schema.projects.updatedAt}`.as('project_updated_at'),
+        registryUrl: sql<string | null>`${schema.builds.registryUrl}`.as('build_registry_url'),
+        releaseUrl: sql<string | null>`${schema.builds.releaseUrl}`.as('build_release_url'),
+        tag: sql<string | null>`${schema.builds.tag}`.as('build_tag')
+      })
+      .from(schema.projects)
+      .innerJoin(schema.builds, eq(schema.builds.projectId, schema.projects.id))
+      .where(eq(schema.projects.userId, userId))
+      .limit(50)
+      .orderBy(desc(schema.projects.updatedAt))
 
     if (projects && recentBuilds) {
       return c.json({projects, recentBuilds}, 200)

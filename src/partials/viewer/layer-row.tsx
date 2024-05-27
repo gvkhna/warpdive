@@ -4,7 +4,7 @@ import {cn} from '@/lib/utils'
 import {WarpDiveImage_Layer, WarpDiveImage_TreeNode, WarpDiveImage_TreeNode_Ref} from '@/generated/warpdive_pb'
 import {useLayer} from './use-layer'
 import {Badge} from '@/components/ui/badge'
-import {formatBytesString} from './format-numbers'
+import {formatBytesString} from './format-byte-size'
 import {useWarpImage} from './warp-dive-image-provider'
 
 export interface LayerRowProps {

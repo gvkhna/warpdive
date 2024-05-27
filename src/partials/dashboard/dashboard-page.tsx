@@ -12,6 +12,7 @@ import {useNavigate} from 'react-router-dom'
 import {ChevronRightIcon, ExternalLinkIcon} from '@radix-ui/react-icons'
 import {Badge} from '@/components/ui/badge'
 import {formatRelativeTimeFromUTC} from '@/lib/format-dates'
+import Link from '@/components/link'
 const statuses = {
   offline: 'text-gray-500 bg-gray-100/10',
   online: 'text-green-400 bg-green-400/10',
@@ -54,6 +55,8 @@ export default function DashboardPage({children}: PropsWithChildren<DashboardPag
     }
   }, [data])
 
+  console.log('data: ', data)
+
   if (error) return <div>failed to load</div>
   if (isLoading) return <div></div>
   return (
@@ -69,21 +72,14 @@ export default function DashboardPage({children}: PropsWithChildren<DashboardPag
                   button: (
                     <Button
                       size={'sm'}
-                      className='gap-x-1'
-                      onClick={() => {
-                        navigate('/app/projects/new')
-                      }}
+                      className='h-8 gap-x-1 hover:no-underline'
+                      asChild
                     >
-                      <PlusIcon />
-                      {'New'}
+                      <Link href='/app/projects/new'>
+                        <PlusIcon className='h-3 w-3' />
+                        {'New'}
+                      </Link>
                     </Button>
-                    //   <Button
-                    //   className='h-8 gap-1'
-                    //   size='sm'
-                    // >
-                    //   <PlusIcon className='h-3.5 w-3.5' />
-                    //   <span className='sr-only sm:not-sr-only sm:whitespace-nowrap'>New API Key</span>
-                    // </Button>
                   ),
                   items: navItems
                 }
@@ -114,11 +110,11 @@ export default function DashboardPage({children}: PropsWithChildren<DashboardPag
                     <div className='h-2 w-2 rounded-full bg-current' />
                   </div> */}
                           <h2 className='min-w-0 text-sm font-semibold leading-6  text-zinc-900 dark:text-white'>
-                            <a
-                              href={`/app/deployments/${deployment.pid}`}
-                              className='flex gap-x-2'
+                            <Link
+                              href={`/app/deployment/${deployment.pid}`}
+                              className='group flex h-auto gap-x-2 p-0 hover:no-underline'
                             >
-                              <span className='truncate'>{deployment.projectPid}</span>
+                              <span className='truncate group-hover:underline'>{deployment.projectName}</span>
                               {deployment.tag ? (
                                 deployment.tag.split(':').map((tag) => (
                                   <Badge
@@ -131,12 +127,12 @@ export default function DashboardPage({children}: PropsWithChildren<DashboardPag
                               ) : (
                                 <>
                                   <span className='text-gray-400'>/</span>
-                                  <span className='whitespace-nowrap'>{deployment.imageSha}</span>
+                                  <span className='whitespace-nowrap group-hover:underline'>{deployment.pid}</span>
                                 </>
                               )}
 
                               <span className='absolute inset-0' />
-                            </a>
+                            </Link>
                           </h2>
                         </div>
                         <div className='mt-3 flex items-center gap-x-2.5 text-xs leading-5 text-gray-400'>

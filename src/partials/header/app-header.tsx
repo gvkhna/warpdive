@@ -14,7 +14,7 @@ export function SiteHeader() {
       <div className='container flex h-14 max-w-screen-2xl items-center'>
         <div className='mr-4 flex'>
           <Link
-            href='/'
+            href='/app/'
             className='mr-6 flex items-center space-x-2'
           >
             {/* <Icons.logo className='h-6 w-6' /> */}
@@ -38,6 +38,7 @@ export function SiteHeader() {
               href={siteConfig.links.github}
               target='_blank'
               rel='noreferrer'
+              className='p-0'
             >
               <div
                 className={cn(
@@ -55,6 +56,7 @@ export function SiteHeader() {
               href={siteConfig.links.twitter}
               target='_blank'
               rel='noreferrer'
+              className='p-0'
             >
               <div
                 className={cn(

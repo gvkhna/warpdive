@@ -25,7 +25,8 @@ export function CopyButton({value, className, src, variant = 'ghost', ...props}:
       size='icon'
       variant={variant}
       className={cn('relative z-10 h-6 w-6 bg-zinc-900 text-zinc-50 hover:bg-zinc-700 hover:text-zinc-50', className)}
-      onClick={() => {
+      onClick={(event) => {
+        event.preventDefault()
         copyToClipboardWithMeta(value)
         setHasCopied(true)
       }}

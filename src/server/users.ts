@@ -1,13 +1,14 @@
 import {Hono, type Context} from 'hono'
 import {HonoServer} from '.'
 import {DrizzleD1Database, drizzle} from 'drizzle-orm/d1'
-import {eq, getTableColumns} from 'drizzle-orm'
+import {eq, desc, and, getTableColumns} from 'drizzle-orm'
 import * as schema from '@/db/schema'
 import {cookieParse} from '@/lib/cookie-parse'
 import {USER_AUTH_COOKIE_NAME} from '@/lib/cookies'
 import {z} from 'zod'
 import {zValidator} from '@hono/zod-validator'
 import {sign} from 'hono/jwt'
+import {getSecretPlatform} from '@/secrets'
 
 interface AuthDB {
   db: DrizzleD1Database<typeof schema> | undefined
@@ -67,7 +68,7 @@ const users = new Hono<HonoServer>()
   .get('/whoami', async (c) => {
     const helper = await getAuthenticatedUserDB(c)
     if (helper.currentUser) {
-      return c.json(helper.currentUser)
+      return c.json({fullName: helper.currentUser.fullName})
     }
     return c.json({message: 'User not found or incorrect authentication'}, 404)
   })
@@ -88,7 +89,6 @@ const users = new Hono<HonoServer>()
 
       const helper = await getAuthenticatedUserDB(c)
       if (helper.currentUser && helper.db) {
-        // return c.json(helper.currentUser)
         const db = helper.db
         const res = await db
           .insert(schema.apiKeys)
@@ -104,9 +104,8 @@ const users = new Hono<HonoServer>()
             role: 'api'
           }
 
-          if (c.env.APP_SECRET_KEY) {
-            const appSecretKey = c.env.APP_SECRET_KEY
-
+          const appSecretKey = getSecretPlatform('APP_SECRET_KEY', c)
+          if (appSecretKey) {
             const token = await sign(payload, appSecretKey, 'HS256')
 
             return c.json(
@@ -129,7 +128,66 @@ const users = new Hono<HonoServer>()
       return c.json({message: 'User not found or incorrect authentication'}, 404)
     }
   )
-  .get('/settings', async (c) => {})
+  .post(
+    '/api-key/revoke',
+    zValidator(
+      'json',
+      z.object({
+        pid: z.string()
+      })
+    ),
+    async (c) => {
+      const {pid} = c.req.valid('json')
+
+      if (!pid) {
+        return c.json({message: 'API Key `pid` not found'}, 400)
+      }
+
+      const helper = await getAuthenticatedUserDB(c)
+      if (helper.currentUser && helper.db) {
+        const db = helper.db
+        const userId = helper.currentUser.id
+        const res = await db
+          .select()
+          .from(schema.apiKeys)
+          .where(and(eq(schema.apiKeys.pid, pid), eq(schema.apiKeys.userId, userId)))
+
+        if (res.length === 1) {
+          const apiKey = res[0]
+          const deleteRes = await db.delete(schema.apiKeys).where(eq(schema.apiKeys.id, apiKey.id))
+          if (deleteRes.success) {
+            return c.json({message: 'Api Key successfully revoked'}, 200)
+          } else {
+            return c.json({message: 'Was unable to revoke api key'}, 500)
+          }
+        } else {
+          return c.json({message: 'Was unable to find valid api key'}, 400)
+        }
+      }
+      return c.json({message: 'User not found or incorrect authentication'}, 404)
+    }
+  )
+  .get('/settings', async (c) => {
+    const helper = await getAuthenticatedUserDB(c)
+    if (helper.currentUser && helper.db) {
+      const db = helper.db
+      const userId = helper.currentUser.id
+
+      const {id: apiKeyId, userId: apiKeyUserId, ...apiKeyCols} = getTableColumns(schema.apiKeys)
+      const apiKeys = await db
+        .select(apiKeyCols)
+        .from(schema.apiKeys)
+        .where(eq(schema.apiKeys.userId, userId))
+        .orderBy(desc(schema.apiKeys.updatedAt))
+      return c.json(
+        {
+          apiKeys
+        },
+        200
+      )
+    }
+    return c.json({message: 'User not found or incorrect authentication'}, 404)
+  })
   .get('/delete', async (c) => {
     const helper = await getAuthenticatedUserDB(c)
     if (helper.currentUser) {

@@ -1,4 +1,4 @@
-import {addDays, addHours, addMinutes} from 'date-fns/esm'
+import {addDays, addHours, addMinutes} from 'date-fns'
 import type {AstroGlobal} from 'astro'
 
 const {PUBLIC_WEB_HOSTNAME} = import.meta.env

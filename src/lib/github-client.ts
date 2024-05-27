@@ -4,7 +4,7 @@ import {eq} from 'drizzle-orm'
 import * as schema from '@/db/schema'
 import {sign, verify} from 'hono/jwt'
 const {crypto} = globalThis
-import {addDays} from 'date-fns/esm'
+import {addDays} from 'date-fns'
 import {
   deleteAllCookies,
   getUserAuthCookie,
@@ -14,7 +14,8 @@ import {
   setUserProfileCookie
 } from './cookies'
 import {GITHUB_OAUTH_REDIRECT_URL} from '@/strings'
-import {getSecret} from '@/secrets'
+import {getSecretAstro} from '@/secrets'
+import {randomString} from './random-string'
 const {PUBLIC_GITHUB_CLIENT_ID} = import.meta.env
 
 interface UserSession {
@@ -35,7 +36,7 @@ export async function verifyValidSession(astro: AstroGlobal): Promise<UserSessio
     if (result) {
       try {
         // verify session token
-        const appSecret = getSecret('APP_SECRET_KEY', astro)
+        const appSecret = getSecretAstro('APP_SECRET_KEY', astro)
         const decodedPayload = await verify(userAuthCookie, appSecret, 'HS256')
         return {
           valid: true,
@@ -124,10 +125,7 @@ export async function signoutSession(astro: AstroGlobal) {
 }
 
 export function githubNewOauthSigninUrl(astro: AstroGlobal) {
-  const arrayBuffer = crypto.getRandomValues(new Uint8Array(16))
-  const randomState = Array.from(arrayBuffer)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('')
+  const randomState = randomString()
 
   setOauthStateCookie(randomState, astro)
 
@@ -158,7 +156,7 @@ export async function githubAuthNewSession(user: UserType, astro: AstroGlobal) {
     exp: exp
   }
 
-  const appSecretKey = getSecret('APP_SECRET_KEY', astro)
+  const appSecretKey = getSecretAstro('APP_SECRET_KEY', astro)
 
   const token = await sign(payload, appSecretKey, 'HS256')
 
@@ -258,7 +256,7 @@ export async function githubAuthUser(userProfile: unknown, astro: AstroGlobal) {
 }
 
 export async function fetchGithubUserAccessToken(githubCode: string, astro: AstroGlobal) {
-  const clientSecret = getSecret('GITHUB_CLIENT_SECRET', astro)
+  const clientSecret = getSecretAstro('GITHUB_CLIENT_SECRET', astro)
 
   const params = new URLSearchParams()
   params.append('client_id', PUBLIC_GITHUB_CLIENT_ID)

@@ -117,7 +117,7 @@ export const builds = sqliteTable(
     registryUrl: text('registry_url'),
     builtWith: text('built_with'), // podman, docker
     builtBy: text('built_by'), // user, ci, etc
-    objectPath: text('object_path'), // r2 object_path
+    objectPath: text('object_path').notNull(), // r2 object_path
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`)
   },
   (table) => {

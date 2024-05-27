@@ -71,7 +71,7 @@ export function SidebarNavItems({items, pathname}: SidebarNavItemsProps) {
             key={index}
             href={item.href}
             className={cn(
-              'group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline',
+              'group flex h-auto w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline',
               item.disabled && 'cursor-not-allowed opacity-60',
               pathname === item.href ? 'font-medium text-foreground' : 'text-muted-foreground'
             )}

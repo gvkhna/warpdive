@@ -1,10 +1,3 @@
-import {Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle} from '@/components/ui/card'
-import {Input} from '@/components/ui/input'
-import {Label} from '@/components/ui/label'
-import Link from '@/components/link'
-import {Button} from '@/components/ui/button'
-import {PlusIcon, ChevronRightIcon, DownloadIcon} from '@radix-ui/react-icons'
-import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from '@/components/ui/select'
 import {Any} from '@/generated/google/protobuf/any_pb'
 import {WarpDiveImage, WarpDiveImage_Node, WarpDiveImage_TreeNode} from '@/generated/warpdive_pb'
 import {useWarpImage} from './warp-dive-image-provider'
@@ -16,6 +9,7 @@ import LayersList from './layers-list'
 import {ScrollArea} from '@/components/ui/scroll-area'
 import {Timestamp} from '@/generated/google/protobuf/timestamp_pb'
 import FileSystemViewer from './file-system-viewer'
+import {useLayer} from './use-layer'
 
 export interface LayerBrowserProps {
   binary: Uint8Array
@@ -25,6 +19,20 @@ export interface LayerBrowserProps {
 const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
   const {wpImage, setWpImage} = useWarpImage()
   const [isLoading, setLoading] = useState(false)
+  const [layerState, setLayerState] = useLayer()
+
+  // Function to get layers from the first root node
+  const getLayersFromRoot = (): WarpDiveImage_TreeNode[] => {
+    // Ensure wpImage and wpImage.tree exist and have the needed properties
+    if (!wpImage || !wpImage.tree || !wpImage.tree.children || wpImage.tree.children.length === 0) {
+      return []
+    }
+    return wpImage.tree.children
+  }
+
+  const layers = getLayersFromRoot()
+
+  console.log('root layers: ', layers)
 
   useEffect(() => {
     function processBinary() {
@@ -54,6 +62,15 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
     processBinary()
   }, [binary, setWpImage, onError])
 
+  useEffect(() => {
+    if (layers.length > 0 && layerState.selectedLayer === null) {
+      const firstLayer = layers[0]
+      setLayerState({
+        selectedLayer: firstLayer
+      })
+    }
+  }, [layerState.selectedLayer, layers, setLayerState])
+
   if (isLoading) {
     return <div>Loading...</div>
   }
@@ -61,19 +78,6 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
   if (!wpImage) {
     return <div>Unknown Error</div>
   }
-
-  // Function to get layers from the first root node
-  const getLayersFromRoot = (): WarpDiveImage_TreeNode[] => {
-    // Ensure wpImage and wpImage.tree exist and have the needed properties
-    if (!wpImage || !wpImage.tree || !wpImage.tree.children || wpImage.tree.children.length === 0) {
-      return []
-    }
-    return wpImage.tree.children
-  }
-
-  const layers = getLayersFromRoot()
-
-  console.log('root layers: ', layers)
 
   // Function to get a node by gid
   const getNodeByGid = (gid: number) => {
