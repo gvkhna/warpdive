@@ -30,7 +30,7 @@ message WarpDiveImage {
 
   message DotWarpDive {
     // Binary Format Specification: `.warpdive`
-    // `.wiredive` is a binary encoded google.protobuf.Any message
+    // `.warpdive` is a binary encoded google.protobuf.Any message
     //  - typeUrl: 'type.googleapis.com/warpdive.WarpDiveImage'
     //  - value: `WarpDiveImage` message encoded in bytes
     //
