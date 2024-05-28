@@ -28,6 +28,7 @@ jobs:
           make proto
           goreleaser release --skip=publish --snapshot --clean
           ./scripts/create-main-npm-package.sh
+          ./scripts/publish-npm-packages.sh
 
       # - name: Set up Go
       #   uses: actions/setup-go@v2
