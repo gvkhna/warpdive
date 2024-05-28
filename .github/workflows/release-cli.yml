@@ -19,7 +19,7 @@ jobs:
       - name: Compile cli binaries
         working-directory: ${{ env.BUILD_PATH }}
         env:
-          NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           pwd
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
