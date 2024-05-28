@@ -2,7 +2,7 @@ name: release cli
 
 on:
   release:
-    types: [created]
+    types: [created, published]
 
 jobs:
   build:
@@ -20,6 +20,11 @@ jobs:
       #   run: |
       #     go build ./...
       #     go test ./...
+
+      - name: Print Release Info
+        run: |
+          echo "Release Tag: ${{ github.event.release.tag_name }}"
+          echo "Release Type: ${{ github.event.release.prerelease }}"
 
       - name: Create Artifacts
         run: |
