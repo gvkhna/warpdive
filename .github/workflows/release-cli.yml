@@ -20,6 +20,7 @@ jobs:
         working-directory: ${{ env.BUILD_PATH }}
         run: |
           pwd
+          go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
           go install github.com/goreleaser/goreleaser@latest
           asdf reshim
           make proto
