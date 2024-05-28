@@ -21,7 +21,10 @@ cat > "${TARGET_DIR}/package.json" <<EOF
   "description": "Warpdive is a docker/oci container layer browser. Learn more at warpdive.xyz.",
   "keywords": ["warpdive", "cli"],
   "name": "warpdive",
-  "repository": "github:gvkhna/warpdive",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gvkhna/warpdive.git"
+  },
   "version": "${VERSION}",
   "bin": {
     "warpdive": "bin/cli"

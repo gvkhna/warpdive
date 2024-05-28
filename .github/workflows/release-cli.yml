@@ -18,6 +18,8 @@ jobs:
         uses: asdf-vm/actions/install@v3
       - name: Compile cli binaries
         working-directory: ${{ env.BUILD_PATH }}
+        env:
+          NPM_ACCESS_TOKEN: ${{ secrets.NPM_ACCESS_TOKEN }}
         run: |
           pwd
           go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
@@ -26,7 +28,6 @@ jobs:
           make proto
           goreleaser release --skip=publish --snapshot --clean
           ./scripts/create-main-npm-package.sh
-          ls dist/
 
       # - name: Set up Go
       #   uses: actions/setup-go@v2
@@ -48,27 +49,64 @@ jobs:
           # Additional steps to compile or prepare release artifacts
           echo "Artifacts ready for ${{ github.event.release.tag_name }}"
 
+      - name: Upload Release Assets
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs').promises;
+            const path = require('path');
+            const dir = './dist';
+            const files = await fs.readdir(dir);
+            for (const file of files) {
+              if (file.endsWith('.tgz')) {
+                console.log(`Uploading ${file}...`);
+                const filePath = path.join(dir, file);
+                await github.rest.repos.uploadReleaseAsset({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  release_id: context.payload.release.id,
+                  name: file,
+                  data: await fs.readFile(filePath)
+                });
+              }
+            }
+
+      - name: Upload Checksum File
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs').promises;
+            await github.rest.repos.uploadReleaseAsset({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              release_id: context.payload.release.id,
+              name: 'checksums.txt',
+              data: await fs.readFile('./dist/checksums.txt')
+            });
+
       # You can upload artifacts if necessary
-      # - uses: actions/upload-artifact@v2
+      # - uses: actions/upload-artifact@v4
       #   with:
       #     name: my-artifact
       #     path: path/to/artifacts
 
-  pre-release:
-    needs: build
-    runs-on: ubuntu-latest
-    environment: release-cli
-    steps:
-      - name: Download Artifacts
-        uses: actions/download-artifact@v2
-        with:
-          name: my-artifact
+  # pre-release:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   environment: release-cli
+  #   steps:
+  #     - name: Download Artifacts
+  #       uses: actions/download-artifact@v2
+  #       with:
+  #         name: my-artifact
 
-      - name: Prepare Release
-        run: |
-          echo "Prepare your release here"
+  #     - name: Prepare Release
+  #       run: |
+  #         echo "Prepare your release here"
 
-      # Here, you might deploy or finalize preparations
-      - name: Finalize Release
-        run: |
-          echo "Final release steps here"
+  #     # Here, you might deploy or finalize preparations
+  #     - name: Finalize Release
+  #       run: |
+  #         echo "Final release steps here"

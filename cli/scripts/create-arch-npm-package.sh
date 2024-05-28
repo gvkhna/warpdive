@@ -30,7 +30,10 @@ cat > "${PACKAGE_DIR}/package.json" <<EOF
   "cpu": ["${ARCH}"],
   "name": "${PACKAGE_NAME}",
   "os": ["${OS}"],
-  "repository": "github:gvkhna/warpdive",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gvkhna/warpdive.git"
+  },
   "version": "${VERSION}"
 }
 EOF
