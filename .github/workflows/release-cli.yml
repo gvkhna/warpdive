@@ -25,6 +25,7 @@ jobs:
           asdf reshim
           make proto
           goreleaser release --skip=publish --snapshot --clean
+          ./scripts/create-main-npm-package.sh
           ls dist/
 
       # - name: Set up Go

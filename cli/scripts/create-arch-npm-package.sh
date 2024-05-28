@@ -26,10 +26,12 @@ cp "${FULL_BINARY_PATH}" "${BIN_FOLDER}/"
 # Create package.json
 cat > "${PACKAGE_DIR}/package.json" <<EOF
 {
+  "author": "Gaurav Khanna",
+  "cpu": ["${ARCH}"],
   "name": "${PACKAGE_NAME}",
-  "version": "${VERSION}",
   "os": ["${OS}"],
-  "cpu": ["${ARCH}"]
+  "repository": "github:gvkhna/warpdive",
+  "version": "${VERSION}"
 }
 EOF
 

@@ -19,7 +19,7 @@ builds:
       - arm64
     ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.buildTime={{.Date}}`.
     hooks:
-      post: .github/scripts/create-arch-npm-package.sh {{ .Os }} {{ .Arch }} {{ .Path }} {{ .Version }}
+      post: scripts/create-arch-npm-package.sh {{ .Os }} {{ .Arch }} {{ .Path }} {{ .Version }}
 
 archives:
   - format: tgz
