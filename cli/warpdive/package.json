@@ -1,0 +1,15 @@
+{
+  "name": "my-package",
+  "version": "1.0.0",
+  "bin": {
+    "my-package": "bin/cli"
+  },
+  "scripts": {
+    "postinstall": "node ./install.js"
+  },
+  "optionalDependencies": {
+    "my-package-linux-x64": "1.0.0",
+    "my-package-linux-arm": "1.0.0",
+    "my-package-windows-x64": "1.0.0"
+  }
+}

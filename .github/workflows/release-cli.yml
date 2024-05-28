@@ -1,0 +1,52 @@
+name: release cli
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      # - name: Set up Go
+      #   uses: actions/setup-go@v2
+      #   with:
+      #     go-version: '1.16' # Adjust as necessary for your project
+
+      # - name: Build and Test
+      #   run: |
+      #     go build ./...
+      #     go test ./...
+
+      - name: Create Artifacts
+        run: |
+          # Additional steps to compile or prepare release artifacts
+          echo "Artifacts ready for ${{ github.event.release.tag_name }}"
+
+      # You can upload artifacts if necessary
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: my-artifact
+      #     path: path/to/artifacts
+
+  pre-release:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v2
+        with:
+          name: my-artifact
+
+      - name: Prepare Release
+        run: |
+          echo "Prepare your release here"
+
+      # Here, you might deploy or finalize preparations
+      - name: Finalize Release
+        run: |
+          echo "Final release steps here"

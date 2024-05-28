@@ -1,0 +1,5 @@
+#!/usr/bin/env node
+
+require('child_process').execFileSync(getBinaryPath(), process.argv.slice(2), {
+  stdio: 'inherit'
+})
