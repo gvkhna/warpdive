@@ -1,5 +1,8 @@
 name: release cli
 
+env:
+  BUILD_PATH: './cli/' # default value when not using subfolders
+
 on:
   release:
     types: [created, published]
@@ -7,9 +10,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: release-cli
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install asdf & tools
+        uses: asdf-vm/actions/install@v3
+      - name: Compile cli binaries
+        working-directory: ${{ env.BUILD_PATH }}
+        run: |
+          pwd
+          go install github.com/goreleaser/goreleaser@latest
+          asdf reshim
+          goreleaser release --skip=publish --snapshot --clean
+          ls dist/
 
       # - name: Set up Go
       #   uses: actions/setup-go@v2
@@ -40,7 +54,7 @@ jobs:
   pre-release:
     needs: build
     runs-on: ubuntu-latest
-    environment: production
+    environment: release-cli
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v2
