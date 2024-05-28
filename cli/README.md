@@ -8,6 +8,7 @@ asdf install
 
 # go install github.com/google/go-licenses@latest
 go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+go install github.com/goreleaser/goreleaser@latest
 asdf reshim
 make proto
 make bin

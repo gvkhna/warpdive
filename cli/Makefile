@@ -64,7 +64,7 @@ ifndef SNAPSHOT_DIR
 endif
 
 define title
-    @printf '$(TITLE)$(1)$(RESET)\n'
+		@printf '$(TITLE)$(1)$(RESET)\n'
 endef
 
 
@@ -126,9 +126,12 @@ bin: #gofmt
 
 .PHONY: proto
 proto:
-#  rm ${PWD}/proto/warpdive.proto || true
-#curl -L -H "Cache-Control: no-cache" -o proto/warpdive.proto https://raw.githubusercontent.com/gvkhna/warpdive/main/proto/warpdive.proto
 	protoc --proto_path ../proto --go_out=generated --go_opt=paths=import --go_opt=module=github.com/gvkhna/warpdive/generated ../proto/warpdive.proto
+
+.PHONY: release-snapshot
+release-snapshot:
+	goreleaser release --skip-publish --snapshot --clean
+	./scripts/create-main-npm-package.sh
 
 .PHONY: generate-test-data
 generate-test-data:
@@ -239,7 +242,7 @@ ci-test-linux-run:
 	ls -la $(SNAPSHOT_DIR)/dive_linux_amd64_v1
 	chmod 755 $(SNAPSHOT_DIR)/dive_linux_amd64_v1/dive && \
 	$(SNAPSHOT_DIR)/dive_linux_amd64_v1/dive '${TEST_IMAGE}'  --ci && \
-    $(SNAPSHOT_DIR)/dive_linux_amd64_v1/dive --source docker-archive .data/test-kaniko-image.tar  --ci --ci-config .data/.dive-ci
+		$(SNAPSHOT_DIR)/dive_linux_amd64_v1/dive --source docker-archive .data/test-kaniko-image.tar  --ci --ci-config .data/.dive-ci
 
 # we're not attempting to test docker, just our ability to run on these systems. This avoids setting up docker in CI.
 .PHONY: ci-test-mac-run
@@ -269,7 +272,7 @@ $(SNAPSHOT_DIR): ## Build snapshot release binaries and packages
 	@bash -c "\
 		VERSION=$(VERSION:v%=%) \
 		$(SNAPSHOT_CMD) --config $(TEMP_DIR)/goreleaser.yaml \
-	  "
+		"
 
 .PHONY: cli
 cli: $(SNAPSHOT_DIR) ## Run CLI tests
