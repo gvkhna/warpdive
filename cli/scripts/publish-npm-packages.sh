@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Check for NPM_TOKEN
-if [[ -z "${NPM_TOKEN}" ]]; then
+# Check for NODE_AUTH_TOKEN
+if [[ -z "${NODE_AUTH_TOKEN}" ]]; then
   echo "Error: NPM access token not found."
   exit 1
 else
