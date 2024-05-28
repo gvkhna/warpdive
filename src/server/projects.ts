@@ -4,12 +4,28 @@ import * as schema from '@/db/schema'
 import {getAuthenticatedUserDB} from './users'
 import {z} from 'zod'
 import {zValidator} from '@hono/zod-validator'
+import {eq, desc, getTableColumns, sql} from 'drizzle-orm'
 
 const projects = new Hono<HonoServer>()
-  .get('/', async (c) => {
+  .get('/:pid', zValidator('param', z.object({pid: z.string()})), async (c) => {
+    const {pid} = c.req.valid('param')
+
     const helper = await getAuthenticatedUserDB(c)
-    if (helper.currentUser) {
-      return c.json({data: null})
+    if (helper.currentUser && helper.db) {
+      const db = helper.db
+
+      const userId = helper.currentUser.id
+
+      const {id: buildId, userId: buildUserId, projectId: buildProjectId, ...buildCols} = getTableColumns(schema.builds)
+
+      const builds = await db
+        .select(buildCols)
+        .from(schema.builds)
+        .where(eq(schema.builds.userId, userId))
+        .limit(50)
+        .orderBy(desc(schema.builds.createdAt))
+
+      return c.json({builds}, 200)
     }
     return c.json({message: 'User not found or incorrect authentication'}, 404)
   })

@@ -22,7 +22,7 @@ export interface MainNavItem extends NavItem {}
 export interface SidebarNavItem extends NavItemWithChildren {}
 
 export interface SidebarNavProps {
-  emptyText: string
+  emptyText?: string
   items: SidebarNavItem[]
 }
 
@@ -47,9 +47,13 @@ export function SidebarNav({items, emptyText}: SidebarNavProps) {
               pathname={pathname}
             />
           ) : (
-            <span className='px-1.5 py-0.5 text-xs leading-none text-muted-foreground no-underline opacity-70 group-hover:no-underline'>
-              {emptyText}
-            </span>
+            <>
+              {emptyText && (
+                <span className='px-1.5 py-0.5 text-xs leading-none text-muted-foreground no-underline opacity-70 group-hover:no-underline'>
+                  {emptyText}
+                </span>
+              )}
+            </>
           )}
         </div>
       ))}
