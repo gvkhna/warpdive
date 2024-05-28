@@ -1,7 +1,7 @@
 name: release cli
 
 env:
-  BUILD_PATH: './cli/' # default value when not using subfolders
+  BUILD_PATH: './cli/'
 
 on:
   release:
@@ -38,27 +38,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           ./scripts/publish-npm-packages.sh
-
-      # - name: Set up Go
-      #   uses: actions/setup-go@v2
-      #   with:
-      #     go-version: '1.16' # Adjust as necessary for your project
-
-      # - name: Build and Test
-      #   run: |
-      #     go build ./...
-      #     go test ./...
-
-      - name: Print Release Info
-        run: |
-          echo "Release Tag: ${{ github.event.release.tag_name }}"
-          echo "Release Type: ${{ github.event.release.prerelease }}"
-
-      - name: Create Artifacts
-        run: |
-          # Additional steps to compile or prepare release artifacts
-          echo "Artifacts ready for ${{ github.event.release.tag_name }}"
-
       - name: Upload Release Assets
         uses: actions/github-script@v7
         with:
@@ -66,7 +45,7 @@ jobs:
           script: |
             const fs = require('fs').promises;
             const path = require('path');
-            const dir = './dist';
+            const dir = './cli/dist';
             const files = await fs.readdir(dir);
             for (const file of files) {
               if (file.endsWith('.tgz')) {
@@ -81,7 +60,6 @@ jobs:
                 });
               }
             }
-
       - name: Upload Checksum File
         uses: actions/github-script@v7
         with:
@@ -93,30 +71,5 @@ jobs:
               repo: context.repo.repo,
               release_id: context.payload.release.id,
               name: 'checksums.txt',
-              data: await fs.readFile('./dist/checksums.txt')
+              data: await fs.readFile('./cli/dist/checksums.txt')
             });
-
-      # You can upload artifacts if necessary
-      # - uses: actions/upload-artifact@v4
-      #   with:
-      #     name: my-artifact
-      #     path: path/to/artifacts
-
-  # pre-release:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   environment: release-cli
-  #   steps:
-  #     - name: Download Artifacts
-  #       uses: actions/download-artifact@v2
-  #       with:
-  #         name: my-artifact
-
-  #     - name: Prepare Release
-  #       run: |
-  #         echo "Prepare your release here"
-
-  #     # Here, you might deploy or finalize preparations
-  #     - name: Finalize Release
-  #       run: |
-  #         echo "Final release steps here"
