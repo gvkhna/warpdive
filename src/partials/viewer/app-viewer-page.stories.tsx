@@ -23,6 +23,28 @@ export const TestFile: Story = {
   ),
   args: {},
   parameters: {
+    viewport: {
+      // defaultViewport: 'desktop'
+    },
+    reactRouter: reactRouterParameters({
+      routing: {
+        path: '/app/deployment/lskdjf'
+      }
+    })
+  }
+}
+
+export const TestFileMobile: Story = {
+  render: () => (
+    <AppLayout>
+      <AppViewerPage fileOverride='/test/assets/phusion-baseimage-docker-noble-1-0-0.warpdive' />
+    </AppLayout>
+  ),
+  args: {},
+  parameters: {
+    viewport: {
+      defaultViewport: 'mobile1'
+    },
     reactRouter: reactRouterParameters({
       routing: {
         path: '/app/deployment/lskdjf'

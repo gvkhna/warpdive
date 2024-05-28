@@ -47,7 +47,7 @@ const dashboard = new Hono<HonoServer>().get('/', async (c) => {
       .innerJoin(schema.builds, eq(schema.builds.projectId, schema.projects.id))
       .where(eq(schema.projects.userId, userId))
       .limit(50)
-      .orderBy(desc(schema.projects.updatedAt))
+      .orderBy(desc(schema.builds.createdAt))
 
     if (projects && recentBuilds) {
       return c.json({projects, recentBuilds}, 200)

@@ -1,4 +1,4 @@
-import React, {useState, memo, type MouseEvent} from 'react'
+import React, {useState, memo, type MouseEvent, useEffect, useCallback} from 'react'
 import {FixedSizeList as List, areEqual} from 'react-window'
 import AutoSizer from 'react-virtualized-auto-sizer'
 import memoizeOne from 'memoize-one'
@@ -6,15 +6,25 @@ import {useWarpImage} from './warp-dive-image-provider'
 import {useLayer} from './use-layer'
 import {WarpDiveImage_FileNode_FileType} from '@/generated/warpdive_pb'
 import type {WarpDiveImage_TreeNode} from '@/generated/warpdive_pb'
-import {FileIcon, FolderIcon, FolderOpenIcon} from 'lucide-react'
+import {ArrowRight, FileIcon, FolderIcon, FolderOpenIcon} from 'lucide-react'
 import {formatBytesString} from './format-byte-size'
 import {formatFilePermissionsMode} from './format-permissions'
+import {useSelectedLayerUiState, useSetSelectedLayerUiState} from './use-layer-ui-state'
+import {useAtom} from 'jotai'
+import {collapseDirsAtom, expandDirsAtom} from './toolbar-events-atoms'
+
+enum DefaultOpenOrCollapse {
+  DefaultOpen = 1,
+  DefaultCollapse = 2
+}
+const DEFAULT_OPEN_OR_COLLAPSE: DefaultOpenOrCollapse = DefaultOpenOrCollapse.DefaultOpen
 
 interface TreeNodeItem {
+  children: number
   collapsed: boolean
   depth: number
-  children: number
   gid: string
+  open: boolean
 }
 
 interface RowProps {
@@ -112,6 +122,22 @@ const Row = memo(({data, index, style}: RowProps) => {
 
   const fsLinkname = currentNode.data.oneofKind === 'fileNode' && currentNode.data.fileNode.nodeData?.fileInfo?.linkname
 
+  const folderOpenClosedIcon = () => {
+    if (DEFAULT_OPEN_OR_COLLAPSE === DefaultOpenOrCollapse.DefaultOpen) {
+      if (node.open) {
+        return <FolderOpenIcon className='mr-1 h-4 w-4' />
+      } else {
+        return <FolderIcon className='mr-1 h-4 w-4' />
+      }
+    } else if (DEFAULT_OPEN_OR_COLLAPSE === DefaultOpenOrCollapse.DefaultCollapse) {
+      if (node.collapsed) {
+        return <FolderIcon className='mr-1 h-4 w-4' />
+      } else {
+        return <FolderOpenIcon className='mr-1 h-4 w-4' />
+      }
+    }
+  }
+
   return (
     <div
       className=' flex cursor-default font-mono text-sm hover:bg-slate-100'
@@ -135,7 +161,7 @@ const Row = memo(({data, index, style}: RowProps) => {
             {'\xa0'.repeat(node.depth)}
             {isFolder ? (
               <>
-                {node.collapsed ? <FolderIcon className='mr-1 h-4 w-4' /> : <FolderOpenIcon className='mr-1 h-4 w-4' />}
+                {folderOpenClosedIcon()}
                 <span className='font-semibold'>{name}</span>
               </>
             ) : (
@@ -144,7 +170,13 @@ const Row = memo(({data, index, style}: RowProps) => {
                 <span className='font-normal'>{name}</span>
               </>
             )}
-            {fsLinkname && <span>&nbsp;-&gt;&nbsp;{fsLinkname}</span>}
+            {fsLinkname && (
+              <span>
+                <ArrowRight className='mx-2 inline-block h-3 w-3' />
+                {fsLinkname}
+              </span>
+            )}
+            {/* {fsLinkname && <span>&nbsp;-&gt;&nbsp;{fsLinkname}</span>} */}
           </div>
         </div>
       </div>
@@ -160,15 +192,69 @@ const getMemoizedItemContext = memoizeOne((onOpen, onSelect, flattenedData) => (
 }))
 
 const FileSystemViewer = () => {
-  const [openedNodeIds, setOpenedNodeIds] = useState<string[]>([])
-  const [collapsedGlobalIds, setCollapsedGlobalIds] = useState<string[]>([])
-
   const {wpImage, setWpImage} = useWarpImage()
   const [layerState, setLayerState] = useLayer()
 
-  // console.log('reloading file system viewer')
+  const collectAllGids = useCallback((node: WarpDiveImage_TreeNode) => {
+    let gids: string[] = []
+    if (node.ref?.gid) {
+      gids.push(node.ref.gid)
+    }
+
+    if (node.children) {
+      node.children.forEach((child) => {
+        gids = gids.concat(collectAllGids(child))
+      })
+    }
+
+    return gids
+  }, [])
+
+  const collectNodesToDepth = useCallback((node: WarpDiveImage_TreeNode | undefined, currentDepth = 1) => {
+    const MAX_DEPTH = 4
+    let nodes: string[] = []
+
+    if (!node || currentDepth > MAX_DEPTH) {
+      return nodes
+    }
+
+    if (node.ref?.gid) {
+      nodes.push(node.ref.gid)
+    }
+
+    if (node.children && currentDepth < MAX_DEPTH) {
+      node.children.forEach((child) => {
+        nodes = nodes.concat(collectNodesToDepth(child, currentDepth + 1))
+      })
+    }
+
+    return nodes
+  }, [])
 
   const selectedLayer = layerState.selectedLayer
+
+  const dirGlobalIdsState = useSelectedLayerUiState(selectedLayer)
+  const setDirGlobalIdsState = useSetSelectedLayerUiState()
+
+  const [expandDirsEvent, setExpandDirsEvent] = useAtom(expandDirsAtom)
+  const [collapseDirsEvent, setCollapseDirsEvent] = useAtom(collapseDirsAtom)
+
+  useEffect(() => {
+    if (expandDirsEvent && wpImage?.tree) {
+      const allGids = collectAllGids(wpImage.tree)
+      setDirGlobalIdsState(selectedLayer, allGids)
+      setExpandDirsEvent(null)
+    }
+  }, [expandDirsEvent, setDirGlobalIdsState, collectAllGids, selectedLayer, wpImage?.tree, setExpandDirsEvent])
+
+  useEffect(() => {
+    if (collapseDirsEvent && wpImage?.tree) {
+      const initialGids = collectNodesToDepth(wpImage.tree)
+      setDirGlobalIdsState(selectedLayer, initialGids)
+      setCollapseDirsEvent(null)
+    }
+  }, [collapseDirsEvent, setDirGlobalIdsState, selectedLayer, wpImage?.tree, setCollapseDirsEvent, collectNodesToDepth])
+
   if (!selectedLayer) {
     return <span>No selected layer found!</span>
   }
@@ -199,32 +285,69 @@ const FileSystemViewer = () => {
 
   const flattenTreeNode = (treeNode: WarpDiveImage_TreeNode, depth: number, result: TreeNodeItem[]) => {
     const id = treeNode.ref?.gid + ''
-    let collapsed = collapsedGlobalIds.includes(id)
+    let open = false
+    let collapsed = false
+    if (dirGlobalIdsState) {
+      if (DEFAULT_OPEN_OR_COLLAPSE === DefaultOpenOrCollapse.DefaultOpen) {
+        open = dirGlobalIdsState.includes(id)
+      } else if (DEFAULT_OPEN_OR_COLLAPSE === DefaultOpenOrCollapse.DefaultCollapse) {
+        collapsed = dirGlobalIdsState.includes(id)
+      }
+    }
+
     const gid = treeNode.ref?.gid
 
     if (!gid) {
       return
     }
 
-    result.push({
-      gid: gid,
+    const node = {
       children: treeNode.children.length,
+      collapsed,
       depth,
-      collapsed
-    })
+      gid,
+      open
+    }
 
-    if (!collapsed && treeNode.children) {
-      for (let child of treeNode.children) {
-        flattenTreeNode(child, depth + 1, result)
+    result.push(node)
+
+    if (DEFAULT_OPEN_OR_COLLAPSE === DefaultOpenOrCollapse.DefaultOpen) {
+      if (open && treeNode.children) {
+        for (let child of treeNode.children) {
+          flattenTreeNode(child, depth + 1, result)
+        }
+      }
+    } else if (DEFAULT_OPEN_OR_COLLAPSE === DefaultOpenOrCollapse.DefaultCollapse) {
+      if (!collapsed && treeNode.children) {
+        for (let child of treeNode.children) {
+          flattenTreeNode(child, depth + 1, result)
+        }
       }
     }
   }
 
   const onOpen: RowProps['data']['onOpen'] = (node) => {
-    if (node.collapsed) {
-      setCollapsedGlobalIds(collapsedGlobalIds.filter((gid) => gid !== node.gid))
-    } else {
-      setCollapsedGlobalIds([...collapsedGlobalIds, node.gid])
+    console.log('setting open', dirGlobalIdsState)
+    if (dirGlobalIdsState) {
+      if (DEFAULT_OPEN_OR_COLLAPSE === DefaultOpenOrCollapse.DefaultOpen) {
+        if (node.open) {
+          setDirGlobalIdsState(
+            selectedLayer,
+            dirGlobalIdsState.filter((gid) => gid !== node.gid)
+          )
+        } else {
+          setDirGlobalIdsState(selectedLayer, [...dirGlobalIdsState, node.gid])
+        }
+      } else if (DEFAULT_OPEN_OR_COLLAPSE === DefaultOpenOrCollapse.DefaultCollapse) {
+        if (node.collapsed) {
+          setDirGlobalIdsState(
+            selectedLayer,
+            dirGlobalIdsState.filter((gid) => gid !== node.gid)
+          )
+        } else {
+          setDirGlobalIdsState(selectedLayer, [...dirGlobalIdsState, node.gid])
+        }
+      }
     }
   }
 

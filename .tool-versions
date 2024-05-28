@@ -1,3 +1,5 @@
+golang 1.22.3
+golangci-lint 1.58.1
 nodejs 22.2.0
 pnpm 9.1.2
 protoc 25.0

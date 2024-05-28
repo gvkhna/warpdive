@@ -3,13 +3,18 @@ import {WarpDiveImage, WarpDiveImage_Node, WarpDiveImage_TreeNode} from '@/gener
 import {useWarpImage} from './warp-dive-image-provider'
 
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable'
-import {useState, useEffect, type FC} from 'react'
+import {useState, useEffect, type FC, useCallback} from 'react'
 import LayerRow from './layer-row'
 import LayersList from './layers-list'
 import {ScrollArea} from '@/components/ui/scroll-area'
 import {Timestamp} from '@/generated/google/protobuf/timestamp_pb'
 import FileSystemViewer from './file-system-viewer'
 import {useLayer} from './use-layer'
+import {LayerListToolbar} from './layer-list-toolbar'
+import {FileSystemViewerToolbar} from './file-system-viewer-toolbar'
+import {MobileLayersList} from './mobile-layers-list'
+import {layerUiStateAtom, useSetSelectedLayerUiState} from './use-layer-ui-state'
+import {useAtom} from 'jotai'
 
 export interface LayerBrowserProps {
   binary: Uint8Array
@@ -20,6 +25,7 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
   const {wpImage, setWpImage} = useWarpImage()
   const [isLoading, setLoading] = useState(false)
   const [layerState, setLayerState] = useLayer()
+  const [, setLayerMap] = useAtom(layerUiStateAtom)
 
   // Function to get layers from the first root node
   const getLayersFromRoot = (): WarpDiveImage_TreeNode[] => {
@@ -29,6 +35,27 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
     }
     return wpImage.tree.children
   }
+
+  const collectNodesToDepth = useCallback((node: WarpDiveImage_TreeNode | undefined, currentDepth = 1) => {
+    const MAX_DEPTH = 4
+    let nodes: string[] = []
+
+    if (!node || currentDepth > MAX_DEPTH) {
+      return nodes
+    }
+
+    if (node.ref?.gid) {
+      nodes.push(node.ref.gid)
+    }
+
+    if (node.children && currentDepth < MAX_DEPTH) {
+      node.children.forEach((child) => {
+        nodes = nodes.concat(collectNodesToDepth(child, currentDepth + 1))
+      })
+    }
+
+    return nodes
+  }, [])
 
   const layers = getLayersFromRoot()
 
@@ -68,8 +95,13 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
       setLayerState({
         selectedLayer: firstLayer
       })
+      // set initial state of ui open/collapsed dirs
+      if (wpImage) {
+        const gids = collectNodesToDepth(wpImage.tree)
+        setLayerMap(new Map(layers.map((layer) => [layer, gids])))
+      }
     }
-  }, [layerState.selectedLayer, layers, setLayerState])
+  }, [layerState.selectedLayer, layers, setLayerState, setLayerMap, wpImage, collectNodesToDepth])
 
   if (isLoading) {
     return <div>Loading...</div>
@@ -86,13 +118,30 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
 
   return (
     <>
-      <div className='flex h-[calc(100vh_-_theme(spacing.16))] w-full'>
+      <div className='h-[calc(100vh_-_theme(spacing.16))] w-full md:hidden'>
+        <MobileLayersList>
+          <LayersList>
+            {layers.map(
+              (layer) =>
+                layer.ref?.gid && (
+                  <LayerRow
+                    key={layer.ref.gid}
+                    treeNode={layer}
+                  />
+                )
+            )}
+          </LayersList>
+        </MobileLayersList>
+        <FileSystemViewer />
+      </div>
+      <div className='hidden h-[calc(100vh_-_theme(spacing.16))] w-full md:flex'>
         <ResizablePanelGroup direction='horizontal'>
-          <ResizablePanel defaultSize={40}>
+          <ResizablePanel
+            minSize={20}
+            defaultSize={40}
+          >
             <div className=' bg-white dark:border-gray-800 dark:bg-gray-950'>
-              {/* <div className='mb-4 flex items-center justify-between'>
-                <h2 className='text-lg font-semibold'>Layers</h2>
-              </div> */}
+              {/* <LayerListToolbar /> */}
               <ScrollArea className=' h-[calc(100vh_-_theme(spacing.16))]'>
                 <LayersList>
                   {layers.map(
@@ -109,7 +158,8 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
             </div>
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel>
+          <ResizablePanel minSize={20}>
+            <FileSystemViewerToolbar />
             <FileSystemViewer />
           </ResizablePanel>
         </ResizablePanelGroup>
