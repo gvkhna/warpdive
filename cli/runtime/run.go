@@ -9,6 +9,9 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/url"
+	"os/exec"
+	"os/user"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -25,6 +28,7 @@ import (
 	"google.golang.org/protobuf/proto"
 	"google.golang.org/protobuf/types/known/anypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
+	"gopkg.in/yaml.v2"
 
 	warpdive "github.com/gvkhna/warpdive/generated"
 )
@@ -40,7 +44,7 @@ type WarpDiveLogger struct {
 
 // NewWarpDiveLogger creates a new WarpDiveLogger instance
 func NewWarpDiveLogger() *WarpDiveLogger {
-	enabled := os.Getenv("DEBUG_WARPDIVE") != ""
+	enabled := os.Getenv("WARPDIVE_DEBUG") != ""
 	return &WarpDiveLogger{
 		enabled: enabled,
 		logger:  log.New(os.Stdout, "WarpDive: ", log.LstdFlags),
@@ -477,18 +481,62 @@ func verifyTree(root *warpdive.WarpDiveImage_TreeNode) {
 	}
 }
 
+func readAPIKeyFromConfig(configPath, endpoint string) (string, error) {
+	fileData, err := os.ReadFile(configPath)
+	if err != nil {
+		return "", err // File could not be read
+	}
+
+	var config map[string]interface{}
+	err = yaml.Unmarshal(fileData, &config)
+	if err != nil {
+		return "", err // YAML could not be parsed
+	}
+
+	// Attempt to get the API key for the given endpoint
+	if apiInfo, ok := config[endpoint].(map[interface{}]interface{}); ok {
+		if apiKey, ok := apiInfo["api_key"].(map[interface{}]interface{}); ok {
+			if value, ok := apiKey["value"].(string); ok {
+				return value, nil
+			}
+		}
+	}
+
+	return "", fmt.Errorf("no API key found for endpoint %s", endpoint)
+}
+
 func run(enableUi bool, options Options, imageResolver image.Resolver, events eventChannel, filesystem afero.Fs) {
+	warpDiveLogger.Printf("Options Received: %+v\n", options)
+
 	var img *image.Image
 	var err error
 	defer close(events)
 
-	warpDiveLogger = NewWarpDiveLogger()
+	// events.message(utils.TitleFormat("Analyzing image..."))
 
 	// doExport := options.ExportFile != ""
 	doBuild := len(options.BuildArgs) > 0
 
+	// events.message(utils.TitleFormat("Analyzing image..."))
+	// fmt.Printf("Test log %s", options.ExportFile)
+	// fmt.Printf("Exporting image %s to file %s\n", imageID, outputFilePath)
+	// imageID := options.BuildArgs[0]
+	// var outputFilePath string
+	// if options.ExportFile == "" {
+	// 	outputFilePath = filepath.Join(".", fmt.Sprintf("%s.warpdive", imageID))
+	// } else {
+	// 	// Check if the provided path is a directory
+	// 	info, err := os.Stat(options.ExportFile)
+	// 	if err == nil && info.IsDir() {
+	// 		outputFilePath = filepath.Join(options.ExportFile, fmt.Sprintf("%s.warpdive", imageID))
+	// 	} // else the outputFilePath is treated as the exact path including filename
+	// }
+
+	// fmt.Printf("Exporting to... %s\n", outputFilePath)
+
 	if doBuild {
 		events.message(utils.TitleFormat("Building image..."))
+		warpDiveLogger.Printf("Options Build Received: %+v\n", options.BuildArgs)
 		img, err = imageResolver.Build(options.BuildArgs)
 		if err != nil {
 			events.exitWithErrorMessage("cannot build image", err)
@@ -511,6 +559,15 @@ func run(enableUi bool, options Options, imageResolver image.Resolver, events ev
 	// 	return
 	// }
 
+	// imageID := args[0]
+
+	// Simulated function call that handles exporting
+	// fmt.Printf("Exporting image %s to file %s\n", imageID, outputFilePath)
+	// Here would go the logic to actually perform the export
+
+	// fmt.Printf("Exporting image to file %s\n", options.ExportFile)
+
+	// return
 	// if doExport {
 	// 	events.message(utils.TitleFormat(fmt.Sprintf("Exporting image to '%s'...", options.ExportFile)))
 	// 	bytes, err := export.NewExport(analysis).Marshal()
@@ -578,7 +635,7 @@ func run(enableUi bool, options Options, imageResolver image.Resolver, events ev
 
 	// }
 
-	events.message(utils.TitleFormat("Not opening ui..."))
+	// events.message(utils.TitleFormat("Not opening ui..."))
 
 	traverseLayerAttributes(img)
 
@@ -619,133 +676,228 @@ func run(enableUi bool, options Options, imageResolver image.Resolver, events ev
 		log.Fatalf("Failed to serialize Any message: %v", err)
 	}
 
-	// Retrieve environment variables
-	warpDiveEndpoint := os.Getenv("WARPDIVE_ENDPOINT")
-	warpDiveAPIKey := os.Getenv("WARPDIVE_API_KEY")
+	if options.ExportFile != "" {
 
-	// Check if API key is set; it's critical for operations
-	if warpDiveAPIKey == "" {
-		log.Println("Error: WARPDIVE_API_KEY environment variable is not set")
-		os.Exit(1) // Exit if API key is not provided
-	}
-
-	// Use default endpoint if not specified
-	if warpDiveEndpoint == "" {
-		warpDiveEndpoint = "https://www.warpdive.xyz"
-		log.Printf("WARPDIVE_ENDPOINT not set. Using default: %s", warpDiveEndpoint)
-	} else {
-		log.Printf("Using WARPDIVE_ENDPOINT: %s", warpDiveEndpoint)
-	}
-	// Parse the endpoint URL
-	parsedUrl, err := url.Parse(warpDiveEndpoint)
-	if err != nil {
-		log.Fatalf("Invalid URL: %v", err)
-	}
-
-	// Resolve the new path relative to the parsed URL
-	// This method ensures that the path is correctly appended, whether or not the base URL has a trailing slash
-	apiEndpoint := parsedUrl.ResolveReference(&url.URL{Path: "/api/builds/new"}).String()
-
-	// Log that environment variables are successfully loaded
-	log.Println("Environment variables loaded successfully")
-
-	// Create a buffer to write our multipart data
-	var requestBody bytes.Buffer
-	writer := multipart.NewWriter(&requestBody)
-
-	// Add the file part
-	filePart, err := writer.CreateFormFile("file", "test.warpdive")
-	if err != nil {
-		log.Fatalf("error creating file part: %v", err)
-	}
-	// Create an io.Reader from the []byte slice
-	binaryReader := bytes.NewReader(binaryData)
-
-	_, err = io.Copy(filePart, binaryReader)
-	if err != nil {
-		log.Fatalf("error writing file part: %v", err)
-	}
-
-	// Add string fields
-	fields := map[string]string{
-		"api-key":      warpDiveAPIKey,
-		"project-name": "warpdive",
-	}
-	for key, val := range fields {
-		err := writer.WriteField(key, val)
-		if err != nil {
-			log.Fatalf("error writing string field: %v", err)
+		if strings.Contains(options.ExportFile, "/") || strings.Contains(options.ExportFile, "\\") {
+			log.Fatalf("file name should not contain directory separators ('/' or '\\')")
 		}
+
+		// Check for other invalid characters as per your OS requirements, e.g., on Windows
+		if strings.ContainsAny(options.ExportFile, "<>:\"|?*") {
+			log.Fatalf("file name contains invalid characters")
+		}
+
+		// Ensure the file name ends with .warpdive if not already
+		if !strings.HasSuffix(options.ExportFile, ".warpdive") {
+			options.ExportFile += ".warpdive"
+		}
+
+		// Resolve the absolute path to ensure the path is valid
+		absPath, err := filepath.Abs(options.ExportFile)
+		if err != nil {
+			log.Fatalf("Failed to resolve absolute path: %v", err)
+		}
+
+		// Write the binary data to the resolved file path
+		err = os.WriteFile(absPath, binaryData, 0644)
+		if err != nil {
+			log.Fatalf("Failed to write binary data to file: %v", err)
+		} else {
+			log.Printf("Successfully output %s", absPath)
+		}
+
+	} else {
+		// Make warpdive.xyz api call
+
+		// Retrieve environment variables
+		warpDiveEndpoint := os.Getenv("WARPDIVE_ENDPOINT")
+		warpDiveAPIKey := os.Getenv("WARPDIVE_API_KEY")
+
+		// Use default endpoint if not specified
+		if warpDiveEndpoint == "" {
+			warpDiveEndpoint = "https://www.warpdive.xyz"
+			log.Printf("WARPDIVE_ENDPOINT not set. Using default: %s", warpDiveEndpoint)
+		} else {
+			log.Printf("Using WARPDIVE_ENDPOINT: %s", warpDiveEndpoint)
+		}
+
+		// Check if API key is set; it's critical for operations
+		if warpDiveAPIKey == "" {
+			// Attempt to read from config file
+			usr, err := user.Current()
+			if err != nil {
+				log.Fatalf("Error retrieving user directory: %v", err)
+			}
+			configPath := filepath.Join(usr.HomeDir, ".warpdiverc")
+			if apiKey, err := readAPIKeyFromConfig(configPath, warpDiveEndpoint); err != nil {
+				log.Println("Error: WARPDIVE_API_KEY environment variable is not set and not found in config file")
+				fmt.Println("Please set the WARPDIVE_API_KEY environment variable or run 'warpdive login'.")
+				os.Exit(1)
+			} else {
+				warpDiveAPIKey = apiKey
+			}
+		}
+
+		fmt.Printf("Successfully loaded configuration: Endpoint %s, API Key %s\n", warpDiveEndpoint, warpDiveAPIKey)
+		// Parse the endpoint URL
+		parsedUrl, err := url.Parse(warpDiveEndpoint)
+		if err != nil {
+			log.Fatalf("Invalid URL: %v", err)
+		}
+
+		// Resolve the new path relative to the parsed URL
+		// This method ensures that the path is correctly appended, whether or not the base URL has a trailing slash
+		apiEndpoint := parsedUrl.ResolveReference(&url.URL{Path: "/api/builds/new"}).String()
+
+		// Log that environment variables are successfully loaded
+		warpDiveLogger.Println("Environment variables loaded successfully")
+
+		// Create a buffer to write our multipart data
+		var requestBody bytes.Buffer
+		writer := multipart.NewWriter(&requestBody)
+
+		// Add the file part
+		filePart, err := writer.CreateFormFile("file", "image.warpdive")
+		if err != nil {
+			log.Fatalf("error creating file part: %v", err)
+		}
+		// Create an io.Reader from the []byte slice
+		binaryReader := bytes.NewReader(binaryData)
+
+		_, err = io.Copy(filePart, binaryReader)
+		if err != nil {
+			log.Fatalf("error writing file part: %v", err)
+		}
+
+		// options.Project
+
+		// Add string fields
+		fields := map[string]string{
+			"api-key": warpDiveAPIKey,
+		}
+
+		// Conditionally add the project-name if options.Project is set
+		if options.Project != "" {
+			fields["project-name"] = options.Project
+		} else {
+			// Optionally handle the case where no project is specified
+			// e.g., you can leave it out or set a default project name as needed
+			fmt.Println("No project specified, uploading <untagged> image.")
+		}
+
+		for key, val := range fields {
+			err := writer.WriteField(key, val)
+			if err != nil {
+				log.Fatalf("error writing string field: %v", err)
+			}
+		}
+
+		// Close the multipart writer to set the terminating boundary
+		err = writer.Close()
+		if err != nil {
+			log.Fatalf("error closing writer: %v", err)
+		}
+
+		// Create a request with your URL and the multipart form data
+		req, err := http.NewRequest("POST", apiEndpoint, &requestBody)
+		if err != nil {
+			log.Fatalf("error creating request: %v", err)
+		}
+		req.Header.Set("Content-Type", writer.FormDataContentType())
+
+		// Send the request
+		client := &http.Client{}
+		resp, err := client.Do(req)
+		if err != nil {
+			log.Fatalf("error sending request: %v", err)
+		}
+		defer resp.Body.Close()
+
+		// Log the HTTP response status
+		// Read the response body
+		responseBody, err := io.ReadAll(resp.Body)
+		if err != nil {
+			log.Fatalf("Error reading response body: %v", err)
+		}
+
+		// Log the HTTP response status and body
+		warpDiveLogger.Printf("Response status: %s", resp.Status)
+		warpDiveLogger.Printf("Response body: %s", responseBody)
+
 	}
 
-	// Close the multipart writer to set the terminating boundary
-	err = writer.Close()
-	if err != nil {
-		log.Fatalf("error closing writer: %v", err)
-	}
-
-	// Create a request with your URL and the multipart form data
-	req, err := http.NewRequest("POST", apiEndpoint, &requestBody)
-	if err != nil {
-		log.Fatalf("error creating request: %v", err)
-	}
-	req.Header.Set("Content-Type", writer.FormDataContentType())
-
-	// Send the request
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		log.Fatalf("error sending request: %v", err)
-	}
-	defer resp.Body.Close()
-
-	// Log the HTTP response status
-	// Read the response body
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		log.Fatalf("Error reading response body: %v", err)
-	}
-
-	// Log the HTTP response status and body
-	log.Printf("Response status: %s", resp.Status)
-	log.Printf("Response body: %s", responseBody)
-
-	// Write the binary data to a file
-	// err = os.WriteFile("test.tmp.warpdive", binaryData, 0644)
+	// warpDiveLogger.Println("-----------RUNNING VERIFICATION -----------")
+	// var newAnyMessage anypb.Any
+	// err = proto.Unmarshal(binaryData, &newAnyMessage)
 	// if err != nil {
-	// 	log.Fatalf("Failed to write binary data to file: %v", err)
-	// } else {
-	// 	log.Println("Successfully output ./test.tmp.warpdrive")
+	// 	log.Fatalf("Failed to deserialize Any message: %v", err)
 	// }
 
-	// warpDiveLogger.Println("Serialization complete, data written to 'mybin'")
+	// // Extract WarpDiveImage from the Any message
+	// var newWarpdiveImage warpdive.WarpDiveImage
+	// if err := anyMessage.UnmarshalTo(&newWarpdiveImage); err != nil {
+	// 	log.Fatalf("Failed to extract WarpDiveImage from Any message: %v", err)
+	// }
 
-	warpDiveLogger.Println("-----------RUNNING VERIFICATION -----------")
-	var newAnyMessage anypb.Any
-	err = proto.Unmarshal(binaryData, &newAnyMessage)
-	if err != nil {
-		log.Fatalf("Failed to deserialize Any message: %v", err)
+	// // Verify the tree structure before initially marshalling and after re-reading the encoded format
+	// if newWarpdiveImage.Tree != nil {
+	// 	warpDiveLogger.Println("Tree verification:")
+	// 	verifyTree(newWarpdiveImage.Tree)
+	// } else {
+	// 	log.Println("No tree found in the WarpDiveImage.")
+	// }
+
+}
+
+func IsCommandAvailable(name string) bool {
+	cmd := exec.Command("which", name)
+	if err := cmd.Run(); err != nil {
+		return false
+	}
+	return true
+}
+
+func GetDefaultEngine() string {
+	var source string
+	source = "docker"
+
+	if !IsCommandAvailable(source) && IsCommandAvailable("podman") {
+		source = "podman"
 	}
 
-	// Extract WarpDiveImage from the Any message
-	var newWarpdiveImage warpdive.WarpDiveImage
-	if err := anyMessage.UnmarshalTo(&newWarpdiveImage); err != nil {
-		log.Fatalf("Failed to extract WarpDiveImage from Any message: %v", err)
+	return source
+}
+
+func GetPreferredEngine(sourceInput string) string {
+	dockerAvailable := IsCommandAvailable("docker")
+	podmanAvailable := IsCommandAvailable("podman")
+
+	switch sourceInput {
+	case "docker":
+		return "docker"
+	case "podman":
+		return "podman"
+	case "docker-archive":
+		return "docker-archive"
 	}
 
-	// Verify the tree structure before initially marshalling and after re-reading the encoded format
-	if newWarpdiveImage.Tree != nil {
-		warpDiveLogger.Println("Tree verification:")
-		verifyTree(newWarpdiveImage.Tree)
-	} else {
-		log.Println("No tree found in the WarpDiveImage.")
+	// Auto-detect available engine
+	if dockerAvailable {
+		return "docker"
 	}
-
+	if podmanAvailable {
+		return "podman"
+	}
+	return ""
 }
 
 func Run(options Options) {
 	var exitCode int
 	var events = make(eventChannel)
+
+	warpDiveLogger = NewWarpDiveLogger()
+
+	warpDiveLogger.Printf("Run Options Received: %+v\n", options)
 
 	imageResolver, err := dive.GetImageResolver(options.Source)
 	if err != nil {

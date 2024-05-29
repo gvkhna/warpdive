@@ -62,16 +62,18 @@ export default function ProjectsPage(props: ProjectsPageProps) {
                 {
                   title: 'Project',
                   button: (
-                    <Button
-                      size={'sm'}
-                      className='h-8 gap-x-1 hover:no-underline'
-                      asChild
-                    >
-                      <Link href={`/app/project/${pid}/edit`}>
-                        <Pencil className='h-3 w-3' />
-                        {'Edit'}
-                      </Link>
-                    </Button>
+                    <>
+                      {/* <Button
+                        size={'sm'}
+                        className='h-8 gap-x-1 hover:no-underline'
+                        asChild
+                      >
+                        <Link href={`/app/project/${pid}/edit`}>
+                          <Pencil className='h-3 w-3' />
+                          {'Edit'}
+                        </Link>
+                      </Button> */}
+                    </>
                   ),
                   items: []
                 }

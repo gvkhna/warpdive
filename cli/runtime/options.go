@@ -7,11 +7,14 @@ import (
 )
 
 type Options struct {
-	Ci           bool
-	Image        string
-	Source       dive.ImageSource
-	IgnoreErrors bool
-	ExportFile   string
-	CiConfig     *viper.Viper
 	BuildArgs    []string
+	Ci           bool
+	CiConfig     *viper.Viper
+	Engine       string
+	ExportFile   string
+	IgnoreErrors bool
+	Image        string
+	Project      string
+	PushArgs     []string
+	Source       dive.ImageSource
 }

@@ -27,6 +27,21 @@ archives:
     files:
       - none*
 
+
+dockers:
+  -
+    ids:
+      - dive
+    dockerfile: Dockerfile
+    # todo: on 1.0 remove 'v' prefix
+    image_templates:
+      - "wagoodman/dive:latest"
+      - "wagoodman/dive:{{ .Tag }}"
+      - "wagoodman/dive:v{{ .Major }}"
+      - "wagoodman/dive:v{{ .Major }}.{{ .Minor }}"
+    build_flag_templates:
+      - "--build-arg=DOCKER_CLI_VERSION={{.Env.DOCKER_CLI_VERSION}}"
+
 checksum:
   name_template: 'checksums.txt'
 

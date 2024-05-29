@@ -1,10 +1,14 @@
 package docker
 
 import (
+	"fmt"
 	"os"
 )
 
 func buildImageFromCli(buildArgs []string) (string, error) {
+	if debug := os.Getenv("WARPDIVE_DEBUG"); debug != "" {
+		fmt.Printf("DOCKER BUILD ARGS: %+v\n", buildArgs)
+	}
 	iidfile, err := os.CreateTemp("/tmp", "dive.*.iid")
 	if err != nil {
 		return "", err

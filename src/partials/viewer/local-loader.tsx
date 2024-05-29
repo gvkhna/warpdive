@@ -39,7 +39,7 @@ export default function LocalLoader({onFileLoad, onError}: LocalLoaderProps) {
 
   return (
     <div
-      className='flex h-screen w-full items-center justify-center bg-gray-100 dark:bg-gray-950'
+      className='flex h-[calc(100vh_-_theme(spacing.16))] w-full items-center justify-center bg-gray-100 dark:bg-gray-950'
       onDrop={handleDrop}
       onDragOver={(event) => event.preventDefault()}
     >

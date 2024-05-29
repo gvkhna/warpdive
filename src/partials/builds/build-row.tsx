@@ -54,11 +54,16 @@ export function BuildRow(props: BuildRowProps) {
             </Link>
           </h2>
         </div>
-        <div className='mt-3 flex items-center gap-x-2.5 text-xs leading-5 text-gray-400'>
+        <div className='mt-3 flex items-center  text-xs leading-5 text-gray-400'>
+          {/* gap-x-2.5 */}
           <p className='truncate'>
-            {props.builtWith} - {props.builtBy}
+            {props.builtBy && props.builtWith && (
+              <>
+                {props.builtWith} - {props.builtBy}
+              </>
+            )}
           </p>
-          <svg
+          {/* <svg
             viewBox='0 0 2 2'
             className='h-0.5 w-0.5 flex-none fill-gray-300'
           >
@@ -67,7 +72,7 @@ export function BuildRow(props: BuildRowProps) {
               cy={1}
               r={1}
             />
-          </svg>
+          </svg> */}
           {props.createdAt && <p className='whitespace-nowrap'>{formatRelativeTimeFromUTC(props.createdAt)}</p>}
         </div>
       </div>

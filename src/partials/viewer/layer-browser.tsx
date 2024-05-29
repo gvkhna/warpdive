@@ -1,5 +1,5 @@
 import {Any} from '@/generated/google/protobuf/any_pb'
-import {WarpDiveImage, WarpDiveImage_Node, WarpDiveImage_TreeNode} from '@/generated/warpdive_pb'
+import {WarpDiveImage, WarpDiveImage_TreeNode} from '@/generated/warpdive_pb'
 import {useWarpImage} from './warp-dive-image-provider'
 
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable'
@@ -10,18 +10,18 @@ import {ScrollArea} from '@/components/ui/scroll-area'
 import {Timestamp} from '@/generated/google/protobuf/timestamp_pb'
 import FileSystemViewer from './file-system-viewer'
 import {useLayer} from './use-layer'
-import {LayerListToolbar} from './layer-list-toolbar'
 import {FileSystemViewerToolbar} from './file-system-viewer-toolbar'
 import {MobileLayersList} from './mobile-layers-list'
-import {layerUiStateAtom, useSetSelectedLayerUiState} from './use-layer-ui-state'
+import {layerUiStateAtom, type TreeNodeMap} from './use-layer-ui-state'
 import {useAtom} from 'jotai'
 
 export interface LayerBrowserProps {
   binary: Uint8Array
   onError: (e: Error) => void
+  fullPage?: boolean
 }
 
-const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
+const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError, fullPage = false}) => {
   const {wpImage, setWpImage} = useWarpImage()
   const [isLoading, setLoading] = useState(false)
   const [layerState, setLayerState] = useLayer()
@@ -59,7 +59,7 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
 
   const layers = getLayersFromRoot()
 
-  console.log('root layers: ', layers)
+  // console.log('root layers: ', layers)
 
   useEffect(() => {
     function processBinary() {
@@ -74,12 +74,12 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
           console.log(wpImageRead.metadata)
           if (wpImageRead.metadata?.ts) {
             const d = Timestamp.toDate(wpImageRead.metadata?.ts)
-            console.log(d.toString())
+            // console.log(d.toString())
           }
           setWpImage(wpImageRead)
         }
       } catch (err) {
-        console.error('Error parsing file:', err)
+        console.log('Error parsing file:', err)
         onError(new Error('Failed to load binary. The file is not a valid `.warpdive` binary.'))
       } finally {
         setLoading(false)
@@ -98,7 +98,18 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
       // set initial state of ui open/collapsed dirs
       if (wpImage) {
         const gids = collectNodesToDepth(wpImage.tree)
-        setLayerMap(new Map(layers.map((layer) => [layer, gids])))
+
+        const initialLayerMap: TreeNodeMap = new Map()
+
+        layers.map((layer) => {
+          const treeNodeGid = layer.ref?.gid
+          if (treeNodeGid) {
+            // console.log('setting default layer', treeNodeGid, gids)
+
+            initialLayerMap.set(treeNodeGid, gids)
+          }
+        })
+        setLayerMap(initialLayerMap)
       }
     }
   }, [layerState.selectedLayer, layers, setLayerState, setLayerMap, wpImage, collectNodesToDepth])
@@ -118,7 +129,7 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
 
   return (
     <>
-      <div className='h-[calc(100vh_-_theme(spacing.16))] w-full md:hidden'>
+      <div className={`${fullPage ? 'h-[calc(100vh)]' : 'h-[calc(100vh_-_theme(spacing.16))]'} w-full md:hidden`}>
         <MobileLayersList>
           <LayersList>
             {layers.map(
@@ -134,7 +145,7 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
         </MobileLayersList>
         <FileSystemViewer />
       </div>
-      <div className='hidden h-[calc(100vh_-_theme(spacing.16))] w-full md:flex'>
+      <div className={`hidden ${fullPage ? 'h-[calc(100vh)]' : 'h-[calc(100vh_-_theme(spacing.16))]'} w-full md:flex`}>
         <ResizablePanelGroup direction='horizontal'>
           <ResizablePanel
             minSize={20}
@@ -142,7 +153,7 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError}) => {
           >
             <div className=' bg-white dark:border-gray-800 dark:bg-gray-950'>
               {/* <LayerListToolbar /> */}
-              <ScrollArea className=' h-[calc(100vh_-_theme(spacing.16))]'>
+              <ScrollArea className={`${fullPage ? 'h-[calc(100vh)]' : 'h-[calc(100vh_-_theme(spacing.16))]'}`}>
                 <LayersList>
                   {layers.map(
                     (layer) =>

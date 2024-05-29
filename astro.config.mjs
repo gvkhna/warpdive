@@ -64,7 +64,7 @@ export default defineConfig({
         if (filterBases.some((base) => url.pathname.startsWith(`/${base}/`))) {
           sitemapAllow = false // Reject the page
         }
-        // eslint-disable-next-line no-undef
+        // eslint-disable-next-line no-undef, no-console
         console.log(`sitemap include?: ${url.pathname} -> ${sitemapAllow}`)
         return sitemapAllow // Include? the page
       },
@@ -91,6 +91,9 @@ export default defineConfig({
     },
     // https://github.com/sveltejs/kit/issues/8140
     optimizeDeps: {exclude: ['fsevents']},
+    esbuild: {
+      drop: PROD ? ['console', 'debugger'] : []
+    },
     ssr: {
       //external: ['node:crypto']
     }

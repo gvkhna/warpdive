@@ -4,11 +4,15 @@
 package podman
 
 import (
+	"fmt"
 	"os"
 )
 
 func buildImageFromCli(buildArgs []string) (string, error) {
-	iidfile, err := os.CreateTemp("/tmp", "dive.*.iid")
+	if debug := os.Getenv("WARPDIVE_DEBUG"); debug != "" {
+		fmt.Printf("PODMAN BUILD ARGS: %+v\n", buildArgs)
+	}
+	iidfile, err := os.CreateTemp("/tmp", "warpdive.*.iid")
 	if err != nil {
 		return "", err
 	}
@@ -16,6 +20,9 @@ func buildImageFromCli(buildArgs []string) (string, error) {
 
 	allArgs := append([]string{"--iidfile", iidfile.Name()}, buildArgs...)
 	err = runPodmanCmd("build", allArgs...)
+	if debug := os.Getenv("WARPDIVE_DEBUG"); debug != "" {
+		fmt.Printf("PODMAN RUN ARGS: %+v\n", buildArgs)
+	}
 	if err != nil {
 		return "", err
 	}

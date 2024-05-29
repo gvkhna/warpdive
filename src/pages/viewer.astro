@@ -1,9 +1,14 @@
 ---
 import MainLayout from '@/layouts/main-layout.astro'
+import SiteHeader from '@/partials/header/site-header.astro'
 export const prerender = true
 import LocalViewerPage from '@/partials/viewer/local-viewer-page'
 ---
 
 <MainLayout title='Local Viewer'>
-  <LocalViewerPage client:only='react' />
+  <SiteHeader />
+  <LocalViewerPage
+    client:only='react'
+    fullPage={false}
+  />
 </MainLayout>

@@ -6,6 +6,7 @@ import {useLayer} from './use-layer'
 import {Badge} from '@/components/ui/badge'
 import {formatBytesString} from './format-byte-size'
 import {useWarpImage} from './warp-dive-image-provider'
+import {useDrawerOpen} from './use-drawer-open'
 
 export interface LayerRowProps {
   treeNode: WarpDiveImage_TreeNode
@@ -14,6 +15,7 @@ export interface LayerRowProps {
 export default function LayerRow(props: LayerRowProps) {
   const {wpImage, setWpImage} = useWarpImage()
   const [layerState, setLayerState] = useLayer()
+  const [isDrawerOpen, setDrawerOpen] = useDrawerOpen()
 
   const gid = props.treeNode.ref?.gid
   if (!wpImage) {
@@ -36,11 +38,14 @@ export default function LayerRow(props: LayerRowProps) {
         'flex flex-col items-start gap-1 text-wrap break-all rounded-lg border p-3 text-left text-sm transition-all hover:bg-accent',
         layerState.selectedLayer?.ref?.gid === gid && 'bg-muted'
       )}
-      onClick={() =>
+      onClick={() => {
         setLayerState({
           selectedLayer: props.treeNode
         })
-      }
+        if (isDrawerOpen) {
+          setDrawerOpen(false)
+        }
+      }}
     >
       <div className='flex gap-1'>
         <Badge>{`#${currentNode.data.layer.index}`}</Badge>

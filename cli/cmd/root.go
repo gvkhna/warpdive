@@ -14,6 +14,7 @@ import (
 
 	"github.com/gvkhna/warpdive/dive"
 	"github.com/gvkhna/warpdive/dive/filetree"
+	"github.com/gvkhna/warpdive/runtime"
 )
 
 var cfgFile string
@@ -21,14 +22,26 @@ var exportFile string
 var ciConfigFile string
 var ciConfig = viper.New()
 var isCi bool
+var defaultSource string
+var projectName string
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
-	Use:   "warpdive [IMAGE]",
+	Use:   "warpdive [command] [IMAGE]",
 	Short: "Docker/OCI Layer Browser",
-	Long:  `Use warpdive-cli with https://www.warpdive.xyz to interactively browse and explore docker/OCI container images.`,
+	Long:  `Use warpdive-cli with https://warpdive.xyz to interactively browse and explore docker/OCI container images.`,
 	Args:  cobra.MaximumNArgs(1),
 	Run:   doAnalyzeCmd,
+	Example: `
+    # Build an image and push to warpdive.xyz
+    warpdive build .
+
+    # Fetch and push a build to warpdive.xyz
+    warpdive push node:20-alpine -p node-alpine
+
+    # Fetch and export a build locally
+    warpdive export ubuntu:latest -o ubuntu.warpdive
+    `,
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -45,63 +58,27 @@ func init() {
 }
 
 func initCli() {
-	// rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.dive.yaml, ~/.config/dive/*.yaml, or $XDG_CONFIG_HOME/dive.yaml)")
-	rootCmd.PersistentFlags().String("source", "docker", "The container engine to fetch the image from. Allowed values: "+strings.Join(dive.ImageSources, ", "))
+
+	rootCmd.SetHelpCommand(&cobra.Command{
+		Use:    "no-help", // You can make this anything, but "no-help" or similar is clear it does nothing
+		Hidden: true,      // Hide the command so it doesn't appear in the list of available commands
+	})
+
+	defaultSource = runtime.GetDefaultEngine()
+	rootCmd.PersistentFlags().StringVar(&defaultSource, "wd-source", defaultSource, "The container engine to use. ["+strings.Join(dive.ImageSources, "|")+"]")
+	viper.BindPFlag("source", rootCmd.PersistentFlags().Lookup("source"))
 	rootCmd.PersistentFlags().BoolP("version", "v", false, "display version number")
-	// rootCmd.PersistentFlags().BoolP("ignore-errors", "i", false, "ignore image parsing errors and run the analysis anyway")
+	rootCmd.PersistentFlags().BoolP("wd-ignore-errors", "i", false, "ignore image parsing errors and run the analysis anyway")
+	viper.BindPFlag("ignore-errors", rootCmd.PersistentFlags().Lookup("ignore-errors"))
 	// rootCmd.Flags().BoolVar(&isCi, "ci", false, "Skip the interactive TUI and validate against CI rules (same as env var CI=true)")
-	// rootCmd.Flags().StringVarP(&exportFile, "json", "j", "", "Skip the interactive TUI and write the layer analysis statistics to a given file.")
-	// rootCmd.Flags().StringVar(&ciConfigFile, "ci-config", ".dive-ci", "If CI=true in the environment, use the given yaml to drive validation rules.")
-
-	// rootCmd.Flags().String("lowestEfficiency", "0.9", "(only valid with --ci given) lowest allowable image efficiency (as a ratio between 0-1), otherwise CI validation will fail.")
-	// rootCmd.Flags().String("highestWastedBytes", "disabled", "(only valid with --ci given) highest allowable bytes wasted, otherwise CI validation will fail.")
-	// rootCmd.Flags().String("highestUserWastedPercent", "0.1", "(only valid with --ci given) highest allowable percentage of bytes wasted (as a ratio between 0-1), otherwise CI validation will fail.")
-
-	// for _, key := range []string{"lowestEfficiency", "highestWastedBytes", "highestUserWastedPercent"} {
-	// 	if err := ciConfig.BindPFlag(fmt.Sprintf("rules.%s", key), rootCmd.Flags().Lookup(key)); err != nil {
-	// 		log.Fatalf("Unable to bind '%s' flag: %v", key, err)
-	// 	}
-	// }
-
-	// if err := ciConfig.BindPFlag("ignore-errors", rootCmd.PersistentFlags().Lookup("ignore-errors")); err != nil {
-	// 	log.Fatalf("Unable to bind 'ignore-errors' flag: %v", err)
-	// }
+	// rootCmd.Flags().StringVarP(&exportFile, "output", "o", "", "Optional: Specify the path to output the .warpdive file. Open with warpdive.xyz/viewer")
+	rootCmd.PersistentFlags().StringVar(&projectName, "wd-project", "", "Optional: Specify the project to push to") // . (Default: inferred from dir name)
+	rootCmd.PersistentFlags().StringVar(&exportFile, "wd-export", "", "Optional: Exports a container image to a .warpdive file. For use with warpdive.xyz/viewer")
 }
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
 	var err error
-
-	viper.SetDefault("log.level", log.InfoLevel.String())
-	viper.SetDefault("log.path", "./dive.log")
-	viper.SetDefault("log.enabled", false)
-	// keybindings: status view / global
-	viper.SetDefault("keybinding.quit", "ctrl+c,q")
-	viper.SetDefault("keybinding.toggle-view", "tab")
-	viper.SetDefault("keybinding.filter-files", "ctrl+f, ctrl+slash")
-	// keybindings: layer view
-	viper.SetDefault("keybinding.compare-all", "ctrl+a")
-	viper.SetDefault("keybinding.compare-layer", "ctrl+l")
-	// keybindings: filetree view
-	viper.SetDefault("keybinding.toggle-collapse-dir", "space")
-	viper.SetDefault("keybinding.toggle-collapse-all-dir", "ctrl+space")
-	viper.SetDefault("keybinding.toggle-sort-order", "ctrl+o")
-	viper.SetDefault("keybinding.toggle-filetree-attributes", "ctrl+b")
-	viper.SetDefault("keybinding.toggle-added-files", "ctrl+a")
-	viper.SetDefault("keybinding.toggle-removed-files", "ctrl+r")
-	viper.SetDefault("keybinding.toggle-modified-files", "ctrl+m")
-	viper.SetDefault("keybinding.toggle-unmodified-files", "ctrl+u")
-	viper.SetDefault("keybinding.toggle-wrap-tree", "ctrl+p")
-	viper.SetDefault("keybinding.page-up", "pgup")
-	viper.SetDefault("keybinding.page-down", "pgdn")
-
-	viper.SetDefault("diff.hide", "")
-
-	viper.SetDefault("layer.show-aggregated-changes", false)
-
-	viper.SetDefault("filetree.collapse-dir", false)
-	viper.SetDefault("filetree.pane-width", 0.5)
-	viper.SetDefault("filetree.show-attributes", true)
 
 	viper.SetDefault("container-engine", "docker")
 	viper.SetDefault("ignore-errors", false)
@@ -112,7 +89,7 @@ func initConfig() {
 		os.Exit(1)
 	}
 
-	viper.SetEnvPrefix("DIVE")
+	viper.SetEnvPrefix("WARPDIVE")
 	// replace all - with _ when looking for matching environment variables
 	viper.SetEnvKeyReplacer(strings.NewReplacer("-", "_"))
 	viper.AutomaticEnv()
@@ -163,7 +140,7 @@ func initLogging() {
 	}
 
 	log.SetLevel(level)
-	log.Debug("Starting Dive...")
+	log.Debug("Starting warpdive...")
 	log.Debugf("config filepath: %s", viper.ConfigFileUsed())
 	for k, v := range viper.AllSettings() {
 		log.Debug("config value: ", k, " : ", v)
@@ -171,8 +148,8 @@ func initLogging() {
 }
 
 // getDefaultCfgFile checks for config file in paths from xdg specs
-// and in $HOME/.config/dive/ directory
-// defaults to $HOME/.dive.yaml
+// and in $HOME/.config/warpdive/ directory
+// defaults to $HOME/.warpdive.yaml
 func getDefaultCfgFile() string {
 	home, err := homedir.Dir()
 	if err != nil {
@@ -191,13 +168,13 @@ func getDefaultCfgFile() string {
 			return file
 		}
 	}
-	return path.Join(home, ".dive.yaml")
+	return path.Join(home, ".warpdive.yaml")
 }
 
-// findInPath returns first "*.yaml" file in path's subdirectory "dive"
+// findInPath returns first "*.yaml" file in path's subdirectory "warpdive"
 // if not found returns empty string
 func findInPath(pathTo string) string {
-	directory := path.Join(pathTo, "dive")
+	directory := path.Join(pathTo, "warpdive")
 	files, err := os.ReadDir(directory)
 	if err != nil {
 		return ""

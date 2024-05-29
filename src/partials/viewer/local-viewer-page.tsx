@@ -12,7 +12,11 @@ import {
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
 
-export default function LocalViewerPage() {
+export interface LocalViewerPageProps {
+  fullPage: boolean
+}
+
+export default function LocalViewerPage(props: LocalViewerPageProps) {
   const onError = (error: Error) => {
     setViewer(
       <>
@@ -46,6 +50,7 @@ export default function LocalViewerPage() {
       <LayerBrowser
         binary={data}
         onError={onError}
+        fullPage={props.fullPage}
       />
     )
   }

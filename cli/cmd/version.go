@@ -22,7 +22,7 @@ var versionCmd = &cobra.Command{
 }
 
 func init() {
-	rootCmd.AddCommand(versionCmd)
+	// rootCmd.AddCommand(versionCmd)
 }
 
 func SetVersion(v *Version) {
@@ -30,5 +30,5 @@ func SetVersion(v *Version) {
 }
 
 func printVersion(cmd *cobra.Command, args []string) {
-	fmt.Printf("dive %s\n", version.Version)
+	fmt.Printf("warpdive %s\n", version.Version)
 }
