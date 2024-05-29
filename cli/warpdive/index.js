@@ -11,10 +11,10 @@ const BINARY_DISTRIBUTION_PACKAGES = {
 // Windows binaries end with .exe so we need to special case them.
 const binaryName = process.platform === 'win32' ? 'warpdive.exe' : 'warpdive'
 
-function getBinaryPath() {
-  // Determine package name for this platform
-  const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[`${process.platform}-${process.arch}`]
+// Determine package name for this platform
+const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[`${process.platform}-${process.arch}`]
 
+function getBinaryPath() {
   try {
     // Resolving will fail if the optionalDependency was not installed
     return require.resolve(`${platformSpecificPackageName}/bin/${binaryName}`)
@@ -30,8 +30,8 @@ function runBinary(...args) {
 }
 
 module.exports = {
-  BINARY_DISTRIBUTION_PACKAGES,
   binaryName,
   getBinaryPath,
+  platformSpecificPackageName,
   runBinary
 }
