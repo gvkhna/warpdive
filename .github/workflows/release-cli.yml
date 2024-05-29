@@ -3,6 +3,9 @@ name: release cli
 env:
   BUILD_PATH: './cli/'
 
+permissions:
+  contents: write
+
 on:
   release:
     types: [published]

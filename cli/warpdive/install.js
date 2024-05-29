@@ -2,6 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const zlib = require('zlib')
 const https = require('https')
+const packageJson = require('./package.json')
 
 // Lookup table for all platforms and binary distribution packages
 const BINARY_DISTRIBUTION_PACKAGES = {
@@ -14,10 +15,11 @@ const BINARY_DISTRIBUTION_PACKAGES = {
 }
 
 // Adjust the version you want to install. You can also make this dynamic.
-const BINARY_DISTRIBUTION_VERSION = '1.0.0'
+// const BINARY_DISTRIBUTION_VERSION = '1.0.0'
+const BINARY_DISTRIBUTION_VERSION = packageJson.version
 
 // Windows binaries end with .exe so we need to special case them.
-const binaryName = process.platform === 'win32' ? 'my-binary.exe' : 'my-binary'
+const binaryName = process.platform === 'win32' ? 'warpdive.exe' : 'warpdive'
 
 // Determine package name for this platform
 const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[`${process.platform}-${process.arch}`]
