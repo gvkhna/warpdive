@@ -1,22 +1,5 @@
 #!/usr/bin/env node
 
-const childProcess = require('child_process')
-const {getBinaryPath} = require('../index')
-const {isPlatformSpecificPackageInstalled, downloadBinaryFromNpm} = require('../install')
+const {runBinary} = require('../index')
 
-// Skip downloading the binary if it was already installed via optionalDependencies
-if (!isPlatformSpecificPackageInstalled()) {
-  downloadBinaryFromNpm()
-    .then(() => {
-      childProcess.execFileSync(getBinaryPath(), process.argv.slice(2), {
-        stdio: 'inherit'
-      })
-    })
-    .catch((error) => {
-      console.log('Failed to download and execute the binary:', error)
-    })
-} else {
-  childProcess.execFileSync(getBinaryPath(), process.argv.slice(2), {
-    stdio: 'inherit'
-  })
-}
+runBinary(process.argv.slice(2))
