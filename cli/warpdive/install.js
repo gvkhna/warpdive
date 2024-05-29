@@ -97,3 +97,8 @@ if (!isPlatformSpecificPackageInstalled()) {
 } else {
   console.log('Platform specific package already installed. Will fall back to manually downloading binary.')
 }
+
+module.exports = {
+  isPlatformSpecificPackageInstalled,
+  downloadBinaryFromNpm
+}
