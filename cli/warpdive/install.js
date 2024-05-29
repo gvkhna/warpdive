@@ -7,11 +7,11 @@ const packageJson = require('./package.json')
 // Lookup table for all platforms and binary distribution packages
 const BINARY_DISTRIBUTION_PACKAGES = {
   'darwin-x64': 'warpdive-darwin-amd64',
-  'darwin-arm': 'warpdive-darwin-arm64',
+  'darwin-arm64': 'warpdive-darwin-arm64',
   'linux-x64': 'warpdive-linux-amd64',
-  'linux-arm': 'warpdive-linux-arm64',
+  'linux-arm64': 'warpdive-linux-arm64',
   'win32-x64': 'warpdive-windows-amd64',
-  'win32-arm': 'warpdive-windows-arm64'
+  'win32-arm64': 'warpdive-windows-arm64'
 }
 
 // Adjust the version you want to install. You can also make this dynamic.
