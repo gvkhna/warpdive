@@ -12,9 +12,6 @@ const BINARY_DISTRIBUTION_PACKAGES = {
 const binaryName = process.platform === 'win32' ? 'warpdive.exe' : 'warpdive'
 
 function getBinaryPath() {
-  // Windows binaries end with .exe so we need to special case them.
-  const binaryName = process.platform === 'win32' ? 'my-binary.exe' : 'my-binary'
-
   // Determine package name for this platform
   const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[`${process.platform}-${process.arch}`]
 
