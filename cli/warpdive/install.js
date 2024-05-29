@@ -3,23 +3,13 @@ const path = require('path')
 const zlib = require('zlib')
 const https = require('https')
 const packageJson = require('./package.json')
+const {BINARY_DISTRIBUTION_PACKAGES, binaryName} = require('./index')
 
 // Lookup table for all platforms and binary distribution packages
-const BINARY_DISTRIBUTION_PACKAGES = {
-  'darwin-x64': 'warpdive-darwin-amd64',
-  'darwin-arm64': 'warpdive-darwin-arm64',
-  'linux-x64': 'warpdive-linux-amd64',
-  'linux-arm64': 'warpdive-linux-arm64',
-  'win32-x64': 'warpdive-windows-amd64',
-  'win32-arm64': 'warpdive-windows-arm64'
-}
 
 // Adjust the version you want to install. You can also make this dynamic.
 // const BINARY_DISTRIBUTION_VERSION = '1.0.0'
 const BINARY_DISTRIBUTION_VERSION = packageJson.version
-
-// Windows binaries end with .exe so we need to special case them.
-const binaryName = process.platform === 'win32' ? 'warpdive.exe' : 'warpdive'
 
 // Determine package name for this platform
 const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[`${process.platform}-${process.arch}`]
