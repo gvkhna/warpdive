@@ -11,6 +11,9 @@ const BINARY_DISTRIBUTION_PACKAGES = {
 // Windows binaries end with .exe so we need to special case them.
 const binaryName = process.platform === 'win32' ? 'warpdive.exe' : 'warpdive'
 
+// Compute the path we want to emit the fallback binary to
+const fallbackBinaryPath = path.join(__dirname, binaryName)
+
 // Determine package name for this platform
 const platformSpecificPackageName = BINARY_DISTRIBUTION_PACKAGES[`${process.platform}-${process.arch}`]
 
@@ -19,7 +22,8 @@ function getBinaryPath() {
     // Resolving will fail if the optionalDependency was not installed
     return require.resolve(`${platformSpecificPackageName}/bin/${binaryName}`)
   } catch (e) {
-    return require('path').join(__dirname, '..', binaryName)
+    return fallbackBinaryPath
+    // return require('path').join(__dirname, '..', binaryName)
   }
 }
 
@@ -31,6 +35,7 @@ function runBinary(...args) {
 
 module.exports = {
   binaryName,
+  fallbackBinaryPath,
   getBinaryPath,
   platformSpecificPackageName,
   runBinary

@@ -6,7 +6,6 @@ const {isPlatformSpecificPackageInstalled, downloadBinaryFromNpm} = require('../
 
 // Skip downloading the binary if it was already installed via optionalDependencies
 if (!isPlatformSpecificPackageInstalled()) {
-  console.log('Platform specific package not found. Will manually download binary...')
   downloadBinaryFromNpm()
     .then(() => {
       childProcess.execFileSync(getBinaryPath(), process.argv.slice(2), {

@@ -3,16 +3,13 @@ const path = require('path')
 const zlib = require('zlib')
 const https = require('https')
 const packageJson = require('./package.json')
-const {binaryName, platformSpecificPackageName} = require('./index')
+const {binaryName, platformSpecificPackageName, fallbackBinaryPath} = require('./index')
 
 // Lookup table for all platforms and binary distribution packages
 
 // Adjust the version you want to install. You can also make this dynamic.
 // const BINARY_DISTRIBUTION_VERSION = '1.0.0'
 const BINARY_DISTRIBUTION_VERSION = packageJson.version
-
-// Compute the path we want to emit the fallback binary to
-const fallbackBinaryPath = path.join(__dirname, binaryName)
 
 function makeRequest(url) {
   return new Promise((resolve, reject) => {
