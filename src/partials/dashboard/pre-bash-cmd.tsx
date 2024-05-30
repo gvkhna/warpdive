@@ -24,7 +24,7 @@ export function PreBashCmd(props: PreBashCmdProps) {
               <span
                 key={`pre-bash-cmd-${index}`}
                 style={{
-                  color: 'rgba(255, 255, 255, 0.533)'
+                  color: 'rgba(255, 255, 255, 0.95)'
                 }}
               >
                 {' '}

@@ -36,16 +36,15 @@ export function ProjectsPage(props: ProjectsPageProps) {
   }
   const {data, error, isLoading} = useSWR(key, fetcher)
 
-  console.log('data: ', data)
   useEffect(() => {
-    // if (data && data.builds) {
-    //   const transformedItems = data.projects.map((item) => ({
-    //     title: item.name,
-    //     href: `/app/project/${item.pid}`,
-    //     items: []
-    //   }))
-    //   setNavItems(transformedItems)
-    // }
+    if (data && data.projects) {
+      const transformedItems = data.projects.map((item) => ({
+        title: item.name,
+        href: `/app/project/${item.pid}`,
+        items: []
+      }))
+      setNavItems(transformedItems)
+    }
   }, [data])
 
   console.log('data: ', data)
@@ -63,19 +62,19 @@ export function ProjectsPage(props: ProjectsPageProps) {
                   title: 'Project',
                   button: (
                     <>
-                      {/* <Button
+                      <Button
                         size={'sm'}
                         className='h-8 gap-x-1 hover:no-underline'
                         asChild
                       >
-                        <Link href={`/app/project/${pid}/edit`}>
-                          <Pencil className='h-3 w-3' />
-                          {'Edit'}
+                        <Link href='/app/projects/new'>
+                          <PlusIcon className='h-3 w-3' />
+                          {'New'}
                         </Link>
-                      </Button> */}
+                      </Button>
                     </>
                   ),
-                  items: []
+                  items: navItems
                 }
               ]}
             />
@@ -83,7 +82,7 @@ export function ProjectsPage(props: ProjectsPageProps) {
         </aside>
         <main className='relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]'>
           <div className='mx-auto w-full min-w-0'>
-            {data && data?.builds.length > 0 ? (
+            {data && data?.projectBuilds.length > 0 ? (
               <>
                 <header className='flex items-center justify-between border-b border-white/5'>
                   <h1 className='text-lg font-semibold leading-7 text-foreground dark:text-white'>Deployments</h1>
@@ -92,7 +91,7 @@ export function ProjectsPage(props: ProjectsPageProps) {
                   role='list'
                   className='divide-y divide-white/5'
                 >
-                  {data.builds.map((build) => (
+                  {data.projectBuilds.map((build) => (
                     <BuildRow
                       key={build.pid}
                       pid={build.pid}
@@ -100,7 +99,7 @@ export function ProjectsPage(props: ProjectsPageProps) {
                       createdAt={build.createdAt}
                       builtBy={build.builtBy}
                       builtWith={build.builtWith}
-                      projectName={''}
+                      projectName={build.projectName}
                     />
                   ))}
                 </ul>

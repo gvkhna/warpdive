@@ -23,7 +23,7 @@ const dashboard = new Hono<HonoServer>().get('/', async (c) => {
     // tracking bug: https://github.com/drizzle-team/drizzle-orm/issues/555
     // const {id: buildId, userId: buildUserId, projectId: buildRepoId, ...buildCols} = getTableColumns(schema.builds)
     const recentBuilds = await db
-      .select({
+      .selectDistinct({
         builtBy: sql<string | null>`${schema.builds.builtBy}`.as('build_built_by'),
         builtWith: sql<string | null>`${schema.builds.builtWith}`.as('build_built_with'),
         commitSha: sql<string | null>`${schema.builds.commitSha}`.as('build_commit_sha'),
