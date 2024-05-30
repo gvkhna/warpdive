@@ -12,6 +12,7 @@ import (
 var exportCmd = &cobra.Command{
 	Use:   "export [IMAGE ID]",
 	Short: "Exports a container image to a .warpdive file. For use with warpdive.xyz/viewer",
+	Args:  cobra.ExactArgs(1), // Expect exactly one argument: the docker image/tag id
 	Run:   doExportCmd,
 }
 
