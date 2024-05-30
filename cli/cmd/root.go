@@ -31,7 +31,7 @@ var rootCmd = &cobra.Command{
 	Short: "Docker/OCI Layer Browser",
 	Long:  `Use warpdive-cli with https://warpdive.xyz to interactively browse and explore docker/OCI container images.`,
 	Args:  cobra.MaximumNArgs(1),
-	Run:   doAnalyzeCmd,
+	// Run:   doAnalyzeCmd,
 	Example: `
     # Build an image and push to warpdive.xyz
     warpdive build .

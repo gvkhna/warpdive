@@ -32,7 +32,7 @@ func doAnalyzeCmd(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	initLogging()
+	// initLogging()
 
 	isCi, ciConfig, err := configureCi()
 
