@@ -51,7 +51,7 @@ function getBinaryPath() {
   }
 }
 
-function runBinary(...args) {
+function runBinary(args) {
   // Skip downloading the binary if it was already installed via optionalDependencies
   if (!isPlatformSpecificPackageInstalled()) {
     if (isFallbackBinaryInstalled()) {

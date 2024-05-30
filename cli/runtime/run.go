@@ -716,7 +716,7 @@ func run(enableUi bool, options Options, imageResolver image.Resolver, events ev
 		// Use default endpoint if not specified
 		if warpDiveEndpoint == "" {
 			warpDiveEndpoint = "https://www.warpdive.xyz"
-			log.Printf("WARPDIVE_ENDPOINT not set. Using default: %s", warpDiveEndpoint)
+			warpDiveLogger.Printf("WARPDIVE_ENDPOINT not set. Using default: %s", warpDiveEndpoint)
 		} else {
 			log.Printf("Using WARPDIVE_ENDPOINT: %s", warpDiveEndpoint)
 		}
@@ -738,7 +738,7 @@ func run(enableUi bool, options Options, imageResolver image.Resolver, events ev
 			}
 		}
 
-		fmt.Printf("Successfully loaded configuration: Endpoint %s, API Key %s\n", warpDiveEndpoint, warpDiveAPIKey)
+		warpDiveLogger.Printf("Successfully loaded configuration: Endpoint %s, API Key %s\n", warpDiveEndpoint, warpDiveAPIKey)
 		// Parse the endpoint URL
 		parsedUrl, err := url.Parse(warpDiveEndpoint)
 		if err != nil {

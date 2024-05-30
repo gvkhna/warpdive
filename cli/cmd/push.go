@@ -7,7 +7,6 @@ import (
 	"github.com/gvkhna/warpdive/dive"
 	"github.com/gvkhna/warpdive/runtime"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 var pushCmd = &cobra.Command{
@@ -60,10 +59,10 @@ func doPushCmd(cmd *cobra.Command, args []string) {
 	sourceType, imageStr = dive.DeriveImageSource(userImage)
 
 	if sourceType == dive.SourceUnknown {
-		sourceStr := viper.GetString("source")
-		sourceType = dive.ParseImageSource(sourceStr)
+		// sourceStr := viper.GetString("source")
+		sourceType = dive.ParseImageSource(defaultSource)
 		if sourceType == dive.SourceUnknown {
-			fmt.Printf("unable to determine image source: %v\n", sourceStr)
+			fmt.Printf("unable to determine image source: %v\n", defaultSource)
 			os.Exit(1)
 		}
 
