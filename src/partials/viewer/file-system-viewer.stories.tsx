@@ -1,7 +1,7 @@
 // Import React and the necessary Storybook components
 import React from 'react'
 import {type Meta, type StoryObj} from '@storybook/react'
-import FileSystemViewer from './file-system-viewer'
+import {FileSystemViewer} from './file-system-viewer'
 import {WarpDiveImage, WarpDiveImage_TreeNode, WarpDiveImage_TreeNode_Ref} from '@/generated/warpdive_pb'
 // Define the metadata for the Storybook
 const meta: Meta<typeof FileSystemViewer> = {

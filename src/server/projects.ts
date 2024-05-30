@@ -4,7 +4,7 @@ import * as schema from '@/db/schema'
 import {getAuthenticatedUserDB} from './users'
 import {z} from 'zod'
 import {zValidator} from '@hono/zod-validator'
-import {eq, desc, getTableColumns, sql} from 'drizzle-orm'
+import {eq, desc, and, getTableColumns, sql} from 'drizzle-orm'
 
 const projects = new Hono<HonoServer>()
   .get('/:pid', zValidator('param', z.object({pid: z.string()})), async (c) => {
@@ -28,7 +28,7 @@ const projects = new Hono<HonoServer>()
       // tracking bug: https://github.com/drizzle-team/drizzle-orm/issues/555
       // const {id: buildId, userId: buildUserId, projectId: buildRepoId, ...buildCols} = getTableColumns(schema.builds)
       const projectBuilds = await db
-        .selectDistinct({
+        .select({
           builtBy: sql<string | null>`${schema.builds.builtBy}`.as('build_built_by'),
           builtWith: sql<string | null>`${schema.builds.builtWith}`.as('build_built_with'),
           commitSha: sql<string | null>`${schema.builds.commitSha}`.as('build_commit_sha'),
@@ -49,12 +49,13 @@ const projects = new Hono<HonoServer>()
           tag: sql<string | null>`${schema.builds.tag}`.as('build_tag')
         })
         .from(schema.projects)
-        .innerJoin(schema.builds, eq(schema.builds.projectPid, pid))
-        .where(eq(schema.projects.userId, userId))
+        .innerJoin(schema.builds, eq(schema.builds.projectId, schema.projects.id))
+        .where(and(eq(schema.projects.userId, userId), eq(schema.builds.projectPid, pid)))
         .limit(50)
         .orderBy(desc(schema.builds.createdAt))
 
       if (projects && projectBuilds) {
+        console.log(projectBuilds)
         return c.json({projects: projectsRes, projectBuilds}, 200)
       }
       return c.json({message: 'User not found or incorrect authentication'}, 404)

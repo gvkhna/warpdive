@@ -9,21 +9,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var pushCmd = &cobra.Command{
-	Use:   "push [IMAGE ID]",
-	Short: "Pushes a container image to to warpdive.xyz",
-	Args:  cobra.ExactArgs(1), // Expect exactly one argument: the docker image/tag id
-	Run:   doPushCmd,
+var exportCmd = &cobra.Command{
+	Use:   "export [IMAGE ID]",
+	Short: "Exports a container image to a .warpdive file. For use with warpdive.xyz/viewer",
+	Run:   doExportCmd,
 }
 
 // var outputFilePath string
 
 func init() {
-	rootCmd.AddCommand(pushCmd)
+	rootCmd.AddCommand(exportCmd)
 }
 
-// doPushCmd implements the steps taken for the push command
-func doPushCmd(cmd *cobra.Command, args []string) {
+// doExportCmd implements the steps taken for the export command
+func doExportCmd(cmd *cobra.Command, args []string) {
+
 	userImage := args[0]
 	if userImage == "" {
 		fmt.Println("No image argument given")
@@ -36,7 +36,6 @@ func doPushCmd(cmd *cobra.Command, args []string) {
 	sourceType, imageStr = dive.DeriveImageSource(userImage)
 
 	if sourceType == dive.SourceUnknown {
-		// sourceStr := viper.GetString("source")
 		sourceType = dive.ParseImageSource(defaultSource)
 		if sourceType == dive.SourceUnknown {
 			fmt.Printf("unable to determine image source: %v\n", defaultSource)
@@ -57,9 +56,8 @@ func doPushCmd(cmd *cobra.Command, args []string) {
 		Engine: defaultSource,
 		Source: dive.ParseImageSource(defaultSource),
 		// Source:     dive.ParseImageSource(engine),
-		PushArgs: args,
-		// ExportFile: exportFile,
-		// ExportFile: outputFilePath,
+		PushArgs:   args,
+		ExportFile: exportFile,
 		// CiConfig:   ciConfig,
 	})
 }
