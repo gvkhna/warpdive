@@ -113,6 +113,7 @@ export const builds = sqliteTable(
     commitSha: text('commit_sha'),
     imageSha: text('image_sha'),
     tag: text('tag'),
+    public: integer('public', {mode: 'boolean'}).notNull().default(false),
     releaseUrl: text('release_url'),
     registryUrl: text('registry_url'),
     builtWith: text('built_with'), // podman, docker

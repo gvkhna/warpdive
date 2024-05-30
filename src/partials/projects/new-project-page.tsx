@@ -6,7 +6,7 @@ import {useNavigate} from 'react-router-dom'
 import {useState, type ClipboardEvent, type ChangeEvent} from 'react'
 import api from '@/lib/api-client'
 
-export default function NewProjectPage() {
+export function NewProjectPage() {
   const navigate = useNavigate()
   const [url, setUrl] = useState('')
   const [name, setName] = useState('')

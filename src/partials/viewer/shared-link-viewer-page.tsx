@@ -1,5 +1,5 @@
 import {WarpDiveImageProvider} from './warp-dive-image-provider'
-import {AppLoader} from './app-loader'
+import {SharedLinkLoader} from './shared-link-loader'
 import {ReactNode, useState} from 'react'
 import {LayerBrowser} from './layer-browser'
 import {
@@ -11,15 +11,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from '@/components/ui/alert-dialog'
-import {useParams} from 'react-router-dom'
 
-interface AppViewerPageProps {
+interface SharedLinkViewerPageProps {
   fileOverride?: string
+  pid: string
 }
 
-export function AppViewerPage({fileOverride}: AppViewerPageProps) {
-  const {pid} = useParams()
-
+export function SharedLinkViewerPage({fileOverride, pid}: SharedLinkViewerPageProps) {
   const onError = (error: Error) => {
     setViewer(
       <>
@@ -40,7 +38,7 @@ export function AppViewerPage({fileOverride}: AppViewerPageProps) {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <AppLoader
+        <SharedLinkLoader
           fileOverride={''}
           pid={''}
           onFileLoad={() => {}}
@@ -55,7 +53,7 @@ export function AppViewerPage({fileOverride}: AppViewerPageProps) {
       <LayerBrowser
         binary={data}
         onError={onError}
-        appViewer={true}
+        appViewer={false}
         pid={pid}
       />
     )
@@ -63,7 +61,7 @@ export function AppViewerPage({fileOverride}: AppViewerPageProps) {
 
   const initialView = (fileOverride_: string | undefined, pid_: string | undefined) => {
     return (
-      <AppLoader
+      <SharedLinkLoader
         fileOverride={fileOverride_}
         pid={pid_}
         onFileLoad={onFileLoad}

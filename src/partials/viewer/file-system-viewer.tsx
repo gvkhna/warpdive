@@ -30,7 +30,7 @@ const getMemoizedItemContext = memoizeOne((onOpen, onSelect, flattenedData) => (
   flattenedData
 }))
 
-const FileSystemViewer = () => {
+export const FileSystemViewer = () => {
   const {wpImage, setWpImage} = useWarpImage()
   const [layerState, setLayerState] = useLayer()
 
@@ -218,5 +218,3 @@ const FileSystemViewer = () => {
     </AutoSizer>
   )
 }
-
-export default FileSystemViewer

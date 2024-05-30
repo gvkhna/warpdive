@@ -5,14 +5,14 @@ import api from '@/lib/api-client'
 import {Button} from '@/components/ui/button'
 import {NavItemWithChildren, SidebarNav} from '../app/sidebar-nav'
 import {ScrollArea} from '@/components/ui/scroll-area'
-import DashboardEmptyState from './dashboard-empty-state'
+import {DashboardEmptyState} from './dashboard-empty-state'
 import {PlusIcon} from '@radix-ui/react-icons'
-import Link from '@/components/link'
+import {Link} from '@/components/link'
 import {BuildRow} from '../builds/build-row'
 
 export interface DashboardPageProps {}
 
-export default function DashboardPage(props: DashboardPageProps) {
+export function DashboardPage(props: DashboardPageProps) {
   const [navItems, setNavItems] = useState<NavItemWithChildren[]>([])
 
   const call = api.dashboard

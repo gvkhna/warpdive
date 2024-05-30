@@ -2,7 +2,7 @@ import {Avatar, AvatarFallback, AvatarImage} from '@/components/ui/avatar'
 import {Card, CardContent, CardHeader, CardTitle} from '@/components/ui/card'
 import {formatUserProfileCookie} from '@/lib/format-user-profile-cookie'
 
-export default function ProfileCard() {
+export function ProfileCard() {
   const {fullName, githubLogin, githubAvatarUrl, initials, pid} = formatUserProfileCookie(document && document.cookie)
 
   return (

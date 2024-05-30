@@ -5,7 +5,7 @@ export interface PreBashCmdProps {
   args: string[]
 }
 
-export default function PreBashCmd(props: PreBashCmdProps) {
+export function PreBashCmd(props: PreBashCmdProps) {
   return (
     <div className='relative'>
       <pre

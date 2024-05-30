@@ -1,14 +1,14 @@
 import api from '@/lib/api-client'
 import {useEffect} from 'react'
 
-interface AppLoaderProps {
+interface SharedLinkLoaderProps {
   fileOverride: string | undefined
   pid: string | undefined
   onFileLoad: (data: Uint8Array) => void
   onError: (e: Error) => void
 }
 
-export function AppLoader({fileOverride, pid, onFileLoad, onError}: AppLoaderProps) {
+export function SharedLinkLoader({fileOverride, pid, onFileLoad, onError}: SharedLinkLoaderProps) {
   useEffect(() => {
     const loadFile = async () => {
       try {
@@ -18,7 +18,7 @@ export function AppLoader({fileOverride, pid, onFileLoad, onError}: AppLoaderPro
           const binary = new Uint8Array(arrayBuffer)
           onFileLoad(binary)
         } else if (pid) {
-          const resp = await api.builds[':pid'].object.$get({param: {pid: pid}})
+          const resp = await api.shares[':pid'].$get({param: {pid: pid}})
           if (resp.ok) {
             const file = await resp.arrayBuffer()
             const binary = new Uint8Array(file)

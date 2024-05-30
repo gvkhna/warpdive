@@ -1,7 +1,7 @@
 import {WarpDiveImageProvider} from './warp-dive-image-provider'
-import LocalLoader from './local-loader'
+import {LocalLoader} from './local-loader'
 import {ReactNode, useState} from 'react'
-import LayerBrowser from './layer-browser'
+import {LayerBrowser} from './layer-browser'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,7 +16,7 @@ export interface LocalViewerPageProps {
   fullPage: boolean
 }
 
-export default function LocalViewerPage(props: LocalViewerPageProps) {
+export function LocalViewerPage(props: LocalViewerPageProps) {
   const onError = (error: Error) => {
     setViewer(
       <>

@@ -1,7 +1,7 @@
 import {cn} from '@/lib/utils'
 import {Icons} from '../header/icons'
 import {useLocation} from 'react-router-dom'
-import Link from '@/components/link'
+import {Link} from '@/components/link'
 
 export interface NavItem {
   title: string

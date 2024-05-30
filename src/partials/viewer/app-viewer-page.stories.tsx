@@ -1,8 +1,8 @@
 import type {Meta, StoryObj} from '@storybook/react'
 import {withRouter, reactRouterParameters} from 'storybook-addon-remix-react-router'
 
-import AppViewerPage from './app-viewer-page'
-import AppLayout from '../app/app-layout'
+import {AppViewerPage} from './app-viewer-page'
+import {AppLayout} from '../app/app-layout'
 const meta = {
   title: 'ContainerBrowser/Viewer',
   component: AppViewerPage,

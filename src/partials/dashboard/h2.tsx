@@ -4,7 +4,7 @@ export interface H2Props {
   title: string
 }
 
-export default function H2(props: H2Props) {
+export function H2(props: H2Props) {
   return (
     <h2 className='font-heading mt-12 scroll-m-20 border-b pb-2 text-2xl font-semibold tracking-tight first:mt-0'>
       {/* id={props.title} */}

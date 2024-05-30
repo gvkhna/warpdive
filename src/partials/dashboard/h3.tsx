@@ -4,7 +4,7 @@ export interface H3Props {
   title: string
 }
 
-export default function H3(props: H3Props) {
+export function H3(props: H3Props) {
   return (
     <h3 className='font-heading mt-8 scroll-m-20 text-xl font-semibold tracking-tight'>
       {/* id={props.title} */}

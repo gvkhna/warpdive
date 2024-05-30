@@ -1,0 +1,19 @@
+---
+import MainLayout from '@/layouts/main-layout.astro'
+import SiteHeader from '@/partials/header/site-header.astro'
+export const prerender = false
+import {SharedLinkViewerPage} from '@/partials/viewer/shared-link-viewer-page'
+
+const {pid} = Astro.params
+if (!pid) {
+  return Astro.redirect('/404')
+}
+---
+
+<MainLayout title='Share link viewer'>
+  <SiteHeader />
+  <SharedLinkViewerPage
+    client:only='react'
+    {pid}
+  />
+</MainLayout>

@@ -7,13 +7,13 @@ import {NavItemWithChildren, SidebarNav} from '../app/sidebar-nav'
 import {ScrollArea} from '@/components/ui/scroll-area'
 import {Button} from '@/components/ui/button'
 import {PlusIcon} from '@radix-ui/react-icons'
-import Link from '@/components/link'
+import {Link} from '@/components/link'
 import api from '@/lib/api-client'
 import {Pencil} from 'lucide-react'
 
 export interface ProjectsPageProps {}
 
-export default function ProjectsPage(props: ProjectsPageProps) {
+export function ProjectsPage(props: ProjectsPageProps) {
   const {pid} = useParams()
   const [navItems, setNavItems] = useState<NavItemWithChildren[]>([])
 

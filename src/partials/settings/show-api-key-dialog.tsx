@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/dialog'
 import {Button} from '@/components/ui/button'
 
-import CopyApiKey from './copy-api-key'
+import {CopyApiKey} from './copy-api-key'
 
 export interface ShowApiKeyDialogProps {
   open: boolean

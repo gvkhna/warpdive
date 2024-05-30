@@ -20,7 +20,7 @@ export interface DeleteUserFormProps {
   showInitialError?: boolean
 }
 
-export default function DeleteUserForm({showInitialError = false}: DeleteUserFormProps) {
+export function DeleteUserForm({showInitialError = false}: DeleteUserFormProps) {
   const navigate = useNavigate()
 
   const [showError, setShowError] = useState(showInitialError)

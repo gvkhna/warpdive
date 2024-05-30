@@ -4,24 +4,27 @@ import {useWarpImage} from './warp-dive-image-provider'
 
 import {ResizableHandle, ResizablePanel, ResizablePanelGroup} from '@/components/ui/resizable'
 import {useState, useEffect, type FC, useCallback} from 'react'
-import LayerRow from './layer-row'
-import LayersList from './layers-list'
+import {LayerRow} from './layer-row'
+import {LayersList} from './layers-list'
 import {ScrollArea} from '@/components/ui/scroll-area'
 import {Timestamp} from '@/generated/google/protobuf/timestamp_pb'
-import FileSystemViewer from './file-system-viewer'
+import {FileSystemViewer} from './file-system-viewer'
 import {useLayer} from './use-layer'
 import {FileSystemViewerToolbar} from './file-system-viewer-toolbar'
 import {MobileLayersList} from './mobile-layers-list'
 import {layerUiStateAtom, type TreeNodeMap} from './use-layer-ui-state'
 import {useAtom} from 'jotai'
+import {LayerListToolbar} from './layer-list-toolbar'
 
 export interface LayerBrowserProps {
   binary: Uint8Array
   onError: (e: Error) => void
   fullPage?: boolean
+  appViewer?: boolean
+  pid?: string
 }
 
-const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError, fullPage = false}) => {
+export const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError, fullPage = false, appViewer = false, pid}) => {
   const {wpImage, setWpImage} = useWarpImage()
   const [isLoading, setLoading] = useState(false)
   const [layerState, setLayerState] = useLayer()
@@ -151,8 +154,14 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError, fullPage = false}
             minSize={20}
             defaultSize={40}
           >
-            <div className=' bg-white dark:border-gray-800 dark:bg-gray-950'>
-              {/* <LayerListToolbar /> */}
+            <div className=' dark:border-gray-800 dark:bg-gray-950 bg-white'>
+              {appViewer && (
+                <LayerListToolbar
+                  appViewer={appViewer}
+                  pid={pid}
+                />
+              )}
+
               <ScrollArea className={`${fullPage ? 'h-[calc(100vh)]' : 'h-[calc(100vh_-_theme(spacing.16))]'}`}>
                 <LayersList>
                   {layers.map(
@@ -178,5 +187,3 @@ const LayerBrowser: FC<LayerBrowserProps> = ({binary, onError, fullPage = false}
     </>
   )
 }
-
-export default LayerBrowser

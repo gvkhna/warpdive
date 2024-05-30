@@ -12,7 +12,7 @@ export interface LayerRowProps {
   treeNode: WarpDiveImage_TreeNode
 }
 
-export default function LayerRow(props: LayerRowProps) {
+export function LayerRow(props: LayerRowProps) {
   const {wpImage, setWpImage} = useWarpImage()
   const [layerState, setLayerState] = useLayer()
   const [isDrawerOpen, setDrawerOpen] = useDrawerOpen()

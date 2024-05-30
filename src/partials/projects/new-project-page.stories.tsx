@@ -1,8 +1,8 @@
 import type {Meta, StoryObj} from '@storybook/react'
 import {withRouter, reactRouterParameters} from 'storybook-addon-remix-react-router'
 
-import NewProjectPage from './new-project-page'
-import AppLayout from '../app/app-layout'
+import {NewProjectPage} from './new-project-page'
+import {AppLayout} from '../app/app-layout'
 const meta = {
   title: 'Projects/New',
   component: NewProjectPage,

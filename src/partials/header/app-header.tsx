@@ -1,4 +1,4 @@
-import Link from '@/components/link'
+import {Link} from '@/components/link'
 import {cn} from '@/lib/utils'
 import {Icons} from './icons'
 import {buttonVariants} from '@/components/ui/button'

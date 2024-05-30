@@ -1,4 +1,4 @@
-import {useState, useEffect, useCallback} from 'react'
+import {useState, useEffect} from 'react'
 import {CheckIcon, ClipboardIcon} from 'lucide-react'
 import {cn} from '@/lib/utils'
 import {Button, ButtonProps} from '@/components/ui/button'

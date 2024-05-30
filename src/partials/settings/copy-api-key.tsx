@@ -4,7 +4,7 @@ export interface CopyApiKeyProps {
   apiKey: string
 }
 
-export default function CopyApiKey(props: CopyApiKeyProps) {
+export function CopyApiKey(props: CopyApiKeyProps) {
   return (
     <div className='relative'>
       <pre className='mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-lg border py-4'>

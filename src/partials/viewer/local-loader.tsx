@@ -6,7 +6,7 @@ interface LocalLoaderProps {
   onError: (e: Error) => void
 }
 
-export default function LocalLoader({onFileLoad, onError}: LocalLoaderProps) {
+export function LocalLoader({onFileLoad, onError}: LocalLoaderProps) {
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -39,14 +39,14 @@ export default function LocalLoader({onFileLoad, onError}: LocalLoaderProps) {
 
   return (
     <div
-      className='flex h-[calc(100vh_-_theme(spacing.16))] w-full items-center justify-center bg-gray-100 dark:bg-gray-950'
+      className='bg-gray-100 dark:bg-gray-950 flex h-[calc(100vh_-_theme(spacing.16))] w-full items-center justify-center'
       onDrop={handleDrop}
       onDragOver={(event) => event.preventDefault()}
     >
-      <div className='mx-4 flex w-full max-w-md flex-col items-center space-y-4 rounded-sm border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900'>
-        <div className='flex h-64 w-full flex-col items-center justify-center rounded-sm border-2 border-dashed border-gray-300 p-4 dark:border-gray-700'>
-          <UploadIcon className='h-12 w-12 text-gray-400 dark:text-gray-500' />
-          <p className='mt-4 px-4 text-center text-gray-500 dark:text-gray-400'>
+      <div className='border-gray-200 dark:border-gray-800 dark:bg-gray-900 mx-4 flex w-full max-w-md flex-col items-center space-y-4 rounded-sm border bg-white p-6 shadow-sm'>
+        <div className='border-gray-300 dark:border-gray-700 flex h-64 w-full flex-col items-center justify-center rounded-sm border-2 border-dashed p-4'>
+          <UploadIcon className='text-gray-400 dark:text-gray-500 h-12 w-12' />
+          <p className='text-gray-500 dark:text-gray-400 mt-4 px-4 text-center'>
             Drag and drop a `.warpdive` file here, or select a file below
           </p>
         </div>

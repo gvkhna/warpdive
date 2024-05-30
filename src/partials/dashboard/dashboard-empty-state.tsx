@@ -1,10 +1,10 @@
 import {cn} from '@/lib/utils'
-import CodeInline from './code-inline'
-import H2 from './h2'
-import Paragraph from './paragraph'
-import PreBashCmd from './pre-bash-cmd'
+import {CodeInline} from './code-inline'
+import {H2} from './h2'
+import {Paragraph} from './paragraph'
+import {PreBashCmd} from './pre-bash-cmd'
 
-export default function DashboardEmptyState() {
+export function DashboardEmptyState() {
   return (
     <>
       <div className='space-y-2'>

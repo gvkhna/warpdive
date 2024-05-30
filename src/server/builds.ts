@@ -5,7 +5,7 @@ import {verify, decode} from 'hono/jwt'
 import {getSecretPlatform} from '@/secrets'
 import {randomString} from '@/lib/random-string'
 import {DrizzleD1Database, drizzle} from 'drizzle-orm/d1'
-import {eq, sql, and} from 'drizzle-orm'
+import {eq, sql, and, getTableColumns} from 'drizzle-orm'
 import {z} from 'zod'
 import {zValidator} from '@hono/zod-validator'
 import {getAuthenticatedUserDB} from './users'
@@ -100,7 +100,7 @@ async function getAuthenticatedAPIDB(apiKey: string, c: Context<HonoServer>): Pr
 }
 
 const builds = new Hono<HonoServer>()
-  .get('/:pid', zValidator('param', z.object({pid: z.string()})), async (c) => {
+  .get('/:pid/object', zValidator('param', z.object({pid: z.string()})), async (c) => {
     const {pid} = c.req.valid('param')
 
     const helper = await getAuthenticatedUserDB(c)
@@ -122,6 +122,69 @@ const builds = new Hono<HonoServer>()
         }
       } else {
         return c.json({message: 'Found incorrect build results'}, 500)
+      }
+    }
+    return c.json({message: 'User not found or incorrect authentication'}, 404)
+  })
+  .get('/:pid', zValidator('param', z.object({pid: z.string()})), async (c) => {
+    const {pid} = c.req.valid('param')
+
+    const helper = await getAuthenticatedUserDB(c)
+    if (helper.currentUser && helper.db) {
+      const db = helper.db
+
+      const {id, userId, projectId, ...buildCols} = getTableColumns(schema.builds)
+
+      const res = await db
+        .select(buildCols)
+        .from(schema.builds)
+        .where(and(eq(schema.builds.userId, helper.currentUser.id), eq(schema.builds.pid, pid)))
+
+      if (res.length === 1) {
+        const build = res[0]
+        return c.json({
+          build
+        })
+      } else {
+        return c.json({message: 'Found incorrect build results'}, 500)
+      }
+    }
+    return c.json({message: 'User not found or incorrect authentication'}, 404)
+  })
+  .get('/:pid/set-public', zValidator('param', z.object({pid: z.string()})), async (c) => {
+    const {pid} = c.req.valid('param')
+
+    const helper = await getAuthenticatedUserDB(c)
+    if (helper.currentUser && helper.db) {
+      const db = helper.db
+      const res = await db
+        .update(schema.builds)
+        .set({public: true})
+        .where(and(eq(schema.builds.userId, helper.currentUser.id), eq(schema.builds.pid, pid)))
+
+      if (res.success) {
+        return c.json({message: 'Successfully set build to public'}, 200)
+      } else {
+        return c.json({message: 'Unable to set build to public, something failed'}, 500)
+      }
+    }
+    return c.json({message: 'User not found or incorrect authentication'}, 404)
+  })
+  .get('/:pid/set-private', zValidator('param', z.object({pid: z.string()})), async (c) => {
+    const {pid} = c.req.valid('param')
+
+    const helper = await getAuthenticatedUserDB(c)
+    if (helper.currentUser && helper.db) {
+      const db = helper.db
+      const res = await db
+        .update(schema.builds)
+        .set({public: false})
+        .where(and(eq(schema.builds.userId, helper.currentUser.id), eq(schema.builds.pid, pid)))
+
+      if (res.success) {
+        return c.json({message: 'Successfully set build to private'}, 200)
+      } else {
+        return c.json({message: 'Unable to set build to private, something failed'}, 500)
       }
     }
     return c.json({message: 'User not found or incorrect authentication'}, 404)

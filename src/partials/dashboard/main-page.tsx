@@ -1,4 +1,4 @@
-import Link from '@/components/link'
+import {Link} from '@/components/link'
 
 import {ChevronRightIcon, ExternalLinkIcon} from '@radix-ui/react-icons'
 import {cn} from '@/lib/utils'
@@ -48,7 +48,7 @@ const environments = {
   Production: 'text-indigo-400 bg-indigo-400/10 ring-indigo-400/30'
 }
 
-export default function MainPage() {
+export function MainPage() {
   return (
     <main className='relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]'>
       <div className='mx-auto w-full min-w-0'>
@@ -87,11 +87,11 @@ export default function MainPage() {
                     </a>
                   </h2>
                 </div>
-                <div className='mt-3 flex items-center gap-x-2.5 text-xs leading-5 text-gray-400'>
+                <div className='text-gray-400 mt-3 flex items-center gap-x-2.5 text-xs leading-5'>
                   <p className='truncate'>{deployment.description}</p>
                   <svg
                     viewBox='0 0 2 2'
-                    className='h-0.5 w-0.5 flex-none fill-gray-300'
+                    className='fill-gray-300 h-0.5 w-0.5 flex-none'
                   >
                     <circle
                       cx={1}
@@ -111,7 +111,7 @@ export default function MainPage() {
                 {deployment.environment}
               </div>
               <ChevronRightIcon
-                className='h-5 w-5 flex-none text-gray-400'
+                className='text-gray-400 h-5 w-5 flex-none'
                 aria-hidden='true'
               />
             </li>

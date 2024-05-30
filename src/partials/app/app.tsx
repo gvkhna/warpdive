@@ -2,14 +2,14 @@ import {StrictMode} from 'react'
 import {SWRConfig} from 'swr'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 
-import DashboardPage from '../dashboard/dashboard-page'
-import ProjectsPage from '../projects/projects-page'
-import NewProjectPage from '../projects/new-project-page'
-import AppLayout from './app-layout'
-import SettingsPage from '../settings/settings-page'
-import AppViewerPage from '../viewer/app-viewer-page'
+import {DashboardPage} from '../dashboard/dashboard-page'
+import {ProjectsPage} from '../projects/projects-page'
+import {NewProjectPage} from '../projects/new-project-page'
+import {AppLayout} from './app-layout'
+import {SettingsPage} from '../settings/settings-page'
+import {AppViewerPage} from '../viewer/app-viewer-page'
 
-export default function App() {
+export function App() {
   return (
     <StrictMode>
       <SWRConfig
@@ -38,6 +38,10 @@ export default function App() {
               />
               <Route
                 path='/app/deployment/:pid'
+                element={<AppViewerPage />}
+              />
+              <Route
+                path='/app/share/:pid'
                 element={<AppViewerPage />}
               />
               <Route

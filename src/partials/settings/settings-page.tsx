@@ -1,9 +1,9 @@
 import {Separator} from '@/components/ui/separator'
 import {SettingsSidebarNav} from './settings-sidebar-nav'
-import ProfileCard from './profile-card'
+import {ProfileCard} from './profile-card'
 import {Button, buttonVariants} from '@/components/ui/button'
 import {ApiKeysCard} from './api-keys-card'
-import DeleteUserForm from './delete-user-form'
+import {DeleteUserForm} from './delete-user-form'
 import useSWR from 'swr'
 import type {InferRequestType} from 'hono/client'
 import api from '@/lib/api-client'
@@ -19,7 +19,7 @@ const sidebarNavItems = [
 
 export interface SettingsPageProps extends DeleteUserFormProps {}
 
-export default function SettingsPage(props: SettingsPageProps) {
+export function SettingsPage(props: SettingsPageProps) {
   const call = api.users.settings
   const $get = call.$get
   const key = call.$url().pathname

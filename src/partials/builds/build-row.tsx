@@ -1,7 +1,7 @@
 import {ChevronRightIcon, ExternalLinkIcon} from '@radix-ui/react-icons'
 import {Badge} from '@/components/ui/badge'
 import {formatRelativeTimeFromUTC} from '@/lib/format-dates'
-import Link from '@/components/link'
+import {Link} from '@/components/link'
 
 import {cn} from '@/lib/utils'
 
@@ -54,7 +54,7 @@ export function BuildRow(props: BuildRowProps) {
             </Link>
           </h2>
         </div>
-        <div className='mt-3 flex items-center  text-xs leading-5 text-gray-400'>
+        <div className='text-gray-400 mt-3 flex  items-center text-xs leading-5'>
           {/* gap-x-2.5 */}
           <p className='truncate'>
             {props.builtBy && props.builtWith && (
@@ -85,7 +85,7 @@ export function BuildRow(props: BuildRowProps) {
                 {deployment.environment}
               </div> */}
       <ChevronRightIcon
-        className='h-5 w-5 flex-none text-gray-400'
+        className='text-gray-400 h-5 w-5 flex-none'
         aria-hidden='true'
       />
     </li>

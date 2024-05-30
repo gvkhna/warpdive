@@ -1,11 +1,11 @@
 import {Input} from '@/components/ui/input'
 import {Label} from '@/components/ui/label'
-import Link from '@/components/link'
+import {Link} from '@/components/link'
 import {Button} from '@/components/ui/button'
 
-export default function ViewerHeader() {
+export function ViewerHeader() {
   return (
-    <header className='flex h-16 items-center justify-between border-b bg-white px-4 shadow-sm dark:border-gray-800 dark:bg-gray-950 md:px-6'>
+    <header className='dark:border-gray-800 dark:bg-gray-950 flex h-16 items-center justify-between border-b bg-white px-4 shadow-sm md:px-6'>
       <div className='flex items-center gap-4'>
         <Link
           className='text-lg font-semibold'

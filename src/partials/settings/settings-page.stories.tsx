@@ -1,8 +1,8 @@
 import type {Meta, StoryObj} from '@storybook/react'
 import {withRouter, reactRouterParameters} from 'storybook-addon-remix-react-router'
 
-import SettingsPage from './settings-page'
-import AppLayout from '../app/app-layout'
+import {SettingsPage} from './settings-page'
+import {AppLayout} from '../app/app-layout'
 import {ShowApiKeyDialog} from './show-api-key-dialog'
 import {useState} from 'react'
 const meta = {

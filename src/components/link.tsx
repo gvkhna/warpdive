@@ -8,7 +8,7 @@ export interface LinkProps extends HTMLProps<HTMLAnchorElement> {
   href: string
 }
 
-export default function Link(props: LinkProps) {
+export function Link(props: LinkProps) {
   const {children, to, href, className: classNameProp, ...rest} = props
 
   let linkHref = ''
