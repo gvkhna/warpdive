@@ -1,7 +1,12 @@
 ---
 import MainLayout from '@/layouts/main-layout.astro'
 import {deleteOauthStateCookie, getOauthStateCookie} from '@/lib/cookies'
-import {fetchGithubUserProfile, fetchGithubUserAccessToken, githubAuthUser} from '@/lib/github-client'
+import {
+  fetchGithubUserProfile,
+  fetchGithubUserAccessToken,
+  githubAuthUser,
+  fetchGithubUserEmail
+} from '@/lib/github-client'
 
 export const prerender = false
 const oauthState = getOauthStateCookie(Astro.cookies)
@@ -21,7 +26,8 @@ if (oauthState && githubState && oauthState === githubState && githubCode) {
         const userProfile = await fetchGithubUserProfile(accessToken)
         if (userProfile) {
           try {
-            const res = await githubAuthUser(userProfile, Astro.locals, Astro.cookies)
+            const userEmailResp = await fetchGithubUserEmail(accessToken)
+            const res = await githubAuthUser(userProfile, userEmailResp, Astro.locals, Astro.cookies)
             console.log('res: ', res)
             return res
           } catch (authError) {

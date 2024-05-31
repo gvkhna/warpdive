@@ -279,7 +279,12 @@ export async function decrypt(dataWithIV: string, secret: string): Promise<strin
   return decoder.decode(decryptedData)
 }
 
-export async function githubAuthUser(userProfile: unknown, locals: App.Locals, astroCookies: Readonly<AstroCookies>) {
+export async function githubAuthUser(
+  userProfile: unknown,
+  userEmailResp: unknown,
+  locals: App.Locals,
+  astroCookies: Readonly<AstroCookies>
+) {
   if (userProfile && typeof userProfile === 'object') {
     // continue only if they are a user
     if ('type' in userProfile && userProfile.type === 'User') {
@@ -318,9 +323,12 @@ export async function githubAuthUser(userProfile: unknown, locals: App.Locals, a
             return githubAuthNewSession(existingUser, locals, astroCookies)
           } else {
             let emailValue: string | null = null
-            if ('email' in userProfile && typeof userProfile.email === 'string') {
-              const appSecret = getSecretAstro('APP_SECRET_KEY', locals)
-              emailValue = await encrypt(userProfile.email, appSecret)
+            if (Array.isArray(userEmailResp)) {
+              const primaryEmail = userEmailResp.find((email) => email.primary && email.verified)
+              if (primaryEmail && typeof primaryEmail.email === 'string') {
+                const appSecret = getSecretAstro('APP_SECRET_KEY', locals)
+                emailValue = await encrypt(primaryEmail.email, appSecret)
+              }
             }
             const newUserArr = await db
               .insert(schema.users)
@@ -406,5 +414,31 @@ export async function fetchGithubUserProfile(accessToken: string) {
   } catch (error) {
     console.log('Failed to fetch user profile:', error)
     throw error
+  }
+}
+
+export async function fetchGithubUserEmail(accessToken: string) {
+  try {
+    const apiUrl = 'https://api.github.com/user/emails'
+    const response = await fetch(apiUrl, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/json',
+        'User-Agent': 'fetch/www.warpdive.xyz'
+      }
+    })
+
+    if (!response.ok) {
+      return []
+      // throw new Error(`GitHub API responded with ${response.status}: ${response.statusText}`)
+    }
+
+    const userEmailResp = await response.json() // Parse the JSON response
+    return userEmailResp // This will contain the user profile information
+  } catch (error) {
+    console.log('Failed to fetch user email:', error)
+    return []
+    // throw error
   }
 }
