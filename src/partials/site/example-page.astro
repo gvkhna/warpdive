@@ -1,30 +1,25 @@
 ---
 import GithubLogo from '@/icons/github-logo.astro'
-import MainLayout from '@/layouts/main-layout.astro'
+import MainLayout, {type Props as MainLayoutProps} from '@/layouts/main-layout.astro'
 import SiteFooter from '@/partials/footer/site-footer.astro'
 import SiteHeader from '@/partials/header/site-header.astro'
 import ExamplesSection from '@/partials/site/examples-section.astro'
 import {Examples} from './examples'
 
-export interface Props {
+export interface Props extends MainLayoutProps {
   exampleId: string
 }
 
-const {exampleId} = Astro.props
+const {exampleId, ...props} = Astro.props
 ---
 
-<MainLayout
-  title='Warpdive'
-  desc='A docker/oci container layer browser'
->
+<MainLayout {...props}>
   <div vaul-drawer-wrapper=''>
     <div class='relative flex min-h-screen flex-col bg-background'>
       <SiteHeader />
       <main class='flex-1'>
         <div class='container relative'>
-          <section
-            class='mx-auto flex max-w-[980px] flex-col items-center gap-2 py-8 md:py-12 md:pb-8 lg:py-24 lg:pb-20'
-          >
+          <section class='mx-auto flex max-w-[980px] flex-col items-center gap-2 pb-4 pt-6 lg:pb-14 lg:pt-16'>
             <a
               class='inline-flex items-center rounded-lg bg-zinc-900 px-3 py-1 text-sm font-medium text-white'
               href='#'
@@ -47,7 +42,7 @@ const {exampleId} = Astro.props
               CI. Catch layer caching issues or debug errors. Free and open source.</span
             >
             <div
-              class='flex w-full flex-col items-center justify-center space-x-4 space-y-2 py-4 md:flex-row md:space-y-0 md:pb-10'
+              class='flex w-full flex-wrap items-center justify-center space-x-4 py-4 md:flex-row md:space-y-0 md:pb-10'
             >
               <a
                 class='focus-visible:ring-1 focus-visible:ring-ring inline-flex h-9 items-center justify-center whitespace-nowrap rounded-[6px] bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'

@@ -8,23 +8,23 @@ export interface ExampleItem {
 
 export const Examples: ExampleItem[] = [
   {
+    id: 'node',
+    name: 'node:latest',
+    url: 'https://www.warpdive.xyz/share/01hz593s1qj1c1epghmnv66vdn/',
+    image: 'node-latest.png',
+    default: true
+  },
+  {
     id: 'ubuntu',
     name: 'ubuntu:noble',
     url: 'https://www.warpdive.xyz/share/01hz598eawqwkdvetayjankaps/',
-    image: 'ubuntu-latest.png',
-    default: true
+    image: 'ubuntu-latest.png'
   },
   {
     id: 'alpine',
     name: 'alpine:latest',
     url: 'https://www.warpdive.xyz/share/01hz58ztjzh93jgngjtt581fyj/',
     image: 'alpine-latest.png'
-  },
-  {
-    id: 'node',
-    name: 'node:latest',
-    url: 'https://www.warpdive.xyz/share/01hz593s1qj1c1epghmnv66vdn/',
-    image: 'node-latest.png'
   },
   {
     id: 'postgres',

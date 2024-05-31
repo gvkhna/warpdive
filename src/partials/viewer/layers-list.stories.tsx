@@ -32,14 +32,14 @@ const layers = Array.from({length: 10}).map((_, index) => ({
 export const Default: Story = {
   render: () => (
     <div className='w-72'>
-      <LayersList>
+      {/* <LayersList>
         {layers.map((item) => (
           <LayerRow
             key={item.gid}
-            layer={item.layer}
+            layer={item.layer.}
           />
         ))}
-      </LayersList>
+      </LayersList> */}
     </div>
   )
 }

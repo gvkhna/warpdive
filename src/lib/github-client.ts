@@ -62,7 +62,6 @@ export async function verifyValidSession(astro: AstroGlobal): Promise<UserSessio
                 displayError: undefined,
                 redirect: astro.redirect('/session-expired')
               }
-              break
             case 'JwtTokenIssuedAt':
               displayError = new Error(`JWT Token verification failed: incorrect 'iat' claim`)
               break
@@ -129,7 +128,7 @@ export function githubNewOauthSigninUrl(astro: AstroGlobal) {
 
   setOauthStateCookie(randomState, astro)
 
-  const scopes = ['read:user']
+  const scopes = ['read:user', 'user:email']
 
   const authUrl = new URL('https://github.com/login/oauth/authorize')
 
@@ -189,6 +188,85 @@ export async function githubAuthNewSession(user: UserType, astro: AstroGlobal) {
   }
 }
 
+export async function encrypt(data: string, secret: string): Promise<string> {
+  const subtle = crypto.subtle
+  const encoder = new TextEncoder()
+
+  // Key derivation setup
+  const keyMaterial = await subtle.importKey('raw', encoder.encode(secret), {name: 'PBKDF2'}, false, ['deriveKey'])
+  const salt = crypto.getRandomValues(new Uint8Array(16))
+  const key = await subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-256'
+    },
+    keyMaterial,
+    {name: 'AES-GCM', length: 256},
+    false,
+    ['encrypt']
+  )
+
+  // Prepare IV and encrypt data
+  const iv = crypto.getRandomValues(new Uint8Array(12))
+  const encryptedData = await subtle.encrypt({name: 'AES-GCM', iv: iv}, key, encoder.encode(data))
+
+  // Base64 encode the encrypted data and IV
+  let binaryString = ''
+  const encryptedBytes = new Uint8Array(encryptedData)
+  for (const byte of encryptedBytes) {
+    binaryString += String.fromCharCode(byte)
+  }
+  const ciphertext = btoa(binaryString)
+
+  binaryString = ''
+  for (const byte of iv) {
+    binaryString += String.fromCharCode(byte)
+  }
+  const ivBase64 = btoa(binaryString)
+
+  return `${ivBase64}:${ciphertext}`
+}
+
+export async function decrypt(dataWithIV: string, secret: string): Promise<string> {
+  const subtle = crypto.subtle
+  const [ivBase64, ciphertext] = dataWithIV.split(':')
+  const decoder = new TextDecoder()
+
+  // Convert Base64 to ArrayBuffer for IV and ciphertext
+  const iv = new Uint8Array(
+    atob(ivBase64)
+      .split('')
+      .map((char) => char.charCodeAt(0))
+  )
+  const encryptedData = atob(ciphertext)
+    .split('')
+    .map((char) => char.charCodeAt(0))
+
+  // Key derivation setup
+  const encoder = new TextEncoder()
+  const keyMaterial = await subtle.importKey('raw', encoder.encode(secret), {name: 'PBKDF2'}, false, ['deriveKey'])
+  const salt = iv.slice(0, 16) // Reuse part of the IV as salt
+  const key = await subtle.deriveKey(
+    {
+      name: 'PBKDF2',
+      salt: salt,
+      iterations: 100000,
+      hash: 'SHA-256'
+    },
+    keyMaterial,
+    {name: 'AES-GCM', length: 256},
+    false,
+    ['decrypt']
+  )
+
+  // Decrypt data
+  const decryptedData = await subtle.decrypt({name: 'AES-GCM', iv: iv}, key, new Uint8Array(encryptedData))
+
+  return decoder.decode(decryptedData)
+}
+
 export async function githubAuthUser(userProfile: unknown, astro: AstroGlobal) {
   if (userProfile && typeof userProfile === 'object') {
     // continue only if they are a user
@@ -227,9 +305,15 @@ export async function githubAuthUser(userProfile: unknown, astro: AstroGlobal) {
             }
             return githubAuthNewSession(existingUser, astro)
           } else {
+            let emailValue: string | null = null
+            if ('email' in userProfile && typeof userProfile.email === 'string') {
+              const appSecret = getSecretAstro('APP_SECRET_KEY', astro)
+              emailValue = await encrypt(userProfile.email, appSecret)
+            }
             const newUserArr = await db
               .insert(schema.users)
               .values({
+                email: emailValue,
                 fullName: userProfile.name,
                 githubAvatarUrl: userProfile.avatar_url,
                 githubId: userProfile.id,

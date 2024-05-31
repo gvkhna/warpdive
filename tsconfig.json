@@ -4,17 +4,15 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "jsx": "react-jsx",
-    "module": "ESNext",
     "verbatimModuleSyntax": false,
     "allowSyntheticDefaultImports": true,
     "strictNullChecks": true,
-    "isolatedModules": true,
-    "target": "ESNext",
     "noUnusedLocals": false,
+    "types": ["@cloudflare/workers-types", "@types/jest"],
     "paths": {
       "@/*": ["src/*"]
     }
   },
-  "include": ["types.d.ts", "src/**/*.ts", "src/**/*.tsx", "src/**/*.astro", "scripts/**/*.ts", "test/**/*.ts"],
+  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.astro", "scripts/**/*.ts", "test/**/*.ts"],
   "exclude": ["node_modules"]
 }

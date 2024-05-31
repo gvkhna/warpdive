@@ -9,7 +9,7 @@
   },
   "scripts": {
     "astro": "astro",
-    "check": "tsc --noEmit && astro check",
+    "check": "eslint --quiet && tsc --noEmit && astro check --minimumSeverity error",
     "db:create": "wrangler d1 execute warpdive-dev-db --local --command 'SELECT NULL'",
     "db:destroy": "rm -rf .wrangler/state/v3/d1",
     "db:generate": "drizzle-kit generate",
@@ -139,7 +139,6 @@
     "@storybook/react-vite": "^8.1.1",
     "@storybook/test": "^8.1.1",
     "@types/jest": "^29.5.12",
-    "@types/node": "^20.12.12",
     "@typescript-eslint/eslint-plugin": "^7.9.0",
     "@typescript-eslint/parser": "^7.9.0",
     "autoprefixer": "^10.4.19",

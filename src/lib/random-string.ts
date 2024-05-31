@@ -1,3 +1,5 @@
+const {crypto} = globalThis
+
 export function randomString(bufferLength = 16): string {
   const arrayBuffer = crypto.getRandomValues(new Uint8Array(bufferLength))
   return Array.from(arrayBuffer)

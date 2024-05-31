@@ -12,7 +12,7 @@ export const users = sqliteTable(
     }),
     createdAt: text('created_at').default(sql`(CURRENT_TIMESTAMP)`),
     updatedAt: text('updated_at').default(sql`(CURRENT_TIMESTAMP)`),
-    // email: text('email').notNull(),
+    email: text('email'), // stored encrypted
     fullName: text('full_name'),
     githubId: integer('github_id', {mode: 'number'}),
     githubLogin: text('github_login'),

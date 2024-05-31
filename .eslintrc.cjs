@@ -11,6 +11,25 @@ module.exports = {
   ],
   plugins: ['@typescript-eslint', 'prettier', 'no-only-tests', 'react', 'react-hooks'],
   rules: {
+    'no-restricted-globals': [
+      'error',
+      {
+        name: 'parent',
+        message: 'Do not use window parent'
+      },
+      {
+        name: 'name',
+        message: 'Use local parameter instead.'
+      },
+      {
+        name: 'event',
+        message: 'Use local parameter instead.'
+      },
+      {
+        name: 'fdescribe',
+        message: 'Do not commit fdescribe. Use describe instead.'
+      }
+    ],
     'no-async-promise-executor': 'off',
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/camelcase': 'off',

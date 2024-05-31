@@ -2,6 +2,7 @@
 import GithubLogo from '@/icons/github-logo.astro'
 import TwitterLogo from '@/icons/twitter-logo.astro'
 import {siteConfig} from '@/strings'
+export const prerender = true
 export interface Props {
   class?: string
 }
@@ -18,13 +19,11 @@ const {class: cls} = Astro.props
         href='/'
         ><span class='inline-block font-bold'>warpdive</span></a
       ><nav class='flex items-center gap-4 text-sm lg:gap-6'>
-        {
-          /* <a
+        <a
           class='text-foreground/60 transition-colors hover:text-foreground/80'
           href='/docs'
           >Docs</a
-        > */
-        }
+        >
         {
           /* <a
           class='hidden text-foreground/60 transition-colors hover:text-foreground/80 lg:block'

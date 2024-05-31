@@ -11,4 +11,8 @@ export function getStaticPaths() {
 const {id} = Astro.params
 ---
 
-<ExamplePage exampleId={id} />
+<ExamplePage
+  exampleId={id}
+  title={`${id} | Warpdive`}
+  desc={`Browse the ${id} docker container layers`}
+/>
