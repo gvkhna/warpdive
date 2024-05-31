@@ -52,11 +52,11 @@ const pathname = Astro.url.pathname
           <div class='mb-4 flex items-center'>
             {
               Examples.map((item) => {
-                if (pathname === `/examples/${item.id}` || (item.default === true && pathname === '/')) {
+                if (pathname.startsWith(`/examples/${item.id}`) || (item.default === true && pathname === '/')) {
                   return (
                     <a
                       class='flex h-7 items-center justify-center rounded-full bg-muted px-4 text-center text-sm font-medium text-primary transition-colors hover:text-primary'
-                      href={`/examples/${item.id}`}
+                      href={`/examples/${item.id}/`}
                     >
                       {item.name}
                     </a>
@@ -65,7 +65,7 @@ const pathname = Astro.url.pathname
                   return (
                     <a
                       class='flex h-7 items-center justify-center rounded-full px-4 text-center text-sm text-muted-foreground transition-colors hover:text-primary'
-                      href={`/examples/${item.id}`}
+                      href={`/examples/${item.id}/`}
                     >
                       {item.name}
                     </a>
@@ -86,7 +86,7 @@ const pathname = Astro.url.pathname
       >
         <div class='group absolute hidden h-full w-full md:block'>
           <div
-            class='bg-black absolute left-[20px] top-[20px] flex items-center gap-x-2 rounded-md p-3 text-white opacity-0 shadow-md transition-opacity group-hover:opacity-100'
+            class='absolute left-[20px] top-[20px] flex items-center gap-x-2 rounded-md bg-black p-3 text-white opacity-0 shadow-md transition-opacity group-hover:opacity-100'
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
