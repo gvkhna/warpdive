@@ -1,7 +1,7 @@
 ---
 import ExamplePage from '@/partials/site/example-page.astro'
 import {Examples} from '@/partials/site/examples'
-
+export const prerender = true
 export function getStaticPaths() {
   return Examples.map((item) => {
     return {params: {id: item.id}}
