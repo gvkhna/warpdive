@@ -26,7 +26,7 @@ compatibility_date = "2024-05-19"
 
 [[env.production.d1_databases]]
 binding = "DB"
-database_id = "a4ccf0ab-f788-4883-9cc1-c76f0d949ec9"
+database_id = "47f35f3e-e407-4274-aa59-1eb5533d262c"
 database_name = "warpdive-db"
 migrations_dir = "./src/db/migrations"
 
