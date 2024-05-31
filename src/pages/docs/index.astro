@@ -2,7 +2,12 @@
 import SiteFooter from '@/partials/footer/site-footer.astro'
 import SiteHeader from '@/partials/header/site-header.astro'
 import MainLayout from '@/layouts/main-layout.astro'
-import P from '@/partials/docs/P.astro'
+import P from '@/partials/docs/paragraph.astro'
+import CmdBtn from '@/partials/docs/cmd-btn.astro'
+import Alert from '@/partials/docs/alert.astro'
+import CodeInline from '@/partials/docs/code-inline.astro'
+import H2 from '@/partials/docs/h2.astro'
+import H3 from '@/partials/docs/h3.astro'
 ---
 
 <MainLayout
@@ -92,97 +97,83 @@ import P from '@/partials/docs/P.astro'
                 </div>
                 <div class='pb-12 pt-8'>
                   <div class='mdx'>
-                    <P>
-                      This is <strong>NOT</strong> a component library. It's a collection of re-usable components that you
-                      can copy and paste into your apps.
-                    </P>
-                    <P>
-                      <strong>What do you mean by not a component library?</strong>
-                    </P>
-                    <P> I mean you do not install it as a dependency. It is not available or distributed via npm. </P>
-                    <P>
-                      Pick the components you need. Copy and paste the code into your project and customize to your
-                      needs. The code is yours.
-                    </P>
-                    <P>
-                      <em>Use this as a reference to build your own component libraries.</em>
-                    </P>
-                    <P>
-                      The <code class='relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm'
-                        >components.json</code
-                      > file holds configuration for your project.
-                    </P>
-                    <P>
-                      We use it to understand how your project is set up and how to generate components customized for
-                      your project.
-                    </P>
-                    <div
-                      role='alert'
-                      class='relative mt-6 w-full rounded-lg border bg-background px-4 py-3 text-sm text-foreground [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground [&>svg~*]:pl-7'
+                    <ol>
+                      <li>1. Create an API Key in your Settings.</li>
+                      <li>2. Log into warpdive-cli and paste your API Key when prompted</li>
+                    </ol>
+                    <CmdBtn
+                      cmd={'npx'}
+                      args={['warpdive', 'login']}
+                    />
+                    <ol>
+                      <li>You can then simply push images to your account</li>
+                    </ol>
+                    <CmdBtn
+                      cmd={'npx'}
+                      args={['warpdive', 'push', 'ubuntu:latest']}
+                    />
+                    <Alert>
+                      Note: You may need to pull the image you&rsquo;re trying to push to warpdive first. In this
+                      example: <CodeInline>docker pull ubuntu:latest</CodeInline>
+                      will fetch the image locally so it can be used.
+                    </Alert>
+                    <P
+                      >You can also target container images you're working on. For instance with a directory containing
+                      a <CodeInline>Dockerfile</CodeInline></P
                     >
-                      <div class='text-sm [&_p]:leading-relaxed'>
-                        <p class='leading-7 [&:not(:first-child)]:mt-6'>
-                          Note: The <code class='relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm'
-                            >components.json</code
-                          > file is optional and <strong>only required if you're using the CLI</strong> to add components
-                          to your project. If you're using the copy and paste method, you don't need this file.
-                        </p>
-                      </div>
-                    </div>
-                    <p class='leading-7 [&:not(:first-child)]:mt-6'>
-                      You can create a <code class='relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm'
-                        >components.json</code
-                      > file in your project by running the following command:
-                    </p>
-                    <div data-rehype-pretty-code-fragment=''>
-                      <pre
-                        class='mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-lg border bg-zinc-950 py-4 dark:bg-zinc-900'
-                        data-language='bash'
-                        data-theme='default'><code class="relative rounded bg-muted px-[0.3rem] py-[0.2rem] font-mono text-sm" data-language="bash" data-theme="default"><span class="line"><span style="color: rgb(255, 255, 255); font-weight: bold;">npx</span><span style="color: rgba(255, 255, 255, 0.533);"> shadcn-ui@latest</span><span style="color: rgba(255, 255, 255, 0.533);"> init</span></span></code></pre><button
-                        class='focus-visible:ring-1 focus-visible:ring-ring absolute right-4 top-4 z-10 inline-flex h-6 w-6 items-center justify-center whitespace-nowrap rounded-md text-sm font-medium text-zinc-50 transition-colors hover:bg-zinc-700 hover:text-zinc-50 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50'
-                        type='button'
-                        id='radix-:r39:'
-                        aria-haspopup='menu'
-                        aria-expanded='false'
-                        data-state='closed'
-                        ><svg
-                          xmlns='http://www.w3.org/2000/svg'
-                          width='24'
-                          height='24'
-                          viewBox='0 0 24 24'
-                          fill='none'
-                          stroke='currentColor'
-                          stroke-width='2'
-                          stroke-linecap='round'
-                          stroke-linejoin='round'
-                          class='lucide lucide-clipboard h-3 w-3'
-                          ><rect
-                            width='8'
-                            height='4'
-                            x='8'
-                            y='2'
-                            rx='1'
-                            ry='1'
-                          ></rect><path d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'
-                          ></path></svg
-                        ><span class='sr-only'>Copy</span></button
+                    <CmdBtn
+                      cmd={'npx'}
+                      args={['warpdive', 'build', '.', '--wd-project', 'example-image']}
+                    />
+                    <P> This will send the file warpdive generates to your account. </P>
+                    <P>Read the command line help to learn more</P>
+                    <CmdBtn
+                      cmd={'npx'}
+                      args={['warpdive', '-h']}
+                    />
+                    <P><i>Warpdive supports Docker and Podman</i></P>
+                    <H3>Local Export</H3>
+                    <P> You can also inspect containers completely offline. </P>
+                    <CmdBtn
+                      cmd={'npx'}
+                      args={['warpdive', 'export', '.', '--wd-export', 'example-image']}
+                    />
+                    <P>
+                      This will create a <CodeInline>.warpdive</CodeInline> file locally which you can inspect at <a
+                        href='https://www.warpdive.xyz/viewer'
+                        class='underline'
+                        >warpdive.xyz/viewer</a
+                      >. The file will be read in your browser and not be sent anywhere.
+                    </P>
+                    <H2><span class='font-mono'>.warpdive</span> File Format</H2>
+                    <P>
+                      Warpdive when &lsquo;building&rsquo; a container reads the layers and their contents in the
+                      container image.
+                    </P>
+                    <P>
+                      A <CodeInline><strong>.warpdive</strong></CodeInline> file is a snapshot of information, specifically,
+                      the file hierarchy in each layer, file sizes, permissions and metadata such as file names etc. It does
+                      not store the actual files that were added/removed, just the information about what files were added/removed.
+                    </P>
+                    <P>
+                      This makes warpdive suitable for CI. Where you want to know what happened during a build, why a
+                      layer isn't caching or what files are added/removed at each layer.
+                    </P>
+                    <P>
+                      To report any issues, please submit an issue at <a
+                        href='https://github.com/gvkhna/warpdive/issues'
+                        class='underline'
+                        >github.com/gvkhna/warpdive/issues</a
                       >
-                    </div>
-                    <p class='leading-7 [&:not(:first-child)]:mt-6'>
-                      See the <a
-                        class='font-medium underline underline-offset-4'
-                        href='/docs/cli'
-                        >CLI section</a
-                      > for more information.
-                    </p>
+                    </P>
                   </div>
                 </div>
               </div>
             </main>
           </div>
+          <SiteFooter />
         </div>
       </main>
-      <SiteFooter />
     </div>
   </div>
 </MainLayout>

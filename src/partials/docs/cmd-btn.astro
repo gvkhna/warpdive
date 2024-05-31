@@ -1,0 +1,31 @@
+---
+export interface Props {
+  cmd: string
+  args: string[]
+}
+const {cmd, args} = Astro.props
+---
+
+<div class='relative'>
+  <pre
+    class='mb-4 mt-6 max-h-[650px] overflow-x-auto whitespace-normal rounded-lg border bg-zinc-950 py-4 dark:bg-zinc-900'
+    data-language='bash'
+    data-theme='default'>
+    <code class='relative grid min-w-full break-words bg-transparent font-mono text-sm' data-language='bash' data-theme='default'>
+      <span class='whitespace-normal inline-block min-h-4 w-full px-4 py-[0.125rem]'>
+        <span class='font-bold text-white' set:html={cmd} />
+        {args.map((arg, index) => (
+          <span style={{
+              color: 'rgba(255, 255, 255, 0.95)'
+            }} set:html={` ${arg}`} />
+        ))}
+      </span>
+    </code>
+  </pre>
+  {
+    /* <CopyButton
+    value={`${props.cmd} ${props.args.join(' ')}`}
+    class='absolute right-4 top-4'
+  /> */
+  }
+</div>
