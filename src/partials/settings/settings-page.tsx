@@ -40,7 +40,7 @@ export function SettingsPage(props: SettingsPageProps) {
   const {data, error, isLoading} = useSWR(key, fetcher)
 
   return (
-    <>
+    <div className='container'>
       <div className='block space-y-6 p-10 pb-16'>
         <div className='space-y-0.5'>
           <h2 className='text-2xl font-bold tracking-tight'>Settings</h2>
@@ -60,6 +60,6 @@ export function SettingsPage(props: SettingsPageProps) {
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }

@@ -24,7 +24,7 @@ if (import.meta.env.DEV && path === 'signin') {
 
   const res = await db.query.users.findFirst()
   if (res) {
-    return await githubAuthNewSession(res, Astro)
+    return await githubAuthNewSession(res, Astro.locals, Astro.cookies)
   } else {
     throw new Error('Run pnpm db:seed to generate a test user')
   }

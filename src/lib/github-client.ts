@@ -1,4 +1,4 @@
-import {AstroCookies, AstroGlobal} from 'astro'
+import {AstroCookies} from 'astro'
 import {drizzle} from 'drizzle-orm/d1'
 import {eq} from 'drizzle-orm'
 import * as schema from '@/db/schema'

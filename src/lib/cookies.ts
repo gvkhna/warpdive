@@ -1,5 +1,5 @@
 import {addDays, addHours, addMinutes} from 'date-fns'
-import type {AstroCookies, AstroGlobal} from 'astro'
+import type {AstroCookies} from 'astro'
 
 const {PUBLIC_WEB_HOSTNAME} = import.meta.env
 
@@ -43,8 +43,8 @@ export function deleteUserProfileCookie(astroCookies: Readonly<AstroCookies>) {
   })
 }
 
-export function getUserProfileCookie(astro: AstroGlobal): UserProfile | undefined {
-  const str = astro.cookies.get(USER_PROFILE_COOKIE_NAME)?.value
+export function getUserProfileCookie(astroCookies: Readonly<AstroCookies>): UserProfile | undefined {
+  const str = astroCookies.get(USER_PROFILE_COOKIE_NAME)?.value
   if (typeof str === 'string' && str) {
     try {
       return JSON.parse(str) as UserProfile
