@@ -203,26 +203,21 @@ export async function githubAuthNewSession(user: UserType, locals: App.Locals, a
 export async function encrypt(data: string, secret: string): Promise<string> {
   const subtle = crypto.subtle
   const encoder = new TextEncoder()
-
-  // Key derivation setup
-  const keyMaterial = await subtle.importKey('raw', encoder.encode(secret), {name: 'PBKDF2'}, false, ['deriveKey'])
-  const salt = crypto.getRandomValues(new Uint8Array(16))
-  const key = await subtle.deriveKey(
+  const key = secret.substring(0, 32)
+  const keyMaterial = await subtle.importKey(
+    'raw',
+    encoder.encode(key),
     {
-      name: 'PBKDF2',
-      salt: salt,
-      iterations: 100000,
-      hash: 'SHA-256'
+      name: 'AES-GCM',
+      length: 256
     },
-    keyMaterial,
-    {name: 'AES-GCM', length: 256},
     false,
     ['encrypt']
   )
 
   // Prepare IV and encrypt data
   const iv = crypto.getRandomValues(new Uint8Array(12))
-  const encryptedData = await subtle.encrypt({name: 'AES-GCM', iv: iv}, key, encoder.encode(data))
+  const encryptedData = await subtle.encrypt({name: 'AES-GCM', iv: iv}, keyMaterial, encoder.encode(data))
 
   // Base64 encode the encrypted data and IV
   let binaryString = ''
@@ -244,38 +239,32 @@ export async function encrypt(data: string, secret: string): Promise<string> {
 export async function decrypt(dataWithIV: string, secret: string): Promise<string> {
   const subtle = crypto.subtle
   const [ivBase64, ciphertext] = dataWithIV.split(':')
-  const decoder = new TextDecoder()
-
-  // Convert Base64 to ArrayBuffer for IV and ciphertext
   const iv = new Uint8Array(
     atob(ivBase64)
       .split('')
       .map((char) => char.charCodeAt(0))
   )
-  const encryptedData = atob(ciphertext)
-    .split('')
-    .map((char) => char.charCodeAt(0))
+  const encryptedData = new Uint8Array(
+    atob(ciphertext)
+      .split('')
+      .map((char) => char.charCodeAt(0))
+  )
 
-  // Key derivation setup
   const encoder = new TextEncoder()
-  const keyMaterial = await subtle.importKey('raw', encoder.encode(secret), {name: 'PBKDF2'}, false, ['deriveKey'])
-  const salt = iv.slice(0, 16) // Reuse part of the IV as salt
-  const key = await subtle.deriveKey(
+  const key = secret.substring(0, 32)
+  const keyMaterial = await subtle.importKey(
+    'raw',
+    encoder.encode(key),
     {
-      name: 'PBKDF2',
-      salt: salt,
-      iterations: 100000,
-      hash: 'SHA-256'
+      name: 'AES-GCM',
+      length: 256
     },
-    keyMaterial,
-    {name: 'AES-GCM', length: 256},
     false,
     ['decrypt']
   )
 
-  // Decrypt data
-  const decryptedData = await subtle.decrypt({name: 'AES-GCM', iv: iv}, key, new Uint8Array(encryptedData))
-
+  const decryptedData = await subtle.decrypt({name: 'AES-GCM', iv: iv}, keyMaterial, encryptedData)
+  const decoder = new TextDecoder()
   return decoder.decode(decryptedData)
 }
 
