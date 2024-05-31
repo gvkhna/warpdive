@@ -4,7 +4,7 @@ import CircleLoader from '@/components/circle-loader.astro'
 import {signoutSession} from '@/lib/github-client'
 export const prerender = false
 
-await signoutSession(Astro)
+await signoutSession(Astro.locals, Astro.cookies)
 ---
 
 <AuthLayout title='Expired'>
@@ -20,13 +20,13 @@ await signoutSession(Astro)
       </div>
       <div class='mt-3 text-center sm:mt-5'>
         <h3
-          class='text-lg font-medium leading-6 text-gray-900'
+          class='text-gray-900 text-lg font-medium leading-6'
           id='modal-headline'
         >
           Session Expired
         </h3>
         <div class='mt-2'>
-          <p class='text-sm text-gray-600'>You are unauthenticated or your session expired. Redirecting to Signin...</p>
+          <p class='text-gray-600 text-sm'>You are unauthenticated or your session expired. Redirecting to Signin...</p>
         </div>
       </div>
     </div>

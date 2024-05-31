@@ -3,9 +3,9 @@
 import {AstroGlobal} from 'astro'
 import {Context} from 'hono'
 
-export function getSecretAstro(key: string, astro: AstroGlobal) {
+export function getSecretAstro(key: string, locals: App.Locals) {
   const importMetaEnv = import.meta.env
-  const astroLocalRuntimeEnv = astro.locals.runtime.env
+  const astroLocalRuntimeEnv = locals.runtime.env
 
   if (importMetaEnv[key]) {
     return importMetaEnv[key]

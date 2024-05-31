@@ -1,4 +1,4 @@
-import {AstroGlobal} from 'astro'
+import {AstroCookies, AstroGlobal} from 'astro'
 import {drizzle} from 'drizzle-orm/d1'
 import {eq} from 'drizzle-orm'
 import * as schema from '@/db/schema'
@@ -24,24 +24,36 @@ interface UserSession {
   redirect: Response | undefined
 }
 
-export async function verifyValidSession(astro: AstroGlobal): Promise<UserSession> {
+function redirect(path: string) {
+  return new Response(null, {
+    status: 302,
+    headers: {
+      Location: path
+    }
+  })
+}
+
+export async function verifyValidSession(
+  locals: App.Locals,
+  astroCookies: Readonly<AstroCookies>
+): Promise<UserSession> {
   let displayError: Error | undefined = undefined
-  const userAuthCookie = getUserAuthCookie(astro)
+  const userAuthCookie = getUserAuthCookie(astroCookies)
 
   if (userAuthCookie) {
-    const db = drizzle(astro.locals.runtime.env.DB, {schema})
+    const db = drizzle(locals.runtime.env.DB, {schema})
     const result = await db.query.userSessions.findFirst({
       where: eq(schema.userSessions.sessionToken, userAuthCookie)
     })
     if (result) {
       try {
         // verify session token
-        const appSecret = getSecretAstro('APP_SECRET_KEY', astro)
+        const appSecret = getSecretAstro('APP_SECRET_KEY', locals)
         const decodedPayload = await verify(userAuthCookie, appSecret, 'HS256')
         return {
           valid: true,
           displayError: undefined,
-          redirect: astro.redirect('/app/')
+          redirect: redirect('/app/')
         }
       } catch (verifyError) {
         if (verifyError instanceof Error) {
@@ -60,7 +72,7 @@ export async function verifyValidSession(astro: AstroGlobal): Promise<UserSessio
               return {
                 valid: false,
                 displayError: undefined,
-                redirect: astro.redirect('/session-expired')
+                redirect: redirect('/session-expired')
               }
             case 'JwtTokenIssuedAt':
               displayError = new Error(`JWT Token verification failed: incorrect 'iat' claim`)
@@ -72,19 +84,19 @@ export async function verifyValidSession(astro: AstroGlobal): Promise<UserSessio
               displayError = new Error(`Encountered Unknown Error: ${verifyError}`)
               break
           }
-          setFlashCookie(displayError.message, astro)
+          setFlashCookie(displayError.message, astroCookies)
           return {
             valid: false,
             displayError: displayError,
-            redirect: astro.redirect('/session-error')
+            redirect: redirect('/session-error')
           }
         } else {
           displayError = new Error(`Encountered Unknown Error: ${verifyError}`)
-          setFlashCookie(displayError.message, astro)
+          setFlashCookie(displayError.message, astroCookies)
           return {
             valid: false,
             displayError: displayError,
-            redirect: astro.redirect('/session-error')
+            redirect: redirect('/session-error')
           }
         }
       }
@@ -93,7 +105,7 @@ export async function verifyValidSession(astro: AstroGlobal): Promise<UserSessio
       return {
         valid: false,
         displayError: displayError,
-        redirect: astro.redirect('/session-error')
+        redirect: redirect('/session-error')
       }
     }
   } else {
@@ -101,17 +113,17 @@ export async function verifyValidSession(astro: AstroGlobal): Promise<UserSessio
     return {
       valid: false,
       displayError: displayError,
-      redirect: astro.redirect('/signin')
+      redirect: redirect('/signin')
     }
   }
 }
 
-export async function signoutSession(astro: AstroGlobal) {
-  const userAuthCookie = getUserAuthCookie(astro)
+export async function signoutSession(locals: App.Locals, astroCookies: Readonly<AstroCookies>) {
+  const userAuthCookie = getUserAuthCookie(astroCookies)
 
   if (userAuthCookie) {
     try {
-      const db = drizzle(astro.locals.runtime.env.DB, {schema})
+      const db = drizzle(locals.runtime.env.DB, {schema})
       const result = await db.delete(schema.userSessions).where(eq(schema.userSessions.sessionToken, userAuthCookie))
 
       console.log('signout res: ', result)
@@ -120,13 +132,13 @@ export async function signoutSession(astro: AstroGlobal) {
     }
   }
 
-  deleteAllCookies(astro)
+  deleteAllCookies(astroCookies)
 }
 
-export function githubNewOauthSigninUrl(astro: AstroGlobal) {
+export function githubNewOauthSigninUrl(astroCookies: Readonly<AstroCookies>) {
   const randomState = randomString()
 
-  setOauthStateCookie(randomState, astro)
+  setOauthStateCookie(randomState, astroCookies)
 
   const scopes = ['read:user', 'user:email']
 
@@ -146,7 +158,7 @@ export function githubNewOauthSigninUrl(astro: AstroGlobal) {
 
 type UserType = typeof schema.users.$inferSelect
 
-export async function githubAuthNewSession(user: UserType, astro: AstroGlobal) {
+export async function githubAuthNewSession(user: UserType, locals: App.Locals, astroCookies: Readonly<AstroCookies>) {
   const exp = addDays(new Date(), 30).valueOf() // 30 days
   // const exp = Math.floor(Date.now() / 1000) + 60 * 1 // 1 minute for testing
   const payload = {
@@ -155,11 +167,11 @@ export async function githubAuthNewSession(user: UserType, astro: AstroGlobal) {
     exp: exp
   }
 
-  const appSecretKey = getSecretAstro('APP_SECRET_KEY', astro)
+  const appSecretKey = getSecretAstro('APP_SECRET_KEY', locals)
 
   const token = await sign(payload, appSecretKey, 'HS256')
 
-  const db = drizzle(astro.locals.runtime.env.DB, {schema})
+  const db = drizzle(locals.runtime.env.DB, {schema})
 
   const insertedUserSession = await db
     .insert(schema.userSessions)
@@ -172,7 +184,7 @@ export async function githubAuthNewSession(user: UserType, astro: AstroGlobal) {
     .returning()
 
   if (insertedUserSession.length === 1) {
-    setUserAuthCookie(token, astro)
+    setUserAuthCookie(token, astroCookies)
     setUserProfileCookie(
       {
         githubAvatarUrl: user.githubAvatarUrl,
@@ -180,9 +192,9 @@ export async function githubAuthNewSession(user: UserType, astro: AstroGlobal) {
         fullName: user.fullName,
         pid: user.pid
       },
-      astro
+      astroCookies
     )
-    return astro.redirect('/app/')
+    return redirect('/app/')
   } else {
     throw new Error('Encountered duplicate authentication token')
   }
@@ -267,13 +279,13 @@ export async function decrypt(dataWithIV: string, secret: string): Promise<strin
   return decoder.decode(decryptedData)
 }
 
-export async function githubAuthUser(userProfile: unknown, astro: AstroGlobal) {
+export async function githubAuthUser(userProfile: unknown, locals: App.Locals, astroCookies: Readonly<AstroCookies>) {
   if (userProfile && typeof userProfile === 'object') {
     // continue only if they are a user
     if ('type' in userProfile && userProfile.type === 'User') {
       if ('id' in userProfile && typeof userProfile.id === 'number') {
         const githubId = userProfile.id
-        const db = drizzle(astro.locals.runtime.env.DB, {schema})
+        const db = drizzle(locals.runtime.env.DB, {schema})
         if (
           'avatar_url' in userProfile &&
           typeof userProfile.avatar_url === 'string' &&
@@ -303,11 +315,11 @@ export async function githubAuthUser(userProfile: unknown, astro: AstroGlobal) {
                 throw new Error('Unable to update user')
               }
             }
-            return githubAuthNewSession(existingUser, astro)
+            return githubAuthNewSession(existingUser, locals, astroCookies)
           } else {
             let emailValue: string | null = null
             if ('email' in userProfile && typeof userProfile.email === 'string') {
-              const appSecret = getSecretAstro('APP_SECRET_KEY', astro)
+              const appSecret = getSecretAstro('APP_SECRET_KEY', locals)
               emailValue = await encrypt(userProfile.email, appSecret)
             }
             const newUserArr = await db
@@ -322,7 +334,7 @@ export async function githubAuthUser(userProfile: unknown, astro: AstroGlobal) {
               .returning()
             if (newUserArr.length === 1) {
               const newUser = newUserArr[0]
-              return githubAuthNewSession(newUser, astro)
+              return githubAuthNewSession(newUser, locals, astroCookies)
             } else {
               throw new Error('Invalid data returned from user creation')
             }
@@ -339,8 +351,8 @@ export async function githubAuthUser(userProfile: unknown, astro: AstroGlobal) {
   }
 }
 
-export async function fetchGithubUserAccessToken(githubCode: string, astro: AstroGlobal) {
-  const clientSecret = getSecretAstro('GITHUB_CLIENT_SECRET', astro)
+export async function fetchGithubUserAccessToken(githubCode: string, locals: App.Locals) {
+  const clientSecret = getSecretAstro('GITHUB_CLIENT_SECRET', locals)
 
   const params = new URLSearchParams()
   params.append('client_id', PUBLIC_GITHUB_CLIENT_ID)

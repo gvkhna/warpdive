@@ -1,16 +1,19 @@
 ---
 import AuthLayout from '../layouts/auth-layout.astro'
 import AlertFlash from '@/components/alert-flash.astro'
+import {deleteUserAuthCookie, deleteUserProfileCookie} from '@/lib/cookies'
 import {verifyValidSession, githubNewOauthSigninUrl} from '@/lib/github-client'
 
 export const prerender = false
 
-const existingSession = await verifyValidSession(Astro)
+const existingSession = await verifyValidSession(Astro.locals, Astro.cookies)
 if (existingSession.valid && existingSession.redirect) {
   return existingSession.redirect
 }
+deleteUserAuthCookie(Astro.cookies)
+deleteUserProfileCookie(Astro.cookies)
 const displayError = existingSession.displayError
-const authLink = githubNewOauthSigninUrl(Astro)
+const authLink = githubNewOauthSigninUrl(Astro.cookies)
 ---
 
 <AuthLayout

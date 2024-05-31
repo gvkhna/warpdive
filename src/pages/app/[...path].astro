@@ -7,7 +7,7 @@ import {verifyValidSession} from '@/lib/github-client'
 
 export const prerender = false
 
-const existingSession = await verifyValidSession(Astro)
+const existingSession = await verifyValidSession(Astro.locals, Astro.cookies)
 if (!existingSession.valid && existingSession.redirect) {
   return existingSession.redirect
 }

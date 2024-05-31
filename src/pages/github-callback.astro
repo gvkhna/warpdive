@@ -4,7 +4,7 @@ import {deleteOauthStateCookie, getOauthStateCookie} from '@/lib/cookies'
 import {fetchGithubUserProfile, fetchGithubUserAccessToken, githubAuthUser} from '@/lib/github-client'
 
 export const prerender = false
-const oauthState = getOauthStateCookie(Astro)
+const oauthState = getOauthStateCookie(Astro.cookies)
 
 const githubCode = Astro.url.searchParams.get('code')
 const githubState = Astro.url.searchParams.get('state')
@@ -13,7 +13,7 @@ let displayError: Error | undefined = undefined
 
 if (oauthState && githubState && oauthState === githubState && githubCode) {
   try {
-    const accessTokenResp = await fetchGithubUserAccessToken(githubCode, Astro)
+    const accessTokenResp = await fetchGithubUserAccessToken(githubCode, Astro.locals)
     console.log(accessTokenResp)
     const accessToken = accessTokenResp && accessTokenResp['access_token']
     if (accessToken) {
@@ -21,7 +21,7 @@ if (oauthState && githubState && oauthState === githubState && githubCode) {
         const userProfile = await fetchGithubUserProfile(accessToken)
         if (userProfile) {
           try {
-            const res = await githubAuthUser(userProfile, Astro)
+            const res = await githubAuthUser(userProfile, Astro.locals, Astro.cookies)
             console.log('res: ', res)
             return res
           } catch (authError) {
@@ -55,7 +55,7 @@ if (oauthState && githubState && oauthState === githubState && githubCode) {
   displayError = new Error('Invalid response from Github, please try again.')
 }
 
-deleteOauthStateCookie(Astro)
+deleteOauthStateCookie(Astro.cookies)
 ---
 
 <MainLayout title='Oauth Login'>

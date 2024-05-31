@@ -1,7 +1,7 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "206a3c30-67f7-4624-868f-1ca6467d0f86",
+  "id": "8ee6a991-2bf8-4fa9-a67e-b41a1df6b756",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "api_keys": {
@@ -145,6 +145,14 @@
           "notNull": false,
           "autoincrement": false
         },
+        "public": {
+          "name": "public",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "autoincrement": false,
+          "default": false
+        },
         "release_url": {
           "name": "release_url",
           "type": "text",
@@ -177,7 +185,7 @@
           "name": "object_path",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "autoincrement": false
         },
         "created_at": {
@@ -453,6 +461,13 @@
           "notNull": false,
           "autoincrement": false,
           "default": "(CURRENT_TIMESTAMP)"
+        },
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "full_name": {
           "name": "full_name",
