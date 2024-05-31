@@ -14,7 +14,8 @@ async function main() {
     viewport: {
       width: 1280,
       height: 727
-    }
+    },
+    deviceScaleFactor: 3
   })
 
   // Navigate to a URL
@@ -26,17 +27,31 @@ async function main() {
     output: process.stdout
   })
 
-  console.log('Press ENTER to take a screenshot...')
+  console.log('Press ENTER to take a screenshot, or CTRL+C to exit.')
 
-  // Wait for user input
-  rl.on('line', async () => {
+  // Function to handle screenshot taking
+  async function takeScreenshot() {
     // Take screenshot on user input
     await page.screenshot({path: 'screenshot.tmp.png'})
     console.log('Screenshot saved as screenshot.tmp.png')
+    console.log('Press ENTER to take another screenshot, or CTRL+C to exit.')
+  }
 
-    // Cleanup
+  // Wait for user input
+  rl.on('line', async () => {
+    await takeScreenshot()
+  })
+
+  // Setup listener for close event to clean up browser
+  rl.on('close', async () => {
+    console.log('Exiting...')
     await browser.close()
-    rl.close()
+    process.exit(0)
+  })
+
+  // Handle Ctrl+C gracefully
+  process.on('SIGINT', () => {
+    rl.close() // This triggers the 'close' event handler
   })
 }
 

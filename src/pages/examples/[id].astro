@@ -1,0 +1,14 @@
+---
+import ExamplePage from '@/partials/site/example-page.astro'
+import {Examples} from '@/partials/site/examples'
+
+export function getStaticPaths() {
+  return Examples.map((item) => {
+    return {params: {id: item.id}}
+  })
+}
+
+const {id} = Astro.params
+---
+
+<ExamplePage exampleId={id} />
