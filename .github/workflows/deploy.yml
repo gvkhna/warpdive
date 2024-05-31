@@ -27,14 +27,17 @@ jobs:
       - name: Build with Astro
         working-directory: ${{ env.BUILD_PATH }}
         env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_PROJECT_NAME: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLIC_GITHUB_CLIENT_ID: ${{ vars.PUBLIC_GITHUB_CLIENT_ID }}
           PUBLIC_WEB_HOSTNAME: ${{ vars.PUBLIC_WEB_HOSTNAME }}
         run: |
           pnpm run proto
           pnpm astro build
+      - name: Deploy to Cloudflare
+        working-directory: ${{ env.BUILD_PATH }}
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_PROJECT_NAME: ${{ vars.CLOUDFLARE_PROJECT_NAME }}
+        run: |
           pnpm wrangler d1 migrations apply warpdive-db --remote --env production
           pnpm wrangler pages deploy ${{ env.BUILD_PATH }}/dist --project-name ${{ env.CLOUDFLARE_PROJECT_NAME}}
