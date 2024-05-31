@@ -86,7 +86,7 @@ const pathname = Astro.url.pathname
       >
         <div class='group absolute hidden h-full w-full md:block'>
           <div
-            class='absolute left-[20px] top-[20px] flex items-center gap-x-2 rounded-md bg-black p-3 text-white opacity-0 shadow-md transition-opacity group-hover:opacity-100'
+            class='absolute left-[20px] top-[20px] flex items-center gap-x-2 rounded-md bg-black p-3 text-white opacity-0 shadow-md transition-opacity group-hover:opacity-70'
           >
             <svg
               xmlns='http://www.w3.org/2000/svg'
@@ -98,11 +98,10 @@ const pathname = Astro.url.pathname
               stroke-width='2'
               stroke-linecap='round'
               stroke-linejoin='round'
-              class='lucide lucide-link'
-              ><path d='M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71'></path><path
-                d='M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71'></path></svg
+              class='lucide lucide-square-arrow-out-up-right'
+              ><path d='M21 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6'></path><path d='m21 3-9 9'
+              ></path><path d='M15 3h6v6'></path></svg
             >
-            <span>Click to open</span>
           </div>
         </div>
         {
