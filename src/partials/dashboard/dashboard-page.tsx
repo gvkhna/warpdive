@@ -47,7 +47,7 @@ export function DashboardPage(props: DashboardPageProps) {
 
   console.log('data: ', data)
 
-  if (error) return <div>failed to load</div>
+  if (error) return <div>failed to load {error.toString()}</div>
   if (isLoading) return <div></div>
   return (
     <div className='border-b'>

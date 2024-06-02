@@ -10,8 +10,6 @@ const existingSession = await verifyValidSession(Astro.locals, Astro.cookies)
 if (existingSession.valid && existingSession.redirect) {
   return existingSession.redirect
 }
-deleteUserAuthCookie(Astro.cookies)
-deleteUserProfileCookie(Astro.cookies)
 const displayError = existingSession.displayError
 const authLink = githubNewOauthSigninUrl(Astro.cookies)
 ---
